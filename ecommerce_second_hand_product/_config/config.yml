@@ -1,0 +1,21 @@
+---
+Name: ecommerce_second_hand_product
+Before: 'mysite/*'
+After: 'framework/*','cms/*','ecommerce/*'
+---
+
+SecondHandProductGroup:
+  base_buyable_class: SecondHandProduct
+
+EcommerceDBConfig:
+  extensions:
+    - SecondHandEcommerceConfigExtension
+
+---
+Only:
+  moduleexists: 'grouped-cms-menu'
+---
+LeftAndMain:
+  menu_groups:
+    Shop:
+      - SecondHandProductAdmin
