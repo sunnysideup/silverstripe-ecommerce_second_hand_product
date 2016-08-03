@@ -8,6 +8,8 @@ class SecondHandProductGroup extends ProductGroup
         'SecondHandProductGroup',
         'SecondHandProduct'
     );
+    
+    private static $icon = 'ecommerce_second_hand_product/images/treeicons/SecondHandProductGroup';
 
     /**
      * Standard SS variable.
