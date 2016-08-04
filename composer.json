@@ -22,7 +22,7 @@
 	],
 	"require":{
 		"silverstripe/framework": "^3.4",
-		"silverstripe/ecommerce": "dev-master"
+		"sunnysideup/ecommerce": "dev-master"
 	},
 	"extra": {
 		"installer-name": "ecommerce_second_hand_product"
