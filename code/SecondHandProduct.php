@@ -100,7 +100,12 @@ class SecondHandProduct extends Product implements PermissionProvider {
      * @return Boolean
      */
     public function canDelete($member = null) {
-        return false;
+        return true;
+    }
+
+    public function onBeforeDelete() {
+        parent::onBeforeDelete();
+        SecondHandArchive::create_from_page($this);
     }
 
     /**

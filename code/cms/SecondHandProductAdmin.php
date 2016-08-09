@@ -18,7 +18,8 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass {
     private static $menu_title = 'Second Hand';
 
     private static $managed_models = array(
-        'SecondHandProduct'
+        'SecondHandProduct',
+        'SecondHandArchive'
     );
 
     private static $allowed_actions = array(
