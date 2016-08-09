@@ -10,11 +10,12 @@ class SecondHandArchive extends DataObject
         'ProductQuality' => 'ENUM("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
         'IncludesBoxOrCase' => 'ENUM("No, Box, Case, Both","No")',
         'OriginalManual' => 'Boolean',
-        'SerialNumber' => 'VarChar(50)'
+        'SerialNumber' => 'VarChar(50)',
         'PageID' => 'Int'
     );
 
-    private static function create_from_page($page) {
+    private static function create_from_page($page)
+    {
         $filter = array(
             'PageID' => $page->ID
         );
@@ -36,17 +37,21 @@ class SecondHandArchive extends DataObject
 
 
     private static $singular_name = 'Archived Second Hand Product';
-        function i18n_singular_name() { return self::$singular_name;}
-    private static $plural_name = 'Archived Second Hand Products';
-        function i18n_plural_name() { return self::$plural_name;}
 
-    private static $casting;
+    function i18n_singular_name() { return self::$singular_name;}
+
+    private static $plural_name = 'Archived Second Hand Products';
+
+    function i18n_plural_name() { return self::$plural_name;}
+
     private static $indexes = array(
-        'PageID' => 'Int'
+        'PageID' => true
     );
-    private static $default_sort => array(
+
+    private static $default_sort = array(
         'Title' => 'ASC'
     );
+
     private static $summary_fields = array(
         'Title' => 'Title',
         'Price' => 'Sale Price',
