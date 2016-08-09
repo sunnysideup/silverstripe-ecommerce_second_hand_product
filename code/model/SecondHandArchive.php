@@ -14,7 +14,7 @@ class SecondHandArchive extends DataObject
         'PageID' => 'Int'
     );
 
-    private static create_from_page($page) {
+    private static function create_from_page($page) {
         $filter = array(
             'PageID' => $page->ID
         );
