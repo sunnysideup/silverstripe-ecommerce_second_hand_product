@@ -6,6 +6,7 @@ class SecondHandArchive extends DataObject
     private static $db = array(
         'Title' => 'Varchar(255)',
         'Price' => 'Currency',
+        'InternalItemID' => 'Varchar(50)',
         'PurchasePrice' => 'Currency',
         'ProductQuality' => 'ENUM("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
         'IncludesBoxOrCase' => 'ENUM("No, Box, Case, Both","No")',
@@ -26,6 +27,7 @@ class SecondHandArchive extends DataObject
         }
         $obj->Title = $page->Title;
         $obj->Price = $page->Price;
+        $obj->InternalItemID = $page->InternalItemID;
         $obj->PurchasePrice = $page->PurchasePrice;
         $obj->ProductQuality = $page->ProductQuality;
         $obj->IncludesBoxOrCase = $page->IncludesBoxOrCase;
@@ -45,7 +47,8 @@ class SecondHandArchive extends DataObject
     function i18n_plural_name() { return self::$plural_name;}
 
     private static $indexes = array(
-        'PageID' => true
+        'PageID' => true,
+        'InternalItemID' => true
     );
 
     private static $default_sort = array(
@@ -55,7 +58,8 @@ class SecondHandArchive extends DataObject
     private static $summary_fields = array(
         'Title' => 'Title',
         'Price' => 'Sale Price',
-        'PurchasePrice' => 'Purcahse Price',
+        'InternalItemID' => 'Code',
+        'PurchasePrice' => 'Purchase Price',
         'ProductQuality' => 'Quality',
         'IncludesBoxOrCase' => 'Includes',
         'OriginalManual.Nice' => 'Has Manual',
@@ -65,6 +69,7 @@ class SecondHandArchive extends DataObject
     private static $field_labels = array(
         'Title' => 'Title',
         'Price' => 'Sale Price',
+        'InternalItemID' => 'Code',
         'PurchasePrice' => 'Purcahse Price',
         'ProductQuality' => 'Quality',
         'IncludesBoxOrCase' => 'Includes',
@@ -75,6 +80,7 @@ class SecondHandArchive extends DataObject
     private static $searchable_fields = array(
         'Title' => 'PartialMatchFilter',
         'Price' => 'ExactMatchFilter',
+        'InternalItemID' => 'PartialMatchFilter',
         'PurchasePrice' => 'ExactMatchFilter',
         'ProductQuality' => 'ExactMatchFilter',
         'IncludesBoxOrCase' => 'ExactMatchFilter',
