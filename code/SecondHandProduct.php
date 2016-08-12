@@ -21,6 +21,10 @@ class SecondHandProduct extends Product implements PermissionProvider {
         'ShowInMenus' => false
     );
 
+    private static $indexes = array(
+        'SerialNumber' => true
+    );
+
     private static $second_hand_admin_group_code = 'second-hand-managers';
 
     private static $second_hand_admin_group_name = 'Second Hand Product Managers';
