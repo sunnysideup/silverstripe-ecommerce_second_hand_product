@@ -27,7 +27,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
             'Title',
             'SerialNumber',
             'ProductQuality',
-            'Price'
+            'Price',
             'Created'
         )
     );
