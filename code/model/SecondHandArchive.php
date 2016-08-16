@@ -17,17 +17,23 @@ class SecondHandArchive extends DataObject
 
     public static function create_from_page($page)
     {
-        $filter = array(
-            'PageID' => $page->ID
-        );
-        if(SecondHandArchive::get()->filter($filter)->count()) {
-            $obj = SecondHandArchive::get()->filter($filter)->first();
+        if($page->InternalItemID) {
+            $filter = array(
+                'InternalItemID' => $page->InternalItemID
+            );
         } else {
+            $filter = array(
+                'PageID' => $page->ID
+            );
+        }
+        $obj = SecondHandArchive::get()->filter($filter)->first()
+        if( ! $obj) {
             $obj = SecondHandArchive::create($filter);
         }
         $obj->Title = $page->Title;
         $obj->Price = $page->Price;
         $obj->InternalItemID = $page->InternalItemID;
+        $obj->PageID = $page->ID;
         $obj->PurchasePrice = $page->PurchasePrice;
         $obj->ProductQuality = $page->ProductQuality;
         $obj->IncludesBoxOrCase = $page->IncludesBoxOrCase;
