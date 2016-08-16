@@ -22,7 +22,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     );
 
     private static $indexes = array(
-        'SerialNumber' => true
+        'SerialNumber' => true,
         'UniqueCode' => array(
             'Title',
             'SerialNumber',
