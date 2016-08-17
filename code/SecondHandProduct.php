@@ -310,5 +310,46 @@ class SecondHandProduct extends Product implements PermissionProvider {
 
 class SecondHandProduct_Controller extends Product_Controller {
 
+    private static $allowed_actions = array(
+        'printview' => true
+    );
+
+    function printview()
+    {
+        return $this->renderWith('SecondHandProduct_printview');
+    }
+
+    function ListOfFieldsForPrinting()
+    {
+        $al = ArrayList::create();
+        $fieldsWeNeed = array(
+            'InternalItemID' => 'Code',
+            'PurchasePrice' => 'Bought from customer: ',
+            'Price' => 'We are selling for',
+            "ProductQuality" => 'Product Quality',
+            "IncludesBoxOrCase" => 'Included',
+            "OriginalManual" => 'Original Manual',
+            "SerialNumber" => 'Serial Number'
+        );
+        $fields = $this->dataRecord->db();
+        foreach($fieldsWeNeed as $key => $description) {
+            $type = preg_replace('/\(.*\)/', '', $fields[$key]);
+            $dbField = DBField::create_field($type, $this->Key);
+            if($dbField->hasMethod('Nice')) {
+                $value = $dbField->Nice();
+            } else {
+                $value = $dbField->Raw();
+            }
+            $al->push(
+                ArrayData::create(
+                    array(
+                        'Key' => $description,
+                        'Value' => $value
+                    )
+                )
+            );
+        }
+        return $al;
+    }
 
 }
