@@ -26,7 +26,7 @@ class SecondHandArchive extends DataObject
                 'PageID' => $page->ID
             );
         }
-        $obj = SecondHandArchive::get()->filter($filter)->first()
+        $obj = SecondHandArchive::get()->filter($filter)->first();
         if( ! $obj) {
             $obj = SecondHandArchive::create($filter);
         }
