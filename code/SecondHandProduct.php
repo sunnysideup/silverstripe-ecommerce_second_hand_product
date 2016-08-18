@@ -14,7 +14,16 @@ class SecondHandProduct extends Product implements PermissionProvider {
         "ProductQuality" => "ENUM('1, 2, 3, 4, 5, 6, 7, 8, 9, 10','10')",
         "IncludesBoxOrCase" => "ENUM('No, Box, Case, Both','No')",
         "OriginalManual" => "Boolean",
-        "SerialNumber" => "VarChar(50)"
+        "SerialNumber" => "VarChar(50)",
+        "SellersName" =>  "VarChar(50)",
+        "SellersPhone" =>  'VarChar(30)',
+        "SellersEmail" =>  "VarChar(255)",
+        "SellersAddress" =>  "VarChar(255)",
+        'SellersAddress2' => 'Varchar(255)',
+        'SellersCity' => 'Varchar(100)',
+        'SellersPostalCode' => 'Varchar(50)',
+        'SellersRegionCode' => 'Varchar(100)',
+        'SellersCountry' => 'Varchar(50)'
     );
 
     private static $defaults = array(
@@ -207,6 +216,45 @@ class SecondHandProduct extends Product implements PermissionProvider {
             'InternalItemID',
             $fields->dataFieldByName('InternalItemID')->performReadonlyTransformation()
         );
+
+        $fields->addFieldsToTab(
+            'Root.SellersDetails',
+            array(
+                HeaderField::create('SellersDetails', 'Enter the details of the person who the product was purchased from'),
+                TextField::create('SellersName', 'Name'),
+                TextField::create('SellersPhone', 'Phone'),
+                TextField::create('SellersEmail', 'Email Address')
+            )
+        );
+
+        if (class_exists('GoogleAddressField')) {
+            $mappingArray = $this->Config()->get('fields_to_google_geocode_conversion');
+            if (is_array($mappingArray) && count($mappingArray)) {
+                $fields->addFieldToTab(
+                    'Root.SellersDetails',
+                    $geocodingField = new GoogleAddressField(
+                        'SellersAddressGeocodingField',
+                        _t('OrderAddress.FIND_ADDRESS', 'Find address'),
+                        Session::get('SellersAddressGeocodingFieldValue')
+                    )
+                );
+                $geocodingField->setFieldMap($mappingArray);
+                $geocodingField->setAlwaysShowFields(true);
+            }
+        }
+
+        $fields->addFieldsToTab(
+            'Root.SellersDetails',
+            array (
+                TextField::create('SellersAddress', 'Address'),
+                TextField::create('SellersAddress2', 'Suburb'),
+                TextField::create('SellersCity', 'City/Town'),
+                TextField::create('SellersPostalCode', 'Postal Code'),
+                TextField::create('SellersRegionCode', 'Region Code'),
+                TextField::create('SellersCountry', 'Country'),
+            )
+        );
+
         return $fields;
     }
 
