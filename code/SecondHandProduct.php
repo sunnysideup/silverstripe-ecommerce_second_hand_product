@@ -141,6 +141,15 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $fields->removeFieldFromTab('Root', 'Metadata');
         $fields->removeFieldFromTab('Root', 'AddToCartLink');
         //add all fields to the main tab
+        $fields->addFieldToTab(
+            'Root.Main',
+            LiteralField::create(
+                'PrintView',
+                '<a href="'.$this->link('printview').'" target="_blank">
+                    Print Details of this Secondhand Product
+                </a>'
+            )
+        );
         $fields->addFieldsToTab(
             'Root.Main',
             array(
@@ -159,7 +168,6 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     $secondhandProductCategories->map()
                 )
             );
-
         }
         $fields->addFieldsToTab(
             'Root.Main',
@@ -239,7 +247,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     )
                 );
                 $geocodingField->setFieldMap($mappingArray);
-                $geocodingField->setAlwaysShowFields(true);
+                //$geocodingField->setAlwaysShowFields(true);
             }
         }
 
@@ -359,7 +367,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
 class SecondHandProduct_Controller extends Product_Controller {
 
     private static $allowed_actions = array(
-        'printview' => true
+        'printview' => 'CMS_ACCESS_SECOND_HAND_PRODUCTS'
     );
 
     function printview()
@@ -371,22 +379,38 @@ class SecondHandProduct_Controller extends Product_Controller {
     {
         $al = ArrayList::create();
         $fieldsWeNeed = array(
+            'Title' => 'Product',
             'InternalItemID' => 'Code',
             'PurchasePrice' => 'Bought from customer: ',
             'Price' => 'We are selling for',
             "ProductQuality" => 'Product Quality',
-            "IncludesBoxOrCase" => 'Included',
-            "OriginalManual" => 'Original Manual',
-            "SerialNumber" => 'Serial Number'
+            "IncludesBoxOrCase" => 'Box and/or Case Included',
+            "OriginalManual" => 'Original Manual Included',
+            "SerialNumber" => 'Serial Number',
+            "SellersDetails" => '</br><span style="font-size: 1.5em;">Sellers Details</span>',
+            "SellersName" =>  "Name",
+            "SellersPhone" =>  'Phone',
+            "SellersEmail" =>  "Email",
+            "SellersAddress" =>  "Address",
+            'SellersAddress2' => 'Suburb',
+            'SellersCity' => 'City',
+            'SellersPostalCode' => 'Postal Code',
+            'SellersRegionCode' => 'Region',
+            'SellersCountry' => 'Country'
         );
         $fields = $this->dataRecord->db();
         foreach($fieldsWeNeed as $key => $description) {
-            $type = preg_replace('/\(.*\)/', '', $fields[$key]);
-            $dbField = DBField::create_field($type, $this->Key);
-            if($dbField->hasMethod('Nice')) {
-                $value = $dbField->Nice();
-            } else {
-                $value = $dbField->Raw();
+            if(isset($fields[$key])){
+                $type = preg_replace('/\(.*\)/', '', $fields[$key]);
+                $dbField = DBField::create_field($type, $this->$key);
+                if($dbField->hasMethod('Nice')) {
+                    $value = $dbField->Nice();
+                } else {
+                    $value = $dbField->Raw();
+                }
+            }
+            else {
+                $value = "";
             }
             $al->push(
                 ArrayData::create(
