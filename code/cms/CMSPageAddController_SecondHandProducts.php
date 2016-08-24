@@ -31,7 +31,7 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
                 $type->getField('AddAction'),
                 $type->getField('Description')
             );
-            $pageTypes[$type->getField('ClassName')] = $html;
+            $pageTypes[$type->getField('ClassName')] = DBField::create_field('HTMLText', $html);;
         }
 
         $numericLabelTmpl = '<span class="step-label"><span class="flyout">%d</span><span class="arrow"></span><span class="title">%s</span></span>';
@@ -59,6 +59,7 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
                 )
             )
         );
+        $typeField->dontEscape = true;
 
         // TODO Re-enable search once it allows for HTML title display,
         // see http://open.silverstripe.org/ticket/7455
