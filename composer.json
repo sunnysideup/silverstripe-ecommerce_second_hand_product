@@ -12,15 +12,14 @@
         "special product"
     ],
     "license": "Sunny Side Up (BSD-3-Clause and CUSTOM)",
-    "authors":[
+    "authors": [
         {
             "name": "Nicolaas Francken",
-            "homepage": "https://github.com/sunnysideup",
-            "email" : "modules@sunnysideup.co.nz",
-            "role" : "lead developer"
+            "email": "modules@sunnysideup.co.nz",
+            "role": "lead developer"
         }
     ],
-    "require":{
+    "require": {
         "silverstripe/framework": "^3.4",
         "sunnysideup/ecommerce": "*",
         "sunnysideup/google_address_field": "*"
@@ -28,5 +27,4 @@
     "extra": {
         "installer-name": "ecommerce_second_hand_product"
     }
-
 }
