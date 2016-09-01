@@ -89,7 +89,11 @@ class SecondHandProduct extends Product implements PermissionProvider {
      * @return Boolean
      */
     public function canCreate($member = null) {
-        return true;
+        return Permission::check(
+            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
+            'any',
+            $member
+        );
     }
 
     /**
@@ -97,7 +101,12 @@ class SecondHandProduct extends Product implements PermissionProvider {
      * @return Boolean
      */
     public function canPublish($member = null) {
-        return true;
+        return Permission::check(
+            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
+            'any',
+            $member
+        );
+
     }
 
     /**
@@ -105,7 +114,12 @@ class SecondHandProduct extends Product implements PermissionProvider {
      * @return Boolean
      */
     public function canEdit($member = null) {
-        return true;
+        return Permission::check(
+            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
+            'any',
+            $member
+        );
+
     }
 
     /**
@@ -113,12 +127,16 @@ class SecondHandProduct extends Product implements PermissionProvider {
      * @return Boolean
      */
     public function canDelete($member = null) {
-        return true;
+        return Permission::check(
+            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
+            'any',
+            $member
+        );
     }
 
     public function onBeforeDelete() {
-        parent::onBeforeDelete();
         SecondHandArchive::create_from_page($this);
+        parent::onBeforeDelete();
     }
 
     /**
@@ -255,12 +273,13 @@ class SecondHandProduct extends Product implements PermissionProvider {
         );
         //add all fields to the main tab
         $fields->addFieldToTab(
-            'Root.Main',
+            'Root.SellersDetails',
             EcommerceCMSButtonField::create(
                 'PrintView',
-                $this->link(),
-                'Print'
+                $this->link('printview'),
+                'Print Details'
             )
+
         );
         return $fields;
     }
@@ -361,6 +380,13 @@ class SecondHandProduct extends Product implements PermissionProvider {
             $member
         );
     }
+
+    function onAferSubmit($order)
+    {
+        DB::query('Update \"Product\" SET AllowPurchase = 0 WHERE \"Product\".\"ID\" = '.$this->ID);
+        DB::query('Update \"Product_Live\" SET AllowPurchase = 0 WHERE \"Product_Live\".\"ID\" = '.$this->ID);
+    }
+
 }
 
 class SecondHandProduct_Controller extends Product_Controller {

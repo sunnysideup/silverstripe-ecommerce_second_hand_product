@@ -44,6 +44,57 @@ class SecondHandArchive extends DataObject
     }
 
 
+    /**
+     * stadard SS method
+     * @return Boolean
+     */
+    public function canCreate($member = null) {
+        return Permission::check(
+            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
+            'any',
+            $member
+        );
+    }
+
+    /**
+     * stadard SS method
+     * @return Boolean
+     */
+    public function canPublish($member = null) {
+        return Permission::check(
+            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
+            'any',
+            $member
+        );
+
+    }
+
+    /**
+     * stadard SS method
+     * @return Boolean
+     */
+    public function canEdit($member = null) {
+        return Permission::check(
+            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
+            'any',
+            $member
+        );
+
+    }
+
+    /**
+     * stadard SS method
+     * @return Boolean
+     */
+    public function canDelete($member = null) {
+        return Permission::check(
+            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
+            'any',
+            $member
+        );
+    }
+
+
     private static $singular_name = 'Archived Second Hand Product';
 
     function i18n_singular_name() { return self::$singular_name;}
