@@ -257,8 +257,8 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $fields->addFieldToTab(
             'Root.SellersDetails',
             EcommerceCMSButtonField::create(
-                'PrintView',
-                $this->printview(),
+                'printview',
+                $this->link(),
                 'Print Details',
                 $newWindow = true
             )
