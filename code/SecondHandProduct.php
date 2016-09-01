@@ -255,11 +255,11 @@ class SecondHandProduct extends Product implements PermissionProvider {
         );
         //add all fields to the main tab
         $fields->addFieldToTab(
-            'Root.Main',
+            'Root.SellersDetails',
             EcommerceCMSButtonField::create(
                 'PrintView',
                 $this->link(),
-                'Print',
+                'Print Details',
                 $newWindow = true
             )
         );
