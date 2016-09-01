@@ -277,9 +277,9 @@ class SecondHandProduct extends Product implements PermissionProvider {
             EcommerceCMSButtonField::create(
                 'PrintView',
                 $this->link('printview'),
-                'Print Details'
+                'Print Details',
+                $newWindow = true
             )
-
         );
         return $fields;
     }
@@ -374,7 +374,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 'second_hand_admin_permission_title'
             ),
             $permissionArray = array(
-                'CMS_ACCESS_CMSMain',
+                'SITETREE_VIEW_ALL',
                 'CMS_ACCESS_SecondHandProductAdmin'
             ),
             $member
