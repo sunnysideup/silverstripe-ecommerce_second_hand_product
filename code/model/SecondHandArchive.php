@@ -50,34 +50,27 @@ class SecondHandArchive extends DataObject
      */
     public function canCreate($member = null) {
         return Permission::check(
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
-            'any',
-            $member
+            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code')
         );
     }
 
-    /**
-     * stadard SS method
-     * @return Boolean
-     */
-    public function canPublish($member = null) {
-        return Permission::check(
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
-            'any',
-            $member
-        );
-
-    }
 
     /**
      * stadard SS method
      * @return Boolean
      */
     public function canEdit($member = null) {
+        return false;
+
+    }
+
+    /**
+     * stadard SS method
+     * @return Boolean
+     */
+    public function canView($member = null) {
         return Permission::check(
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
-            'any',
-            $member
+            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code')
         );
 
     }
@@ -87,11 +80,7 @@ class SecondHandArchive extends DataObject
      * @return Boolean
      */
     public function canDelete($member = null) {
-        return Permission::check(
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
-            'any',
-            $member
-        );
+        return false;
     }
 
 
