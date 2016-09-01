@@ -1,31 +1,30 @@
 {
-	"name": "sunnysideup/ecommerce_second_hand_product",
-	"type": "silverstripe-module",
-	"description": "Add a second hand product (or similar) to your Silverstripe e-commerce install.",
-	"keywords": [
-		"e-commerce",
-		"CMS",
-		"Silverstripe",
-		"second hand",
-		"second-hand",
-		"product",
-		"special product"
-	],
-	"license": "Sunny Side Up (BSD-3-Clause and CUSTOM)",
-	"authors":[
-		{
-			"name": "Nicolaas Francken",
-			"homepage": "https://github.com/sunnysideup",
-			"email" : "modules@sunnysideup.co.nz",
-			"role" : "lead developer"
-		}
-	],
-	"require":{
-		"silverstripe/framework": "^3.4",
-		"sunnysideup/ecommerce": "dev-master"
-	},
-	"extra": {
-		"installer-name": "ecommerce_second_hand_product"
-	}
-
+    "name": "sunnysideup/ecommerce_second_hand_product",
+    "type": "silverstripe-module",
+    "description": "Add a second hand product (or similar) to your Silverstripe e-commerce install.",
+    "keywords": [
+        "e-commerce",
+        "CMS",
+        "Silverstripe",
+        "second hand",
+        "second-hand",
+        "product",
+        "special product"
+    ],
+    "license": "Sunny Side Up (BSD-3-Clause and CUSTOM)",
+    "authors": [
+        {
+            "name": "Nicolaas Francken",
+            "email": "modules@sunnysideup.co.nz",
+            "role": "lead developer"
+        }
+    ],
+    "require": {
+        "silverstripe/framework": "^3.4",
+        "sunnysideup/ecommerce": "*",
+        "sunnysideup/google_address_field": "*"
+    },
+    "extra": {
+        "installer-name": "ecommerce_second_hand_product"
+    }
 }

@@ -140,16 +140,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $fields->removeFieldFromTab('Root', 'Content');
         $fields->removeFieldFromTab('Root', 'Metadata');
         $fields->removeFieldFromTab('Root', 'AddToCartLink');
-        //add all fields to the main tab
-        $fields->addFieldToTab(
-            'Root.Main',
-            LiteralField::create(
-                'PrintView',
-                '<a href="'.$this->link('printview').'" target="_blank">
-                    Print Details of this Secondhand Product
-                </a>'
-            )
-        );
+
         $fields->addFieldsToTab(
             'Root.Main',
             array(
@@ -262,7 +253,16 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 TextField::create('SellersCountry', 'Country'),
             )
         );
-
+        //add all fields to the main tab
+        $fields->addFieldToTab(
+            'Root.Main',
+            EcommerceCMSButtonField::create(
+                'PrintView',
+                $this->link(),
+                'Print',
+                $newWindow = true
+            )
+        );
         return $fields;
     }
 
