@@ -356,7 +356,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 'second_hand_admin_permission_title'
             ),
             $permissionArray = array(
-                'CMS_ACCESS_CMSMain',
+                'SITETREE_VIEW_ALL',
                 'CMS_ACCESS_SecondHandProductAdmin'
             ),
             $member
