@@ -49,9 +49,7 @@ class SecondHandArchive extends DataObject
      * @return Boolean
      */
     public function canCreate($member = null) {
-        return Permission::check(
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code')
-        );
+        return false;
     }
 
 
