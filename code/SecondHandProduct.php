@@ -138,6 +138,10 @@ class SecondHandProduct extends Product implements PermissionProvider {
         SecondHandArchive::create_from_page($this);
         parent::onBeforeDelete();
     }
+    public function onBeforeDelete() {
+        SecondHandArchive::create_from_page($this);
+        parent::onBeforeDelete();
+    }
 
     /**
      * stadard SS method
@@ -385,6 +389,8 @@ class SecondHandProduct extends Product implements PermissionProvider {
     {
         DB::query('Update \"Product\" SET AllowPurchase = 0 WHERE \"Product\".\"ID\" = '.$this->ID);
         DB::query('Update \"Product_Live\" SET AllowPurchase = 0 WHERE \"Product_Live\".\"ID\" = '.$this->ID);
+        $this->writeToStage('Stage');
+        $this->doPublish();
     }
 
 }
