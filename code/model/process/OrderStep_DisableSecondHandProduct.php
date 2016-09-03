@@ -45,7 +45,7 @@ class OrderStep_DisableSecondHandProduct extends OrderStep implements OrderStepI
       **/
      public function doStep(Order $order)
      {
-         foreach($order->Items() as $buyable) {
+         foreach($order->Buyables() as $buyable) {
              if($buyable instanceof SecondHandProduct) {
                  $buyable->AllowPurchase = 0;
                  if (is_a($buyable, Object::getCustomClass('SiteTree'))) {
@@ -56,6 +56,7 @@ class OrderStep_DisableSecondHandProduct extends OrderStep implements OrderStepI
                  }
              }
          }
+         return true;
      }
 
     /**

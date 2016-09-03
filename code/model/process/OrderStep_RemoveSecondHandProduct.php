@@ -45,7 +45,7 @@ class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepIn
       **/
      public function doStep(Order $order)
      {
-         foreach($order->Items() as $buyable) {
+         foreach($order->Buyables() as $buyable) {
              if($buyable instanceof SecondHandProduct) {
                  if (is_a($buyable, Object::getCustomClass('SiteTree'))) {
                      $buyable->deleteFromStage('Live');
@@ -55,6 +55,7 @@ class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepIn
                  }
              }
          }
+         return true;
      }
 
     /**
