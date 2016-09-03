@@ -3,6 +3,10 @@
 class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepInterface
 {
 
+    function HideFromEveryone()
+    {
+        return true;
+    }
 
     private static $defaults = array(
         'CustomerCanEdit' => 0,
