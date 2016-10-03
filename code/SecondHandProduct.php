@@ -138,10 +138,6 @@ class SecondHandProduct extends Product implements PermissionProvider {
         SecondHandArchive::create_from_page($this);
         parent::onBeforeDelete();
     }
-    public function onBeforeDelete() {
-        SecondHandArchive::create_from_page($this);
-        parent::onBeforeDelete();
-    }
 
     /**
      * stadard SS method
