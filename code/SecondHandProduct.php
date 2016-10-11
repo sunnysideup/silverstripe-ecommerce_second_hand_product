@@ -139,6 +139,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         parent::onBeforeDelete();
     }
 
+
     /**
      * stadard SS method
      * @return FieldList
@@ -449,6 +450,20 @@ class SecondHandProduct_Controller extends Product_Controller {
             );
         }
         return $al;
+    }
+
+    //*********** TEMPLATE FUNCTION: CACHING KEYS ******************/
+
+    function ProductCacheKey_SECTION_A(){
+        return "ProductCacheKey_SECTION_A_"
+            .$this->ID."_"
+            .$this->MenuCacheKey();
+    }
+
+    function ProductCacheKey_SECTION_Z(){
+        return "ProductCacheKey_SECTION_Z_"
+            .$this->ID."_"
+            .$this->MenuCacheKey();
     }
 
 }
