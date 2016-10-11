@@ -26,6 +26,10 @@ class SecondHandProduct extends Product implements PermissionProvider {
         'SellersCountry' => 'Varchar(50)'
     );
 
+    private static $default_sort = array(
+        'Created' => 'DESC'
+    );
+
     private static $defaults = array(
         'ShowInMenus' => false
     );
@@ -389,6 +393,17 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $this->doPublish();
     }
 
+
+    /**
+     * adds created as a summary field as we are sorting by created 
+     * @return array
+     */
+    public function summaryFields() {
+        $fields = parent::summaryFields();
+        $fields['Created'] = 'Created';
+        return $fields;
+    }    
+    
 }
 
 class SecondHandProduct_Controller extends Product_Controller {
