@@ -318,7 +318,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         if($orderItems->count()){
             foreach($orderItems as $item){
                 $order = $item->Order();
-                if($order && $order->IsSubmitted()) {
+                if($order && $order->IsSubmitted() && !$order->IsCancelled()) {
                     return false;
                 }
             }
@@ -396,15 +396,15 @@ class SecondHandProduct extends Product implements PermissionProvider {
 
 
     /**
-     * adds created as a summary field as we are sorting by created 
+     * adds created as a summary field as we are sorting by created
      * @return array
      */
     public function summaryFields() {
         $fields = parent::summaryFields();
         $fields['Created'] = 'Created';
         return $fields;
-    }    
-    
+    }
+
 }
 
 class SecondHandProduct_Controller extends Product_Controller {
