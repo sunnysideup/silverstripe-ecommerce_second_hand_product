@@ -1,14 +1,18 @@
 <?php
 
 
-class SecondHandProductValue extends SS_Report
+class StaleSecondHandProduct extends SS_Report
 {
+
+    private static $default_days_back = 180;
+
     /**
      * The class of object being managed by this report.
      * Set by overriding in your subclass.
      */
     protected $dataClass = 'SiteTree';
 
+    
     /**
      * @return string
      */
@@ -19,8 +23,8 @@ class SecondHandProductValue extends SS_Report
         $object = Currency::create('Sum');
         $object->setValue($sum);
         $name = _t(
-            'EcommerceSideReport.SECOND_HAND_REPORT_TOTAL_STOCK_VALUE', 
-            'Second Hand Products, total stock value'
+            'EcommerceSideReport.STALE_SECOND_HAND_REPORT', 
+            'Stale Second Hand Products'
          );
         return $name . ': ' . $object->Nice();
     }
@@ -50,10 +54,15 @@ class SecondHandProductValue extends SS_Report
      */
     public function sourceRecords($params = null)
     {
+        if(isset($params['OlderThanNDays'])) {
+            $params['OlderThanNDays'] = intval($params['OlderThanNDays']);
+        } else {
+            $params['OlderThanNDays'] = Config::inst()->get('StaleSecondHandProduct', 'default_days_back');
+        }
         return SecondHandProduct::get()->filter(
             array(
                 'AllowPurchase' => 1,
-                'SellingOnBehalf' => 0
+                'Created:LessThan' => date('Y-m-d',strtotime('-'. $params['OlderThanNDays'] .' days'))
             )
         );
     }
@@ -82,4 +91,19 @@ class SecondHandProductValue extends SS_Report
     {
         return new FieldList();
     }
+    
+    public function parameterFields()
+    {
+        $params = new FieldList();
+        
+        $params->push(
+            NumericField::create(
+                'OlderThanNDays',
+                'Older than: [Number of days]',
+                Config::inst()->get('StaleSecondHandProduct', 'default_days_back')
+            )
+        );
+                 
+        return $params;
+    }   
 }
