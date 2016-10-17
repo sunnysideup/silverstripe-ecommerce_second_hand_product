@@ -413,11 +413,14 @@ class SecondHandProduct extends Product implements PermissionProvider {
 class SecondHandProduct_Controller extends Product_Controller {
 
     private static $allowed_actions = array(
-        'printview' => 'CMS_ACCESS_SECOND_HAND_PRODUCTS'
+        'printview' => true
     );
 
     function printview()
     {
+        if(!Permission::check('CMS_ACCESS_SECOND_HAND_PRODUCTS')){
+            return Security::permissionFailure($this, 'You do not have access to this feature, please login first.');
+        }
         return $this->renderWith('SecondHandProduct_printview');
     }
 
