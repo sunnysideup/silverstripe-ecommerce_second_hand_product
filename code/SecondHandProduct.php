@@ -276,12 +276,17 @@ class SecondHandProduct extends Product implements PermissionProvider {
             'Root.SellersDetails',
             EcommerceCMSButtonField::create(
                 'PrintView',
-                $this->link('printview'),
+                $this->PrintLink(),
                 'Print Details',
                 $newWindow = true
             )
         );
         return $fields;
+    }
+
+    function PrintLink()
+    {
+        return $this->link('printview');
     }
 
     function CMSEditLink()
