@@ -18,8 +18,11 @@ class SecondHandProductValue extends SS_Report
         $sum = array_sum($values);
         $object = Currency::create('Sum');
         $object->setValue($sum);
-        return _t('EcommerceSideReport.TOTAL_STOCK_VALUE', 'Total Stock Value').
-        ': '.$object->Nice().'';
+        $name = _t(
+            'EcommerceSideReport.SECOND_HAND_REPORT_TOTAL_STOCK_VALUE', 
+            'Second Hand Products, total stock value'
+         );
+        return $name . ': ' . $object->Nice();
     }
 
     /**
@@ -47,7 +50,12 @@ class SecondHandProductValue extends SS_Report
      */
     public function sourceRecords($params = null)
     {
-        return SecondHandProduct::get()->filter(array('AllowPurchase' => 1));
+        return SecondHandProduct::get()->filter(
+            array(
+                'AllowPurchase' => 1,
+                'SellingOnBehalf' => 0
+            )
+        );
     }
 
     /**
@@ -56,10 +64,14 @@ class SecondHandProductValue extends SS_Report
     public function columns()
     {
         return array(
+            'InternalItemID' => 'ID',
             'Title' => array(
-                'title' => 'FullName',
+                'title' => 'Product Name',
                 'link' => true,
             ),
+            'Created' => 'Created Time',
+            'Price' => 'Selling Price',
+            'PurchasePrice' => 'Purchase Price'
         );
     }
 

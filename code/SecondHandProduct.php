@@ -13,6 +13,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         "PurchasePrice" => "Currency",
         "ProductQuality" => "ENUM('1, 2, 3, 4, 5, 6, 7, 8, 9, 10','10')",
         "IncludesBoxOrCase" => "ENUM('No, Box, Case, Both','No')",
+        'SellingOnBehalf' => 'Boolean',
         "OriginalManual" => "Boolean",
         "SerialNumber" => "VarChar(50)",
         "SellersName" =>  "VarChar(50)",
@@ -24,6 +25,10 @@ class SecondHandProduct extends Product implements PermissionProvider {
         'SellersPostalCode' => 'Varchar(50)',
         'SellersRegionCode' => 'Varchar(100)',
         'SellersCountry' => 'Varchar(50)'
+    );
+
+    private static $default_sort = array(
+        'Created' => 'DESC'
     );
 
     private static $defaults = array(
@@ -139,6 +144,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         parent::onBeforeDelete();
     }
 
+
     /**
      * stadard SS method
      * @return FieldList
@@ -163,6 +169,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
             'Root.Main',
             array(
                 $allowPurchaseField = CheckboxField::create("AllowPurchase", "<strong>Allow product to be purchased</strong>"),
+                $sellinOnBehalf = CheckboxField::create("SellingOnBehalf", "<strong>Selling on behalf</strong>"),
                 $featuredProductField = CheckboxField::create('FeaturedProduct', _t('Product.FEATURED', '<strong>Featured Product</strong>')),
                 TextField::create('Title', 'Product Title'),
             )
@@ -204,6 +211,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         //set right titles and descriptions
         $featuredProductField->setDescription('If this box is ticked then this product will appear in the "Featured Products" box on the home page');
         $allowPurchaseField->setDescription("This box must be ticked to allow a customer to purchase it");
+        $sellinOnBehalf->setDescription('This box must be ticked if this product is being sold on behalf');
         $salePriceField->setRightTitle("Selling price");
         $purchasePriceField->setRightTitle("Price paid for the product");
         $serialNumberField->setRightTitle("Enter the serial number of the product here");
@@ -276,7 +284,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
             'Root.SellersDetails',
             EcommerceCMSButtonField::create(
                 'PrintView',
-                $this->PrintLink(),
+                $this->getPrintLink(),
                 'Print Details',
                 $newWindow = true
             )
@@ -284,11 +292,10 @@ class SecondHandProduct extends Product implements PermissionProvider {
         return $fields;
     }
 
-    function PrintLink()
-    {
+    public function getPrintLink() {
         return $this->link('printview');
     }
-
+    
     function CMSEditLink()
     {
         return Controller::join_links(
@@ -318,7 +325,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         if($orderItems->count()){
             foreach($orderItems as $item){
                 $order = $item->Order();
-                if($order && $order->IsSubmitted()) {
+                if($order && $order->IsSubmitted() && !$order->IsCancelled()) {
                     return false;
                 }
             }
@@ -380,7 +387,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
             ),
             $permissionArray = array(
                 'SITETREE_VIEW_ALL',
-                'CMS_ACCESS_SecondHandProductAdmin'
+                'CMS_ACCESS_SecondHandProductAdmin',
             ),
             $member
         );
@@ -394,16 +401,30 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $this->doPublish();
     }
 
+
+    /**
+     * adds created as a summary field as we are sorting by created
+     * @return array
+     */
+    public function summaryFields() {
+        $fields = parent::summaryFields();
+        $fields['Created'] = 'Created';
+        return $fields;
+    }
+
 }
 
 class SecondHandProduct_Controller extends Product_Controller {
 
     private static $allowed_actions = array(
-        'printview' => 'CMS_ACCESS_SECOND_HAND_PRODUCTS'
+        'printview' => true
     );
 
     function printview()
     {
+        if(!Permission::check('CMS_ACCESS_SECOND_HAND_PRODUCTS')){
+            return Security::permissionFailure($this, 'You do not have access to this feature, please login first.');
+        }
         return $this->renderWith('SecondHandProduct_printview');
     }
 
@@ -455,5 +476,4 @@ class SecondHandProduct_Controller extends Product_Controller {
         }
         return $al;
     }
-
 }

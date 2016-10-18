@@ -11,6 +11,12 @@ EcommerceDBConfig:
   extensions:
     - SecondHandEcommerceConfigExtension
 
+SecondHandProductGroup:
+  sort_options:
+    default:
+      Title: 'Default Order - (Most Recent)'
+      SQL: "\"Created\" DESC"
+
 ---
 Only:
   moduleexists: 'grouped-cms-menu'
