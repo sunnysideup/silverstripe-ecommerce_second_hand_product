@@ -15,6 +15,7 @@ class EcommerceTaskSecondHandPublishAll extends BuildTask
             $product->writeToStage('Stage');
             $product->publish('Stage', 'Live');
         }
+        DB::alteration_message('Completed ... ')
 
     }
 }
