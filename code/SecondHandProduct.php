@@ -6,6 +6,13 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $can_be_root = false;
 
     /**
+     * halt purchase for ... number of days 
+     * from the day of creation.
+     * @var int
+     */
+    private static $embargo_number_of_days = 0;
+
+    /**
      * stadard SS declaration
      * @var Array
      */
@@ -328,6 +335,13 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 if($order && $order->IsSubmitted() && !$order->IsCancelled()) {
                     return false;
                 }
+            }
+        }
+        $embargoDays = Config::inst()->get('SecondHandProduct', 'embargo_number_of_days');
+        if(intval($embargoDays) > 0) {
+            $daysOld = (time() - strtotime($this->Created)) / 60 / 60 / 24;
+            if($daysOld <= $embargoDays) {
+                return false;
             }
         }
         return parent::canPurchase($member, $checkPrice);
