@@ -340,6 +340,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
             //todo - this may need improvement
             $this->InternalItemID = "S-H-".strtoupper(substr(md5(microtime()),rand(0,26),5));
         }
+        $this->URLSegment = $this->generateURLSegment($this->Title."-".$this->InternalItemID);
         parent::onBeforeWrite();
     }
 
