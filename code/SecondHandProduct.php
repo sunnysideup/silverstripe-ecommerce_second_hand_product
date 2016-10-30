@@ -295,7 +295,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     public function getPrintLink() {
         return $this->link('printview');
     }
-    
+
     function CMSEditLink()
     {
         return Controller::join_links(
@@ -335,13 +335,12 @@ class SecondHandProduct extends Product implements PermissionProvider {
 
     function onBeforeWrite()
     {
-        parent::onBeforeWrite();
-        $this->URLSegment = $this->generateURLSegment($this->Title);
         //set the IternatlItemID if it doesn't already exist
         if( ! $this->InternalItemID) {
             //todo - this may need improvement
             $this->InternalItemID = "S-H-".strtoupper(substr(md5(microtime()),rand(0,26),5));
         }
+        parent::onBeforeWrite();
     }
 
     public function SecondHandProductQualityPercentage() {
