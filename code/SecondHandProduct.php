@@ -17,21 +17,26 @@ class SecondHandProduct extends Product implements PermissionProvider {
      * @var Array
      */
     private static $db = array (
-        "PurchasePrice" => "Currency",
-        "ProductQuality" => "ENUM('1, 2, 3, 4, 5, 6, 7, 8, 9, 10','10')",
-        "IncludesBoxOrCase" => "ENUM('No, Box, Case, Both','No')",
+        'PurchasePrice' => 'Currency',
+        'ProductQuality' => 'ENUM("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
+        'IncludesBoxOrCase' => "ENUM('No, Box, Case, Both','No')",
         'SellingOnBehalf' => 'Boolean',
-        "OriginalManual" => "Boolean",
-        "SerialNumber" => "VarChar(50)",
-        "SellersName" =>  "VarChar(50)",
-        "SellersPhone" =>  'VarChar(30)',
-        "SellersEmail" =>  "VarChar(255)",
-        "SellersAddress" =>  "VarChar(255)",
+        'OriginalManual' => 'Boolean',
+        'DateItemWasBought'=> 'Date', 
+        'SerialNumber' => 'VarChar(50)',
+        'SellersName' =>  'VarChar(50)',
+        'SellersPhone' =>  'VarChar(30)',
+        'SellersEmail' =>  'VarChar(255)',
+        'SellersAddress' =>  'VarChar(255)',
         'SellersAddress2' => 'Varchar(255)',
         'SellersCity' => 'Varchar(100)',
         'SellersPostalCode' => 'Varchar(50)',
         'SellersRegionCode' => 'Varchar(100)',
-        'SellersCountry' => 'Varchar(50)'
+        'SellersCountry' => 'Varchar(50)',
+        'SellersIDType' => 'ENUM("Drivers Licence, Firearms Licence, Passport","Drivers Licence")',
+        'SellersIDNumber' => 'VarChar(50)',
+        'SellersIDExpiryDate' => 'Date',
+        'SellersIDPohotocopy' => 'Boolean'
     );
 
     private static $default_sort = array(
@@ -211,6 +216,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 ),
                 $originalManualField = CheckboxField::create("OriginalManual", "Includes Original Manual"),
                 $contentField = TextAreaField::create("ShortDescription", "Description"),
+                $boughtDate = DateField::create('DateItemWasBought','Date this item was bought'),
                 $mainImageField = UploadField::create("Image", "Main Product Image"),
                 $additionalImagesField = UploadField::create("AdditionalImages", "More Images"),
             )
@@ -255,7 +261,14 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 HeaderField::create('SellersDetails', 'Enter the details of the person who the product was purchased from'),
                 TextField::create('SellersName', 'Name'),
                 TextField::create('SellersPhone', 'Phone'),
-                TextField::create('SellersEmail', 'Email Address')
+                TextField::create('SellersEmail', 'Email Address'),
+                DropdownField::create(
+                    'SellersIDType',
+                    'ID Type',
+                    $this->dbObject('SellersIDType')->enumValues()),
+                TextField::create('SellersIDNumber', 'ID Number'),
+                DateField::create('SellersIDExpiryDate', 'ID Expiry Date'),
+                CheckboxField::create('SellersIDPhotocopy','ID Photocopy')
             )
         );
 
