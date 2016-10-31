@@ -3,7 +3,7 @@
     <body>
         <h1>$Title</h1>
         <ul style="list-style-type: none;">
-            <% loop ListOfFieldsForPrinting %>
+        <% loop ListOfFieldsForPrinting %>
             <li>
                 <strong>$Key:</strong> $Value
             </li>

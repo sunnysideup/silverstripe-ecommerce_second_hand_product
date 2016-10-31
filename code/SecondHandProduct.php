@@ -6,31 +6,49 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $can_be_root = false;
 
     /**
+     * halt purchase for ... number of days 
+     * from the day of creation.
+     * @var int
+     */
+    private static $embargo_number_of_days = 0;
+
+    /**
      * stadard SS declaration
      * @var Array
      */
     private static $db = array (
-        "PurchasePrice" => "Currency",
-        "ProductQuality" => "ENUM('1, 2, 3, 4, 5, 6, 7, 8, 9, 10','10')",
-        "IncludesBoxOrCase" => "ENUM('No, Box, Case, Both','No')",
+        'PurchasePrice' => 'Currency',
+        'ProductQuality' => 'ENUM("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
+        'IncludesBoxOrCase' => "ENUM('No, Box, Case, Both','No')",
         'SellingOnBehalf' => 'Boolean',
-        "OriginalManual" => "Boolean",
-        "SerialNumber" => "VarChar(50)",
-        "SellersName" =>  "VarChar(50)",
-        "SellersPhone" =>  'VarChar(30)',
-        "SellersEmail" =>  "VarChar(255)",
-        "SellersAddress" =>  "VarChar(255)",
+        'OriginalManual' => 'Boolean',
+        'DateItemWasBought' => 'Date', 
+        'DateItemWasSold' => 'Date', 
+        'SerialNumber' => 'VarChar(50)',
+        'SellersName' =>  'VarChar(50)',
+        'SellersPhone' =>  'VarChar(30)',
+        'SellersEmail' =>  'VarChar(255)',
+        'SellersAddress' =>  'VarChar(255)',
         'SellersAddress2' => 'Varchar(255)',
         'SellersCity' => 'Varchar(100)',
         'SellersPostalCode' => 'Varchar(50)',
         'SellersRegionCode' => 'Varchar(100)',
-        'SellersCountry' => 'Varchar(50)'
+        'SellersCountry' => 'Varchar(50)',
+        'SellersIDType' => 'ENUM(",Drivers Licence, Firearms Licence, Passport","")',
+        'SellersIDNumber' => 'Varchar(50)',
+        'SellersDateOfBirth' => 'Date',
+        'SellersIDExpiryDate' => 'Date',
+        'SellersIDPhotocopy' => 'Boolean'
     );
 
+    private static $has_one = array(
+        'BasedOn' => 'SecondHandProduct'
+    );
+    
     private static $default_sort = array(
         'Created' => 'DESC'
     );
-
+   
     private static $defaults = array(
         'ShowInMenus' => false
     );
@@ -38,7 +56,40 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $indexes = array(
         'SerialNumber' => true
     );
+    
+    private static $casting = array(
+        'SellersSummary' => 'Varchar'
+    );
+    
+    private static $seller_summary_detail_fields = array(
+        'SellersName',
+        'SellersPhone',
+        'SellersEmail',
+        'SellersAddress',
+        'SellersAddress2',
+        'SellersCity',
+        'SellersPostalCode',
+        'SellersRegionCode',
+        'SellersCountry',
+        'SellersIDType',
+        'SellersIDNumber',
+        'SellersDateOfBirth',
+        'SellersIDExpiryDate',
+        'SellersIDPhotocopy'
+    );
 
+    public function getSellerSummary()
+    {
+        $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
+        $array = array();
+        foreach($list as $field) {
+            if(trim($this->$field)){
+                $array[] = $this->$field;
+            }
+        }
+        return implode('; ', $array);
+    }
+    
     private static $second_hand_admin_group_code = 'second-hand-managers';
 
     private static $second_hand_admin_group_name = 'Second Hand Product Managers';
@@ -60,7 +111,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $second_hand_admin_user_password = "";
 
     /**
-     * stadard SS declaration
+     * standard SS declaration
      * @var String
      */
     private static $icon = "ecommerce_second_hand_product/images/treeicons/SecondHandProduct";
@@ -102,7 +153,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     }
 
     /**
-     * stadard SS method
+     * standard SS method
      * @return Boolean
      */
     public function canPublish($member = null) {
@@ -204,10 +255,13 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 ),
                 $originalManualField = CheckboxField::create("OriginalManual", "Includes Original Manual"),
                 $contentField = TextAreaField::create("ShortDescription", "Description"),
+                $boughtDate = DateField::create('DateItemWasBought','Date this item was bought'),
+                DateField_Disabled::create('DateItemWasSold','Date this item was sold'),
                 $mainImageField = UploadField::create("Image", "Main Product Image"),
                 $additionalImagesField = UploadField::create("AdditionalImages", "More Images"),
             )
         );
+        
         //set right titles and descriptions
         $featuredProductField->setDescription('If this box is ticked then this product will appear in the "Featured Products" box on the home page');
         $allowPurchaseField->setDescription("This box must be ticked to allow a customer to purchase it");
@@ -224,6 +278,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
             $qualityFieldDescription = 'An explanation of the ratings scale can be found by clicking this <a href="' . $obj->Link() . '">link</a>';
         }
         $productQualityField->setRightTitle($qualityFieldDescription);
+        $boughtDate->setRightTitle('Date Format (dd-mm-YYYY). Example: 3rd of May 1992 should be entered as 03-05-1992');
         $mainImageField->setRightTitle(
             "<strong>Upload the main image for the product here.</strong><br>
             Recommended size: 810px wide x 418px high - but you can choose any width up to 810px, height must
@@ -242,13 +297,38 @@ class SecondHandProduct extends Product implements PermissionProvider {
             $fields->dataFieldByName('InternalItemID')->performReadonlyTransformation()
         );
 
+        $lastEditedItems = SecondHandProduct::get()->sort('Created','DESC')->limit(100);
+        
+        $lastItems = array(
+            0 => '--- not based on previous sale ---'
+        );
+        
+        foreach($lastEditedItems as $lastEditedItem){
+            $details = $lastEditedItem->getSellerSummary();
+            if($details) {
+                $lastItems[$lastEditedItem->ID] = $details;
+            }
+        }
+        
         $fields->addFieldsToTab(
             'Root.SellersDetails',
             array(
                 HeaderField::create('SellersDetails', 'Enter the details of the person who the product was purchased from'),
+                DropdownField::create(
+                    'BasedOnID',
+                    'Autocomplete from saved items',
+                    $lastItems),
                 TextField::create('SellersName', 'Name'),
                 TextField::create('SellersPhone', 'Phone'),
-                TextField::create('SellersEmail', 'Email Address')
+                TextField::create('SellersEmail', 'Email Address'),
+                DropdownField::create(
+                    'SellersIDType',
+                    'ID Type',
+                    $this->dbObject('SellersIDType')->enumValues()),
+                TextField::create('SellersIDNumber', 'ID Number'),
+                DateField::create('SellersDateOfBirth', 'Date of Birth'),
+                DateField::create('SellersIDExpiryDate', 'ID Expiry Date'),
+                CheckboxField::create('SellersIDPhotocopy', 'ID Photocopy')
             )
         );
 
@@ -264,6 +344,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     )
                 );
                 $geocodingField->setFieldMap($mappingArray);
+                $geocodingField->setRestrictToCountryCode('NZ');
                 //$geocodingField->setAlwaysShowFields(true);
             }
         }
@@ -289,10 +370,24 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 $newWindow = true
             )
         );
+        if($this->BasedOnID) {
+            $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
+            $labels = $this->FieldLabels();
+            foreach($list as $listField){
+                $fields->replaceField(
+                    $listField, 
+                    ReadonlyField::create(
+                        $listField, 
+                        $fields->dataFieldByName($listField)->Title()
+                    )
+                );
+            }
+            $fields->removeByName('SellersAddressGeocodingField');
+        }
         $fields->addFieldToTab(
             'Root.Categorisation',
             $this->getProductGroupsTableField()
-        );
+        );        
         return $fields;
     }
 
@@ -334,18 +429,42 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 }
             }
         }
+        $embargoDays = Config::inst()->get('SecondHandProduct', 'embargo_number_of_days');
+        if(intval($embargoDays) > 0) {
+            $daysOld = (time() - strtotime($this->DateItemWasBought)) / 60 / 60 / 24;
+            if($daysOld <= $embargoDays) {
+                return false;
+            }
+        }
         return parent::canPurchase($member, $checkPrice);
     }
 
     function onBeforeWrite()
     {
-        parent::onBeforeWrite();
-        $this->URLSegment = $this->generateURLSegment($this->Title);
+        if($this->BasedOnID){
+            $basedOn = $this->BasedOn();
+            if($basedOn && $basedOn->exists()){
+                $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
+                foreach($list as $field){
+                    $this->$field = $basedOn->$field; 
+                }
+            }
+        }       
+        $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
+        
         //set the IternatlItemID if it doesn't already exist
         if( ! $this->InternalItemID) {
             //todo - this may need improvement
             $this->InternalItemID = "S-H-".strtoupper(substr(md5(microtime()),rand(0,26),5));
         }
+        $this->URLSegment = $this->generateURLSegment($this->Title."-".$this->InternalItemID);
+        
+        // Save the date when the product was sold.
+        if (! $this->AllowPurchase){
+            $this->DateItemWasSold = SS_Datetime::now()->Rfc2822();
+        }
+                    
+        parent::onBeforeWrite();
     }
 
     public function SecondHandProductQualityPercentage() {
@@ -415,6 +534,14 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $fields['Created'] = 'Created';
         return $fields;
     }
+    
+    
+    public function populateDefaults() {
+        parent::populateDefaults();
+        if(! $this->DateItemWasBought){
+            $this->DateItemWasBought = SS_Datetime::now()->Rfc2822();
+        }
+    }    
 
 }
 
