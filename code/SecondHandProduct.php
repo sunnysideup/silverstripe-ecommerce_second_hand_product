@@ -26,7 +26,6 @@ class SecondHandProduct extends Product implements PermissionProvider {
         'SerialNumber' => 'VarChar(50)',
         'SellersName' =>  'VarChar(50)',
         'SellersPhone' =>  'VarChar(30)',
-        'SellersDateOfBirth' => 'Date',
         'SellersEmail' =>  'VarChar(255)',
         'SellersAddress' =>  'VarChar(255)',
         'SellersAddress2' => 'Varchar(255)',
@@ -36,6 +35,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         'SellersCountry' => 'Varchar(50)',
         'SellersIDType' => 'ENUM("Drivers Licence, Firearms Licence, Passport","Drivers Licence")',
         'SellersIDNumber' => 'Varchar(50)',
+        'SellersDateOfBirth' => 'Date',
         'SellersIDExpiryDate' => 'Date',
         'SellersIDPhotocopy' => 'Boolean'
     );
@@ -72,6 +72,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         'SellersCountry',
         'SellersIDType',
         'SellersIDNumber',
+        'SellersDateOfBirth',
         'SellersIDExpiryDate',
         'SellersIDPhotocopy'
     );
@@ -321,7 +322,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     'ID Type',
                     $this->dbObject('SellersIDType')->enumValues()),
                 TextField::create('SellersIDNumber', 'ID Number'),
-                DateField::create('SellersIDExpiryDate', 'ID Expiry Date'),
+                DateField::create('SellersDateOfBirth', 'Date of Birth'),
                 DateField::create('SellersIDExpiryDate', 'ID Expiry Date'),
                 CheckboxField::create('SellersIDPhotocopy','ID Photocopy')
             )
@@ -339,6 +340,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     )
                 );
                 $geocodingField->setFieldMap($mappingArray);
+                $geocodingField->setRestrictToCountryCode('NZ');
                 //$geocodingField->setAlwaysShowFields(true);
             }
         }
@@ -376,6 +378,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     )
                 );
             }
+            $fields->removeByName('SellersAddressGeocodingField');
         }
         
         return $fields;
