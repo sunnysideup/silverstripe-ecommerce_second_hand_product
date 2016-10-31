@@ -26,6 +26,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         'SerialNumber' => 'VarChar(50)',
         'SellersName' =>  'VarChar(50)',
         'SellersPhone' =>  'VarChar(30)',
+        'SellersDateOfBirth' => 'Date',
         'SellersEmail' =>  'VarChar(255)',
         'SellersAddress' =>  'VarChar(255)',
         'SellersAddress2' => 'Varchar(255)',
@@ -320,6 +321,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     'ID Type',
                     $this->dbObject('SellersIDType')->enumValues()),
                 TextField::create('SellersIDNumber', 'ID Number'),
+                DateField::create('SellersIDExpiryDate', 'ID Expiry Date'),
                 DateField::create('SellersIDExpiryDate', 'ID Expiry Date'),
                 CheckboxField::create('SellersIDPhotocopy','ID Photocopy')
             )
