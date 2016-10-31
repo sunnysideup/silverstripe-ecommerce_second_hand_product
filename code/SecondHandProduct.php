@@ -22,7 +22,8 @@ class SecondHandProduct extends Product implements PermissionProvider {
         'IncludesBoxOrCase' => "ENUM('No, Box, Case, Both','No')",
         'SellingOnBehalf' => 'Boolean',
         'OriginalManual' => 'Boolean',
-        'DateItemWasBought'=> 'Date', 
+        'DateItemWasBought' => 'Date', 
+        'DateItemWasSold' => 'Date', 
         'SerialNumber' => 'VarChar(50)',
         'SellersName' =>  'VarChar(50)',
         'SellersPhone' =>  'VarChar(30)',
@@ -33,7 +34,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         'SellersPostalCode' => 'Varchar(50)',
         'SellersRegionCode' => 'Varchar(100)',
         'SellersCountry' => 'Varchar(50)',
-        'SellersIDType' => 'ENUM("Drivers Licence, Firearms Licence, Passport","Drivers Licence")',
+        'SellersIDType' => 'ENUM(",Drivers Licence, Firearms Licence, Passport","")',
         'SellersIDNumber' => 'Varchar(50)',
         'SellersDateOfBirth' => 'Date',
         'SellersIDExpiryDate' => 'Date',
@@ -254,11 +255,13 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 ),
                 $originalManualField = CheckboxField::create("OriginalManual", "Includes Original Manual"),
                 $contentField = TextAreaField::create("ShortDescription", "Description"),
-                $boughtDate = DateField::create('DateItemWasBought','Date this item was bought'),
+                DateField::create('DateItemWasBought','Date this item was bought'),
+                ReadonlyField::create('DateItemWasSold','Date this item was sold'),
                 $mainImageField = UploadField::create("Image", "Main Product Image"),
                 $additionalImagesField = UploadField::create("AdditionalImages", "More Images"),
             )
         );
+        
         //set right titles and descriptions
         $featuredProductField->setDescription('If this box is ticked then this product will appear in the "Featured Products" box on the home page');
         $allowPurchaseField->setDescription("This box must be ticked to allow a customer to purchase it");
@@ -324,7 +327,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 TextField::create('SellersIDNumber', 'ID Number'),
                 DateField::create('SellersDateOfBirth', 'Date of Birth'),
                 DateField::create('SellersIDExpiryDate', 'ID Expiry Date'),
-                CheckboxField::create('SellersIDPhotocopy','ID Photocopy')
+                CheckboxField::create('SellersIDPhotocopy', 'ID Photocopy')
             )
         );
 
@@ -442,7 +445,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     $this->$field = $basedOn->$field; 
                 }
             }
-        }
+        }       
         $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
         
         //set the IternatlItemID if it doesn't already exist
@@ -522,6 +525,14 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $fields['Created'] = 'Created';
         return $fields;
     }
+    
+    
+    public function populateDefaults() {
+        parent::populateDefaults();
+        if(! $this->DateItemWasBought){
+            $this->DateItemWasBought = SS_Datetime::now()->Rfc2822();
+        }
+    }    
 
 }
 
