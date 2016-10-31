@@ -428,7 +428,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         }
         $embargoDays = Config::inst()->get('SecondHandProduct', 'embargo_number_of_days');
         if(intval($embargoDays) > 0) {
-            $daysOld = (time() - strtotime($this->Created)) / 60 / 60 / 24;
+            $daysOld = (time() - strtotime($this->DateItemWasBought)) / 60 / 60 / 24;
             if($daysOld <= $embargoDays) {
                 return false;
             }
