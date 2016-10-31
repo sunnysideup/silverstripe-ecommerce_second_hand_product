@@ -289,13 +289,17 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 $newWindow = true
             )
         );
+        $fields->addFieldToTab(
+            'Root.Categorisation',
+            $this->getProductGroupsTableField()
+        );
         return $fields;
     }
 
     public function getPrintLink() {
         return $this->link('printview');
     }
-    
+
     function CMSEditLink()
     {
         return Controller::join_links(
