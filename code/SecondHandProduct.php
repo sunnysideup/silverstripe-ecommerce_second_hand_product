@@ -111,7 +111,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $second_hand_admin_user_password = "";
 
     /**
-     * stadard SS declaration
+     * standard SS declaration
      * @var String
      */
     private static $icon = "ecommerce_second_hand_product/images/treeicons/SecondHandProduct";
@@ -153,7 +153,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     }
 
     /**
-     * stadard SS method
+     * standard SS method
      * @return Boolean
      */
     public function canPublish($member = null) {
@@ -255,8 +255,8 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 ),
                 $originalManualField = CheckboxField::create("OriginalManual", "Includes Original Manual"),
                 $contentField = TextAreaField::create("ShortDescription", "Description"),
-                DateField::create('DateItemWasBought','Date this item was bought'),
-                ReadonlyField::create('DateItemWasSold','Date this item was sold'),
+                $boughtDate = DateField::create('DateItemWasBought','Date this item was bought'),
+                DateField_Disabled::create('DateItemWasSold','Date this item was sold'),
                 $mainImageField = UploadField::create("Image", "Main Product Image"),
                 $additionalImagesField = UploadField::create("AdditionalImages", "More Images"),
             )
@@ -278,6 +278,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
             $qualityFieldDescription = 'An explanation of the ratings scale can be found by clicking this <a href="' . $obj->Link() . '">link</a>';
         }
         $productQualityField->setRightTitle($qualityFieldDescription);
+        $boughtDate->setRightTitle('Date Format (dd-mm-YYYY). Example: 3rd of May 1992 should be entered as 03-05-1992');
         $mainImageField->setRightTitle(
             "<strong>Upload the main image for the product here.</strong><br>
             Recommended size: 810px wide x 418px high - but you can choose any width up to 810px, height must
@@ -455,6 +456,10 @@ class SecondHandProduct extends Product implements PermissionProvider {
         }
         $this->URLSegment = $this->generateURLSegment($this->Title."-".$this->InternalItemID);
         
+        if (! $this->AllowPurchase){
+            $this->DateItemWasSold = SS_Datetime::now()->Rfc2822();
+        }
+                    
         parent::onBeforeWrite();
     }
 
