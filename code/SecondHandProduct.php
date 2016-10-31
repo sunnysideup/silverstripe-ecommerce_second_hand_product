@@ -13,6 +13,12 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $embargo_number_of_days = 0;
 
     /**
+     * Restrict GoogleAddressField to a specific Country
+     * E.g. for New Zealand, $country_code =  'NZ'
+     * @var string
+     */
+    private static $country_code = null;
+    /**
      * stadard SS declaration
      * @var Array
      */
@@ -166,7 +172,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     }
 
     /**
-     * stadard SS method
+     * standard SS method
      * @return Boolean
      */
     public function canEdit($member = null) {
@@ -179,7 +185,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     }
 
     /**
-     * stadard SS method
+     * standard SS method
      * @return Boolean
      */
     public function canDelete($member = null) {
@@ -344,7 +350,11 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     )
                 );
                 $geocodingField->setFieldMap($mappingArray);
-                $geocodingField->setRestrictToCountryCode('NZ');
+                
+                $country_code = Config::inst()->get('SecondHandProduct', 'country_code');
+                if ($country_code){
+                    $geocodingField->setRestrictToCountryCode($country_code);
+                }
                 //$geocodingField->setAlwaysShowFields(true);
             }
         }
