@@ -456,6 +456,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         }
         $this->URLSegment = $this->generateURLSegment($this->Title."-".$this->InternalItemID);
         
+        // Save the date when the product was sold.
         if (! $this->AllowPurchase){
             $this->DateItemWasSold = SS_Datetime::now()->Rfc2822();
         }
