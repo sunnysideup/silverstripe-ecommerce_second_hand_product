@@ -34,15 +34,19 @@ class SecondHandProduct extends Product implements PermissionProvider {
         'SellersRegionCode' => 'Varchar(100)',
         'SellersCountry' => 'Varchar(50)',
         'SellersIDType' => 'ENUM("Drivers Licence, Firearms Licence, Passport","Drivers Licence")',
-        'SellersIDNumber' => 'VarChar(50)',
+        'SellersIDNumber' => 'Varchar(50)',
         'SellersIDExpiryDate' => 'Date',
-        'SellersIDPohotocopy' => 'Boolean'
+        'SellersIDPhotocopy' => 'Boolean'
     );
 
+    private static $has_one = array(
+        'BasedOn' => 'SecondHandProduct'
+    );
+    
     private static $default_sort = array(
         'Created' => 'DESC'
     );
-
+   
     private static $defaults = array(
         'ShowInMenus' => false
     );
@@ -50,7 +54,39 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $indexes = array(
         'SerialNumber' => true
     );
+    
+    private static $casting = array(
+        'SellersSummary' => 'Varchar'
+    );
+    
+    private static $seller_summary_detail_fields = array(
+        'SellersName',
+        'SellersPhone',
+        'SellersEmail',
+        'SellersAddress',
+        'SellersAddress2',
+        'SellersCity',
+        'SellersPostalCode',
+        'SellersRegionCode',
+        'SellersCountry',
+        'SellersIDType',
+        'SellersIDNumber',
+        'SellersIDExpiryDate',
+        'SellersIDPhotocopy'
+    );
 
+    public function getSellerSummary()
+    {
+        $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
+        $array = array();
+        foreach($list as $field) {
+            if(trim($this->$field)){
+                $array[] = $this->$field;
+            }
+        }
+        return implode('; ', $array);
+    }
+    
     private static $second_hand_admin_group_code = 'second-hand-managers';
 
     private static $second_hand_admin_group_name = 'Second Hand Product Managers';
@@ -255,10 +291,27 @@ class SecondHandProduct extends Product implements PermissionProvider {
             $fields->dataFieldByName('InternalItemID')->performReadonlyTransformation()
         );
 
+        $lastEditedItems = SecondHandProduct::get()->sort('Created','DESC')->limit(100);
+        
+        $lastItems = array(
+            0 => '--- not based on previous sale ---'
+        );
+        
+        foreach($lastEditedItems as $lastEditedItem){
+            $details = $lastEditedItem->getSellerSummary();
+            if($details) {
+                $lastItems[$lastEditedItem->ID] = $details;
+            }
+        }
+        
         $fields->addFieldsToTab(
             'Root.SellersDetails',
             array(
                 HeaderField::create('SellersDetails', 'Enter the details of the person who the product was purchased from'),
+                DropdownField::create(
+                    'BasedOnID',
+                    'Autocomplete from saved items',
+                    $lastItems),
                 TextField::create('SellersName', 'Name'),
                 TextField::create('SellersPhone', 'Phone'),
                 TextField::create('SellersEmail', 'Email Address'),
@@ -309,6 +362,20 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 $newWindow = true
             )
         );
+        if($this->BasedOnID) {
+            $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
+            $labels = $this->FieldLabels();
+            foreach($list as $listField){
+                $fields->replaceField(
+                    $listField, 
+                    ReadonlyField::create(
+                        $listField, 
+                        $fields->dataFieldByName($listField)->Title()
+                    )
+                );
+            }
+        }
+        
         return $fields;
     }
 
@@ -362,12 +429,24 @@ class SecondHandProduct extends Product implements PermissionProvider {
 
     function onBeforeWrite()
     {
+        if($this->BasedOnID){
+            $basedOn = $this->BasedOn();
+            if($basedOn && $basedOn->exists()){
+                $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
+                foreach($list as $field){
+                    $this->$field = $basedOn->$field; 
+                }
+            }
+        }
+        $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
+        
         //set the IternatlItemID if it doesn't already exist
         if( ! $this->InternalItemID) {
             //todo - this may need improvement
             $this->InternalItemID = "S-H-".strtoupper(substr(md5(microtime()),rand(0,26),5));
         }
         $this->URLSegment = $this->generateURLSegment($this->Title."-".$this->InternalItemID);
+        
         parent::onBeforeWrite();
     }
 
