@@ -428,17 +428,8 @@ class SecondHandProduct extends Product implements PermissionProvider {
     }
 
     public function canPurchase(Member $member = NULL, $checkPrice = true) {
-        //to do - Nicolaas to review this code
-        $orderItems = OrderItem::get()->filter(
-            array("BuyableID" => $this->ID, "BuyableClassName" => $this->ClassName)
-        );
-        if($orderItems->count()){
-            foreach($orderItems as $item){
-                $order = $item->Order();
-                if($order && $order->IsSubmitted() && !$order->IsCancelled()) {
-                    return false;
-                }
-            }
+        if($this->HasBeenSold()) {
+            return false;
         }
         $embargoDays = Config::inst()->get('SecondHandProduct', 'embargo_number_of_days');
         if(intval($embargoDays) > 0) {
@@ -450,6 +441,23 @@ class SecondHandProduct extends Product implements PermissionProvider {
         return parent::canPurchase($member, $checkPrice);
     }
 
+    function HasBeenSold() {
+        if(parent::HasBeenSold()) {
+            $orderItems = OrderItem::get()->filter(
+                array("BuyableID" => $this->ID, "BuyableClassName" => $this->ClassName)
+            );
+            if($orderItems->count()){
+                foreach($orderItems as $item){
+                    $order = $item->Order();
+                    if($order && $order->IsSubmitted() && !$order->IsCancelled()) {
+                        return true;
+                    }
+                }
+            }            
+        }
+        return false;
+    }
+    
     function onBeforeWrite()
     {
         if($this->BasedOnID){
