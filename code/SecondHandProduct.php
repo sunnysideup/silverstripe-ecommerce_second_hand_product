@@ -6,7 +6,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $can_be_root = false;
 
     /**
-     * halt purchase for ... number of days 
+     * halt purchase for ... number of days
      * from the day of creation.
      * @var int
      */
