@@ -6,7 +6,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $can_be_root = false;
 
     /**
-     * halt purchase for ... number of days 
+     * halt purchase for ... number of days
      * from the day of creation.
      * @var int
      */
@@ -28,8 +28,8 @@ class SecondHandProduct extends Product implements PermissionProvider {
         'IncludesBoxOrCase' => "ENUM('No, Box, Case, Both','No')",
         'SellingOnBehalf' => 'Boolean',
         'OriginalManual' => 'Boolean',
-        'DateItemWasBought' => 'Date', 
-        'DateItemWasSold' => 'Date', 
+        'DateItemWasBought' => 'Date',
+        'DateItemWasSold' => 'Date',
         'SerialNumber' => 'VarChar(50)',
         'SellersName' =>  'VarChar(50)',
         'SellersPhone' =>  'VarChar(30)',
@@ -50,11 +50,11 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $has_one = array(
         'BasedOn' => 'SecondHandProduct'
     );
-    
+
     private static $default_sort = array(
         'Created' => 'DESC'
     );
-   
+
     private static $defaults = array(
         'ShowInMenus' => false
     );
@@ -62,11 +62,11 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $indexes = array(
         'SerialNumber' => true
     );
-    
+
     private static $casting = array(
         'SellersSummary' => 'Varchar'
     );
-    
+
     private static $seller_summary_detail_fields = array(
         'SellersName',
         'SellersPhone',
@@ -95,7 +95,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         }
         return implode('; ', $array);
     }
-    
+
     private static $second_hand_admin_group_code = 'second-hand-managers';
 
     private static $second_hand_admin_group_name = 'Second Hand Product Managers';
@@ -206,7 +206,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
      * stadard SS method
      * @return FieldList
      */
-    public function getCMSFields() {        
+    public function getCMSFields() {
         $fields = parent::getCMSFields();
         //remove all unneccessary fields and tabs
         $fields->removeByName("AlsoShowHere");
@@ -267,7 +267,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 $additionalImagesField = UploadField::create("AdditionalImages", "More Images"),
             )
         );
-        
+
         //set right titles and descriptions
         $featuredProductField->setDescription('If this box is ticked then this product will appear in the "Featured Products" box on the home page');
         $allowPurchaseField->setDescription("This box must be ticked to allow a customer to purchase it");
@@ -305,18 +305,18 @@ class SecondHandProduct extends Product implements PermissionProvider {
         );
 
         $lastEditedItems = SecondHandProduct::get()->sort('Created','DESC')->limit(100);
-        
+
         $lastItems = array(
             0 => '--- not based on previous sale ---'
         );
-        
+
         foreach($lastEditedItems as $lastEditedItem){
             $details = $lastEditedItem->getSellerSummary();
             if($details) {
                 $lastItems[$lastEditedItem->ID] = $details;
             }
         }
-        
+
         $fields->addFieldsToTab(
             'Root.SellersDetails',
             array(
@@ -351,7 +351,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     )
                 );
                 $geocodingField->setFieldMap($mappingArray);
-                
+
                 $country_code = Config::inst()->get('SecondHandProduct', 'country_code');
                 if ($country_code){
                     $geocodingField->setRestrictToCountryCode($country_code);
@@ -386,9 +386,9 @@ class SecondHandProduct extends Product implements PermissionProvider {
             $labels = $this->FieldLabels();
             foreach($list as $listField){
                 $fields->replaceField(
-                    $listField, 
+                    $listField,
                     ReadonlyField::create(
-                        $listField, 
+                        $listField,
                         $fields->dataFieldByName($listField)->Title()
                     )
                 );
@@ -398,7 +398,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $fields->addFieldToTab(
             'Root.Categorisation',
             $this->getProductGroupsTableField()
-        );        
+        );
         return $fields;
     }
 
@@ -427,13 +427,17 @@ class SecondHandProduct extends Product implements PermissionProvider {
         return $fields;
     }
 
-    public function canPurchase(Member $member = NULL, $checkPrice = true) {
+    public function canPurchase(Member $member = null, $checkPrice = true) {
         if($this->HasBeenSold()) {
             return false;
         }
         $embargoDays = Config::inst()->get('SecondHandProduct', 'embargo_number_of_days');
         if(intval($embargoDays) > 0) {
-            $daysOld = (time() - strtotime($this->DateItemWasBought)) / 60 / 60 / 24;
+            $createdDate = strtotime($this->DateItemWasBought);
+            if($createdDate < 1000) {
+                $createdDate = strtotime($this->Created);
+            }
+            $daysOld = (time() - $createdDate) / 60 / 60 / 24;
             if($daysOld <= $embargoDays) {
                 return false;
             }
@@ -453,11 +457,11 @@ class SecondHandProduct extends Product implements PermissionProvider {
                         return true;
                     }
                 }
-            }            
+            }
         }
         return false;
     }
-    
+
     function onBeforeWrite()
     {
         if($this->BasedOnID){
@@ -465,24 +469,24 @@ class SecondHandProduct extends Product implements PermissionProvider {
             if($basedOn && $basedOn->exists()){
                 $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
                 foreach($list as $field){
-                    $this->$field = $basedOn->$field; 
+                    $this->$field = $basedOn->$field;
                 }
             }
-        }       
+        }
         $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
-        
+
         //set the IternatlItemID if it doesn't already exist
         if( ! $this->InternalItemID) {
             //todo - this may need improvement
             $this->InternalItemID = "S-H-".strtoupper(substr(md5(microtime()),rand(0,26),5));
         }
         $this->URLSegment = $this->generateURLSegment($this->Title."-".$this->InternalItemID);
-        
+
         // Save the date when the product was sold.
         if (! $this->AllowPurchase){
             $this->DateItemWasSold = SS_Datetime::now()->Rfc2822();
         }
-                    
+
         parent::onBeforeWrite();
     }
 
@@ -553,18 +557,34 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $fields['Created'] = 'Created';
         return $fields;
     }
-    
-    
+
+
     public function populateDefaults() {
         parent::populateDefaults();
         if(! $this->DateItemWasBought){
             $this->DateItemWasBought = SS_Datetime::now()->Rfc2822();
         }
-    }    
+    }
 
 }
 
 class SecondHandProduct_Controller extends Product_Controller {
+
+    private static $fields_to_remove_from_print = array(
+        'CUS',
+        'SPC',
+        'MGP',
+        'ZOR',
+        'FPS',
+        'SPE',
+        'IOS',
+        'PRO',
+        'FER',
+        'POA',
+        'PHT',
+        'NotForSaleMessage',
+        'KeepRecordEvenThoughItIsNotForSale'
+    );
 
     private static $allowed_actions = array(
         'printview' => true
@@ -581,26 +601,15 @@ class SecondHandProduct_Controller extends Product_Controller {
     function ListOfFieldsForPrinting()
     {
         $al = ArrayList::create();
-        $fieldsWeNeed = array(
-            'Title' => 'Product',
-            'InternalItemID' => 'Code',
-            'PurchasePrice' => 'Bought from customer: ',
-            'Price' => 'We are selling for',
-            "ProductQuality" => 'Product Quality',
-            "IncludesBoxOrCase" => 'Box and/or Case Included',
-            "OriginalManual" => 'Original Manual Included',
-            "SerialNumber" => 'Serial Number',
-            "SellersDetails" => '</br><span style="font-size: 1.5em;">Sellers Details</span>',
-            "SellersName" =>  "Name",
-            "SellersPhone" =>  'Phone',
-            "SellersEmail" =>  "Email",
-            "SellersAddress" =>  "Address",
-            'SellersAddress2' => 'Suburb',
-            'SellersCity' => 'City',
-            'SellersPostalCode' => 'Postal Code',
-            'SellersRegionCode' => 'Region',
-            'SellersCountry' => 'Country'
-        );
+        $fieldsWeNeed = $this->dataRecord->stat('db');
+        $labels = $this->FieldLabels();
+        foreach($fieldsWeNeed as $fieldKey => $useless) {
+            if(in_array($fieldKey, self::$fields_to_remove_from_print)) {
+                unset($fieldsWeNeed[$fieldKey]);
+            } else {
+                $fieldsWeNeed[$fieldKey] = $labels[$fieldKey];
+            }
+        }
         $fields = $this->dataRecord->db();
         foreach($fieldsWeNeed as $key => $description) {
             if(isset($fields[$key])){

@@ -8,7 +8,7 @@ class SecondHandProductGroup extends ProductGroup
         'SecondHandProductGroup',
         'SecondHandProduct'
     );
-    
+
     private static $icon = 'ecommerce_second_hand_product/images/treeicons/SecondHandProductGroup';
 
     /**
@@ -89,7 +89,7 @@ class SecondHandProductGroup_Controller extends ProductGroup_Controller
 
 
     /**
-     * @return DataList 
+     * @return DataList
      */
     function ListOfFilters()
     {
@@ -97,7 +97,11 @@ class SecondHandProductGroup_Controller extends ProductGroup_Controller
         $sql = '
             SELECT ProductGroupID
             FROM Product_ProductGroups
-            WHERE ProductID IN ('.implode(',', $productIDs).')
+                INNER JOIN Product
+                    ON Product.ID = Product_ProductGroups.ProductID
+            WHERE
+                ProductID IN ('.implode(',', $productIDs).') AND
+                AllowPurchase = 1
             GROUP BY ProductGroupID;
         ';
         $rows = DB::query($sql);
