@@ -8,7 +8,7 @@ class SecondHandProductGroup extends ProductGroup
         'SecondHandProductGroup',
         'SecondHandProduct'
     );
-
+    
     private static $icon = 'ecommerce_second_hand_product/images/treeicons/SecondHandProductGroup';
 
     /**
@@ -87,6 +87,10 @@ class SecondHandProductGroup_Controller extends ProductGroup_Controller
 
     }
 
+
+    /**
+     * @return DataList 
+     */
     function ListOfFilters()
     {
         $productIDs = $this->getProductsThatCanBePurchasedArray();
@@ -97,10 +101,11 @@ class SecondHandProductGroup_Controller extends ProductGroup_Controller
             GROUP BY ProductGroupID;
         ';
         $rows = DB::query($sql);
-        $idArray = array();
+        $idArray = array(0 => 0);
         foreach($rows as $row) {
             $idArray[$row['ProductGroupID']] = $row['ProductGroupID'];
         }
+
         return ProductGroup::get()->filter(array('ID' => $idArray));
     }
 
