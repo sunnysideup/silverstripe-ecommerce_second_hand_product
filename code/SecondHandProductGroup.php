@@ -8,7 +8,7 @@ class SecondHandProductGroup extends ProductGroup
         'SecondHandProductGroup',
         'SecondHandProduct'
     );
-
+    
     private static $icon = 'ecommerce_second_hand_product/images/treeicons/SecondHandProductGroup';
 
     /**
@@ -35,7 +35,6 @@ class SecondHandProductGroup extends ProductGroup
      * @var string
      */
     private static $description = 'A product category page specifically for second had products';
-
 
 }
 
@@ -87,6 +86,7 @@ class SecondHandProductGroup_Controller extends ProductGroup_Controller
         $term = Convert::raw2sql($request->param('searchterm'));
 
     }
+
 
     /**
      * @return DataList 
