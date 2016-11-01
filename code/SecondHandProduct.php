@@ -141,13 +141,13 @@ class SecondHandProduct extends Product implements PermissionProvider {
     }
 
     /**
-     * stadard SS declaration
+     * standard SS declaration
      * @var String
      */
     private static $description = "This page displays a single secondhand product that can only be sold once";
 
     /**
-     * stadard SS method
+     * standard SS method
      * @return Boolean
      */
     public function canCreate($member = null) {
@@ -206,7 +206,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
      * stadard SS method
      * @return FieldList
      */
-    public function getCMSFields() {
+    public function getCMSFields() {        
         $fields = parent::getCMSFields();
         //remove all unneccessary fields and tabs
         $fields->removeByName("AlsoShowHere");
@@ -260,7 +260,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     $this->dbObject('IncludesBoxOrCase')->enumValues()
                 ),
                 $originalManualField = CheckboxField::create("OriginalManual", "Includes Original Manual"),
-                $contentField = TextAreaField::create("ShortDescription", "Description"),
+                $contentField = TextField::create("ShortDescription", "Description"),
                 $boughtDate = DateField::create('DateItemWasBought','Date this item was bought'),
                 DateField_Disabled::create('DateItemWasSold','Date this item was sold'),
                 $mainImageField = UploadField::create("Image", "Main Product Image"),
@@ -278,6 +278,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $originalManualField->setDescription("Tick this box if the product includes the original manual, otherwise leave it empty");
         $boxOrCaseField->setRightTitle("Does this product come with a box, case or both?");
         $contentField->setRightTitle("Optional text only description, the maximum length of this description is 255 characters.");
+        $contentField->setMaxLength(255);
         $qualityFieldDescription = "A <strong>Condition Rating Page</strong> has yet to be setup";
         $obj = $this->EcomConfig()->SecondHandExplanationPage();
         if($obj->exists()){
