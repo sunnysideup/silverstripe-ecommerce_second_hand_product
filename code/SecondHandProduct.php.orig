@@ -6,18 +6,12 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $can_be_root = false;
 
     /**
-     * halt purchase for ... number of days
+     * halt purchase for ... number of days 
      * from the day of creation.
      * @var int
      */
     private static $embargo_number_of_days = 0;
 
-    /**
-     * Restrict GoogleAddressField to a specific Country
-     * E.g. for New Zealand, $country_code =  'NZ'
-     * @var string
-     */
-    private static $country_code = null;
     /**
      * stadard SS declaration
      * @var Array
@@ -141,13 +135,13 @@ class SecondHandProduct extends Product implements PermissionProvider {
     }
 
     /**
-     * standard SS declaration
+     * stadard SS declaration
      * @var String
      */
     private static $description = "This page displays a single secondhand product that can only be sold once";
 
     /**
-     * standard SS method
+     * stadard SS method
      * @return Boolean
      */
     public function canCreate($member = null) {
@@ -172,7 +166,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     }
 
     /**
-     * standard SS method
+     * stadard SS method
      * @return Boolean
      */
     public function canEdit($member = null) {
@@ -185,7 +179,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     }
 
     /**
-     * standard SS method
+     * stadard SS method
      * @return Boolean
      */
     public function canDelete($member = null) {
@@ -206,7 +200,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
      * stadard SS method
      * @return FieldList
      */
-    public function getCMSFields() {        
+    public function getCMSFields() {
         $fields = parent::getCMSFields();
         //remove all unneccessary fields and tabs
         $fields->removeByName("AlsoShowHere");
@@ -260,7 +254,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     $this->dbObject('IncludesBoxOrCase')->enumValues()
                 ),
                 $originalManualField = CheckboxField::create("OriginalManual", "Includes Original Manual"),
-                $contentField = TextField::create("ShortDescription", "Description"),
+                $contentField = TextAreaField::create("ShortDescription", "Description"),
                 $boughtDate = DateField::create('DateItemWasBought','Date this item was bought'),
                 DateField_Disabled::create('DateItemWasSold','Date this item was sold'),
                 $mainImageField = UploadField::create("Image", "Main Product Image"),
@@ -278,7 +272,6 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $originalManualField->setDescription("Tick this box if the product includes the original manual, otherwise leave it empty");
         $boxOrCaseField->setRightTitle("Does this product come with a box, case or both?");
         $contentField->setRightTitle("Optional text only description, the maximum length of this description is 255 characters.");
-        $contentField->setMaxLength(255);
         $qualityFieldDescription = "A <strong>Condition Rating Page</strong> has yet to be setup";
         $obj = $this->EcomConfig()->SecondHandExplanationPage();
         if($obj->exists()){
@@ -351,11 +344,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     )
                 );
                 $geocodingField->setFieldMap($mappingArray);
-                
-                $country_code = Config::inst()->get('SecondHandProduct', 'country_code');
-                if ($country_code){
-                    $geocodingField->setRestrictToCountryCode($country_code);
-                }
+                $geocodingField->setRestrictToCountryCode('NZ');
                 //$geocodingField->setAlwaysShowFields(true);
             }
         }
@@ -381,6 +370,12 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 $newWindow = true
             )
         );
+<<<<<<< HEAD
+        $fields->addFieldToTab(
+            'Root.Categorisation',
+            $this->getProductGroupsTableField()
+        );
+=======
         if($this->BasedOnID) {
             $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
             $labels = $this->FieldLabels();
@@ -395,10 +390,8 @@ class SecondHandProduct extends Product implements PermissionProvider {
             }
             $fields->removeByName('SellersAddressGeocodingField');
         }
-        $fields->addFieldToTab(
-            'Root.Categorisation',
-            $this->getProductGroupsTableField()
-        );        
+        
+>>>>>>> 6122f48d60f37877a2b319e22508f4e182e56212
         return $fields;
     }
 
@@ -428,8 +421,17 @@ class SecondHandProduct extends Product implements PermissionProvider {
     }
 
     public function canPurchase(Member $member = NULL, $checkPrice = true) {
-        if($this->HasBeenSold()) {
-            return false;
+        //to do - Nicolaas to review this code
+        $orderItems = OrderItem::get()->filter(
+            array("BuyableID" => $this->ID, "BuyableClassName" => $this->ClassName)
+        );
+        if($orderItems->count()){
+            foreach($orderItems as $item){
+                $order = $item->Order();
+                if($order && $order->IsSubmitted() && !$order->IsCancelled()) {
+                    return false;
+                }
+            }
         }
         $embargoDays = Config::inst()->get('SecondHandProduct', 'embargo_number_of_days');
         if(intval($embargoDays) > 0) {
@@ -441,23 +443,6 @@ class SecondHandProduct extends Product implements PermissionProvider {
         return parent::canPurchase($member, $checkPrice);
     }
 
-    function HasBeenSold() {
-        if(parent::HasBeenSold()) {
-            $orderItems = OrderItem::get()->filter(
-                array("BuyableID" => $this->ID, "BuyableClassName" => $this->ClassName)
-            );
-            if($orderItems->count()){
-                foreach($orderItems as $item){
-                    $order = $item->Order();
-                    if($order && $order->IsSubmitted() && !$order->IsCancelled()) {
-                        return true;
-                    }
-                }
-            }            
-        }
-        return false;
-    }
-    
     function onBeforeWrite()
     {
         if($this->BasedOnID){
