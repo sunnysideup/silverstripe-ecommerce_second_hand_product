@@ -58,7 +58,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $defaults = array(
         'ShowInMenus' => false
     );
-
+    
     private static $indexes = array(
         'SerialNumber' => true
     );
@@ -221,7 +221,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $fields->removeFieldFromTab('Root', 'Content');
         $fields->removeFieldFromTab('Root', 'Metadata');
         $fields->removeFieldFromTab('Root', 'AddToCartLink');
-
+        
         $fields->addFieldsToTab(
             'Root.Main',
             array(
@@ -262,12 +262,13 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 $originalManualField = CheckboxField::create("OriginalManual", "Includes Original Manual"),
                 $contentField = TextField::create("ShortDescription", "Description"),
                 $boughtDate = DateField::create('DateItemWasBought','Date this item was bought'),
-                DateField_Disabled::create('DateItemWasSold','Date this item was sold'),
+                $soldDate = DateField::create('DateItemWasSold','Date this item was sold'),
                 $mainImageField = UploadField::create("Image", "Main Product Image"),
                 $additionalImagesField = UploadField::create("AdditionalImages", "More Images"),
             )
         );
-
+        $soldDate->setDisabled(True);
+        
         //set right titles and descriptions
         $featuredProductField->setDescription('If this box is ticked then this product will appear in the "Featured Products" box on the home page');
         $allowPurchaseField->setDescription("This box must be ticked to allow a customer to purchase it");
@@ -338,7 +339,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 CheckboxField::create('SellersIDPhotocopy', 'ID Photocopy')
             )
         );
-
+        
         if (class_exists('GoogleAddressField')) {
             $mappingArray = $this->Config()->get('fields_to_google_geocode_conversion');
             if (is_array($mappingArray) && count($mappingArray)) {
@@ -397,8 +398,32 @@ class SecondHandProduct extends Product implements PermissionProvider {
         }
         $fields->addFieldToTab(
             'Root.Categorisation',
-            $this->getProductGroupsTableField()
+            $categoriesTable = $this->getProductGroupsTableField()
         );
+        
+        // If the product has been sold all fields should be disabled
+        // Only the shop administrator is allowed to undo this.
+        if($this->HasBeenSold()){
+            $fields = $fields->makeReadonly();
+            $fields->replaceField($categoriesTable->Name, $categoriesTable);
+            $categoriesTable->setConfig(GridFieldConfig_RecordViewer::create());
+            $fields->replaceField(
+                'EnquiresList',
+                GridField::create(
+                    'EnquiresList',
+                    'Enquiries List',
+                    $this->PageEnquiries(),
+                    GridFieldConfig_RecordViewer::create()
+                )
+            );
+            
+        }
+        
+        if($this->HasBeenSold() && Permission::check('ADMIN')){
+            $fields->replaceField('AllowPurchase', CheckboxField::create('AllowPurchase', '<strong>Allow product to be purchased</strong>'));
+            $fields->replaceField('DateItemWasSold', DateField::create('DateItemWasSold','Date this item was sold'));
+        }
+        
         return $fields;
     }
 
@@ -459,6 +484,9 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 }
             }
         }
+        if($this->DateItemWasSold){
+            return true;
+        }
         return false;
     }
 
@@ -486,7 +514,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         if (! $this->AllowPurchase){
             $this->DateItemWasSold = SS_Datetime::now()->Rfc2822();
         }
-
+        
         parent::onBeforeWrite();
     }
 
