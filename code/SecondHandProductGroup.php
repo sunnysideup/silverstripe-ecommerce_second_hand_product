@@ -110,7 +110,11 @@ class SecondHandProductGroup_Controller extends ProductGroup_Controller
             $idArray[$row['ProductGroupID']] = $row['ProductGroupID'];
         }
 
-        return ProductGroup::get()->filter(array('ID' => $idArray));
+        return  GroupedList::create(
+                    ProductGroup::get()
+                    ->filter(array('ID' => $idArray))
+                    ->sort('IF("ClassName" = \'BrandPage\', 1, 0) ASC, Title ASC')
+                );
     }
 
     function HasSearchFilterAndSort()
