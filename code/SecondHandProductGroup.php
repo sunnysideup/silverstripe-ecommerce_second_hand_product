@@ -87,36 +87,6 @@ class SecondHandProductGroup_Controller extends ProductGroup_Controller
 
     }
 
-
-    /**
-     * @return DataList
-     */
-    function ListOfFilters()
-    {
-        $productIDs = $this->getProductsThatCanBePurchasedArray();
-        $sql = '
-            SELECT ProductGroupID
-            FROM Product_ProductGroups
-                INNER JOIN Product
-                    ON Product.ID = Product_ProductGroups.ProductID
-            WHERE
-                ProductID IN ('.implode(',', $productIDs).') AND
-                AllowPurchase = 1
-            GROUP BY ProductGroupID;
-        ';
-        $rows = DB::query($sql);
-        $idArray = array(0 => 0);
-        foreach($rows as $row) {
-            $idArray[$row['ProductGroupID']] = $row['ProductGroupID'];
-        }
-
-        return  GroupedList::create(
-                    ProductGroup::get()
-                    ->filter(array('ID' => $idArray))
-                    ->sort('IF("ClassName" = \'BrandPage\', 1, 0) ASC, Title ASC')
-                );
-    }
-
     function HasSearchFilterAndSort()
     {
         return true;
