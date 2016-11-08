@@ -58,7 +58,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
     private static $defaults = array(
         'ShowInMenus' => false
     );
-    
+
     private static $indexes = array(
         'SerialNumber' => true
     );
@@ -221,7 +221,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $fields->removeFieldFromTab('Root', 'Content');
         $fields->removeFieldFromTab('Root', 'Metadata');
         $fields->removeFieldFromTab('Root', 'AddToCartLink');
-        
+
         $fields->addFieldsToTab(
             'Root.Main',
             array(
@@ -245,6 +245,8 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $fields->addFieldsToTab(
             'Root.Main',
             array(
+                ReadonlyField::create('CanBeSold', "For Sale", DBField::create_field('Boolean', $this->canPurchase())->Nice()),
+                ReadonlyField::create('CreatedNice', "First Entered", $this->Created.' = '.DBField::create_field('Date', $this->Created)->Ago()),
                 TextField::create('InternalItemID', "Product Code"),
                 $salePriceField = NumericField::create('Price', 'Sale Price'),
                 $purchasePriceField = NumericField::create('PurchasePrice', 'Purchase Price'),
@@ -268,7 +270,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
             )
         );
         $soldDate->setDisabled(True);
-        
+
         //set right titles and descriptions
         $featuredProductField->setDescription('If this box is ticked then this product will appear in the "Featured Products" box on the home page');
         $allowPurchaseField->setDescription("This box must be ticked to allow a customer to purchase it");
@@ -339,7 +341,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
                 CheckboxField::create('SellersIDPhotocopy', 'ID Photocopy')
             )
         );
-        
+
         if (class_exists('GoogleAddressField')) {
             $mappingArray = $this->Config()->get('fields_to_google_geocode_conversion');
             if (is_array($mappingArray) && count($mappingArray)) {
@@ -400,7 +402,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
             'Root.Categorisation',
             $categoriesTable = $this->getProductGroupsTableField()
         );
-        
+
         // If the product has been sold all fields should be disabled
         // Only the shop administrator is allowed to undo this.
         if($this->HasBeenSold()){
@@ -416,14 +418,14 @@ class SecondHandProduct extends Product implements PermissionProvider {
                     GridFieldConfig_RecordViewer::create()
                 )
             );
-            
+
         }
-        
+
         if($this->HasBeenSold() && Permission::check('ADMIN')){
             $fields->replaceField('AllowPurchase', CheckboxField::create('AllowPurchase', '<strong>Allow product to be purchased</strong>'));
             $fields->replaceField('DateItemWasSold', DateField::create('DateItemWasSold','Date this item was sold'));
         }
-        
+
         return $fields;
     }
 
@@ -462,7 +464,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
             if($createdDate < 1000) {
                 $createdDate = strtotime($this->Created);
             }
-            $daysOld = (time() - $createdDate) / 60 / 60 / 24;
+            $daysOld = (time() - $createdDate) / (60 * 60 * 24);
             if($daysOld <= $embargoDays) {
                 return false;
             }
@@ -514,7 +516,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         if (! $this->AllowPurchase){
             $this->DateItemWasSold = SS_Datetime::now()->Rfc2822();
         }
-        
+
         parent::onBeforeWrite();
     }
 
