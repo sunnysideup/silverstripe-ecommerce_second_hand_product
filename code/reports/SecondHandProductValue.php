@@ -7,7 +7,7 @@ class SecondHandProductValue extends SS_Report
      * The class of object being managed by this report.
      * Set by overriding in your subclass.
      */
-    protected $dataClass = 'SiteTree';
+    protected $dataClass = 'SecondHandProduct';
 
     /**
      * @return string
@@ -75,11 +75,14 @@ class SecondHandProductValue extends SS_Report
         );
     }
 
-    /**
-     * @return FieldList
-     */
-    public function getParameterFields()
+    function getReportField()
     {
-        return new FieldList();
+        $field = parent::getReportField();
+        $config = $field->getConfig();
+        $exportButton = $config->getComponentByType('GridFieldExportButton');
+        $exportButton->setExportColumns($field->getColumns());
+        
+        return $field;
     }
+    
 }
