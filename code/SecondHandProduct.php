@@ -84,6 +84,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
         'SellersIDPhotocopy'
     );
 
+
     public function getSellerSummary()
     {
         $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');

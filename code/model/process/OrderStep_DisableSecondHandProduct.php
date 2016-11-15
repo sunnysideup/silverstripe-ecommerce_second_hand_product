@@ -54,7 +54,7 @@ class OrderStep_DisableSecondHandProduct extends OrderStep implements OrderStepI
                  $buyable->AllowPurchase = 0;
                  if (is_a($buyable, Object::getCustomClass('SiteTree'))) {
                      $buyable->writeToStage('Stage');
-                     $buyable->doPublish();
+                     $buyable->publish('Stage', 'Live');
                  } else {
                      $buyable->write();
                  }
