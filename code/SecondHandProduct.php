@@ -64,7 +64,8 @@ class SecondHandProduct extends Product implements PermissionProvider {
     );
 
     private static $casting = array(
-        'SellersSummary' => 'Varchar'
+        'SellersSummary' => 'Varchar',
+        'CreatedNice' => 'Varchar'
     );
 
     private static $seller_summary_detail_fields = array(
@@ -247,7 +248,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
             'Root.Main',
             array(
                 ReadonlyField::create('CanBeSold', "For Sale", DBField::create_field('Boolean', $this->canPurchase())->Nice()),
-                ReadonlyField::create('CreatedNice', "First Entered", $this->Created.' = '.DBField::create_field('Date', $this->Created)->Ago()),
+                ReadonlyField::create('CreatedNice', "First Entered", $this->getCreatedNice()),
                 TextField::create('InternalItemID', "Product Code"),
                 $salePriceField = NumericField::create('Price', 'Sale Price'),
                 $purchasePriceField = NumericField::create('PurchasePrice', 'Purchase Price'),
@@ -461,10 +462,12 @@ class SecondHandProduct extends Product implements PermissionProvider {
         }
         $embargoDays = Config::inst()->get('SecondHandProduct', 'embargo_number_of_days');
         if(intval($embargoDays) > 0) {
-            $createdDate = strtotime($this->DateItemWasBought);
-            if($createdDate < 1000) {
-                $createdDate = strtotime($this->Created);
+            if($this->DateItemWasBought) {
+                $date = $this->DateItemWasBought;
+            } else {
+                $date = $this->Created;
             }
+            $createdDate = strtotime($date);
             $daysOld = (time() - $createdDate) / (60 * 60 * 24);
             if($daysOld <= $embargoDays) {
                 return false;
@@ -475,17 +478,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
 
     function HasBeenSold() {
         if(parent::HasBeenSold()) {
-            $orderItems = OrderItem::get()->filter(
-                array("BuyableID" => $this->ID, "BuyableClassName" => $this->ClassName)
-            );
-            if($orderItems->count()){
-                foreach($orderItems as $item){
-                    $order = $item->Order();
-                    if($order && $order->IsSubmitted() && !$order->IsCancelled()) {
-                        return true;
-                    }
-                }
-            }
+            return true;
         }
         if($this->DateItemWasSold){
             return true;
@@ -514,10 +507,11 @@ class SecondHandProduct extends Product implements PermissionProvider {
         $this->URLSegment = $this->generateURLSegment($this->Title."-".$this->InternalItemID);
 
         // Save the date when the product was sold.
-        if (! $this->AllowPurchase){
-            $this->DateItemWasSold = SS_Datetime::now()->Rfc2822();
+        if ($this->HasBeenSold()){
+            if(! $this->DateItemWasSold) {
+                $this->DateItemWasSold = SS_Datetime::now()->Rfc2822();
+            }
         }
-
         parent::onBeforeWrite();
     }
 
@@ -585,7 +579,7 @@ class SecondHandProduct extends Product implements PermissionProvider {
      */
     public function summaryFields() {
         $fields = parent::summaryFields();
-        $fields['Created'] = 'Created';
+        $fields['CreatedNice'] = 'Entered';
         return $fields;
     }
 
@@ -596,6 +590,18 @@ class SecondHandProduct extends Product implements PermissionProvider {
             $this->DateItemWasBought = SS_Datetime::now()->Rfc2822();
         }
     }
+
+
+    public function getCreatedNice()
+    {
+        if($this->DateItemWasBought) {
+            $date = $this->DateItemWasBought;
+        } else {
+            $date = $this->Created;
+        }
+        return $date.' = '.DBField::create_field('Date', $date)->Ago();
+    }
+
 
 }
 
@@ -666,4 +672,6 @@ class SecondHandProduct_Controller extends Product_Controller {
         }
         return $al;
     }
+
+
 }
