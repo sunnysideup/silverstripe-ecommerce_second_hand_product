@@ -20,7 +20,7 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask
         $permissionProviderFactory = Injector::inst()->get('PermissionProviderFactory');
         db::alteration_message('========================== <br />creating second hand products sales manager', 'created');
         $email = EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_user_email');
-        if ( ! $email) {
+        if (! $email) {
             $email = 'secondhandproducts@'.$_SERVER['HTTP_HOST'];
         }
         $firstName = EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_user_first_name');
@@ -49,5 +49,4 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask
             $member
         );
     }
-
 }

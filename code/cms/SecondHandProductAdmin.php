@@ -9,8 +9,8 @@
  * @sub-package: cms
  **/
 
-class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass {
-
+class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
+{
     private static $menu_priority = 3.2;
 
     private static $url_segment = 'secondhandproducts';
@@ -34,14 +34,15 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass {
     private static $menu_icon = "ecommerce/images/icons/product-file.gif";
 
 
-    function getEditForm($id = null, $fields = null){
-        foreach(GoogleAddressField::js_requirements() as $jsFile) {
+    public function getEditForm($id = null, $fields = null)
+    {
+        foreach (GoogleAddressField::js_requirements() as $jsFile) {
             Requirements::javascript($jsFile);
         }
         $form = parent::getEditForm();
-        if(singleton($this->modelClass) instanceof SiteTree) {
-            if($gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass))) {
-                if($gridField instanceof GridField) {
+        if (singleton($this->modelClass) instanceof SiteTree) {
+            if ($gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass))) {
+                if ($gridField instanceof GridField) {
                     $gridField->setConfig(GridFieldEditOriginalPageConfigSecondHandPage::create());
                 }
             }
@@ -50,8 +51,8 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass {
     }
 
 
-    public function doCancel($data, $form) {
+    public function doCancel($data, $form)
+    {
         return $this->redirect(singleton('CMSMain')->Link());
     }
-
 }

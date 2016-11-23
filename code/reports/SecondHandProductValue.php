@@ -19,7 +19,7 @@ class SecondHandProductValue extends SS_Report
         $object = Currency::create('Sum');
         $object->setValue($sum);
         $name = _t(
-            'EcommerceSideReport.SECOND_HAND_REPORT_TOTAL_STOCK_VALUE', 
+            'EcommerceSideReport.SECOND_HAND_REPORT_TOTAL_STOCK_VALUE',
             'Second Hand Products, total stock value'
          );
         return $name . ': ' . $object->Nice();
@@ -75,7 +75,7 @@ class SecondHandProductValue extends SS_Report
         );
     }
 
-    function getReportField()
+    public function getReportField()
     {
         $field = parent::getReportField();
         $config = $field->getConfig();
@@ -84,5 +84,4 @@ class SecondHandProductValue extends SS_Report
         
         return $field;
     }
-    
 }

@@ -2,8 +2,7 @@
 
 class OrderStep_DisableSecondHandProduct extends OrderStep implements OrderStepInterface
 {
-
-    function HideFromEveryone()
+    public function HideFromEveryone()
     {
         return true;
     }
@@ -49,8 +48,8 @@ class OrderStep_DisableSecondHandProduct extends OrderStep implements OrderStepI
       **/
      public function doStep(Order $order)
      {
-         foreach($order->Buyables() as $buyable) {
-             if($buyable instanceof SecondHandProduct) {
+         foreach ($order->Buyables() as $buyable) {
+             if ($buyable instanceof SecondHandProduct) {
                  $buyable->AllowPurchase = 0;
                  if (is_a($buyable, Object::getCustomClass('SiteTree'))) {
                      $buyable->writeToStage('Stage');
@@ -85,5 +84,4 @@ class OrderStep_DisableSecondHandProduct extends OrderStep implements OrderStepI
     {
         return _t('OrderStep.DISABLESECONDHANDPRODUCT_DESCRIPTION', 'Disallow second hand products from being sold more than once.');
     }
-
 }

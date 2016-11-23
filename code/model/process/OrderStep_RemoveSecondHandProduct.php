@@ -2,8 +2,7 @@
 
 class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepInterface
 {
-
-    function HideFromEveryone()
+    public function HideFromEveryone()
     {
         return true;
     }
@@ -49,8 +48,8 @@ class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepIn
       **/
      public function doStep(Order $order)
      {
-         foreach($order->Buyables() as $buyable) {
-             if($buyable instanceof SecondHandProduct) {
+         foreach ($order->Buyables() as $buyable) {
+             if ($buyable instanceof SecondHandProduct) {
                  if (is_a($buyable, Object::getCustomClass('SiteTree'))) {
                      $buyable->deleteFromStage('Live');
                      $buyable->deleteFromStage('Stage');
@@ -84,5 +83,4 @@ class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepIn
     {
         return _t('OrderStep.REMOVESECONDHANDPRODUCT_DESCRIPTION', 'Remove second hand products once the sale has been confirmed.');
     }
-
 }

@@ -3,7 +3,6 @@
 
 class CMSPageAddController_SecondHandProducts extends CMSPageAddController
 {
-
     private static $url_segment = 'addsecondhandproduct';
 
     private static $url_rule = '/$Action/$ID/$OtherID';
@@ -23,15 +22,17 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
     /**
      * @return Form
      */
-    public function AddForm() {
+    public function AddForm()
+    {
         $pageTypes = array();
-        foreach($this->PageTypes() as $type) {
+        foreach ($this->PageTypes() as $type) {
             $html = sprintf('<span class="page-icon class-%s"></span><strong class="title">%s</strong><span class="description">%s</span>',
                 $type->getField('ClassName'),
                 $type->getField('AddAction'),
                 $type->getField('Description')
             );
-            $pageTypes[$type->getField('ClassName')] = DBField::create_field('HTMLText', $html);;
+            $pageTypes[$type->getField('ClassName')] = DBField::create_field('HTMLText', $html);
+            ;
         }
 
         $numericLabelTmpl = '<span class="step-label"><span class="flyout">%d</span><span class="arrow"></span><span class="title">%s</span></span>';
@@ -69,15 +70,15 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
 
         // CMSMain->currentPageID() automatically sets the homepage,
         // which we need to counteract in the default selection (which should default to root, ID=0)
-        if($parentID = $this->getRequest()->getVar('ParentID')) {
+        if ($parentID = $this->getRequest()->getVar('ParentID')) {
             $parentField->setValue((int)$parentID);
         }
 
         $actions = new FieldList(
-            FormAction::create("doAdd", _t('CMSMain.Create',"Create"))
+            FormAction::create("doAdd", _t('CMSMain.Create', "Create"))
                 ->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept')
                 ->setUseButtonTag(true),
-            FormAction::create("doCancel", _t('CMSMain.Cancel',"Cancel"))
+            FormAction::create("doCancel", _t('CMSMain.Cancel', "Cancel"))
                 ->addExtraClass('ss-ui-action-destructive ss-ui-action-cancel')
                 ->setUseButtonTag(true)
         );
@@ -97,30 +98,31 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
         return $form;
     }
 
-    public function doAdd($data, $form) {
+    public function doAdd($data, $form)
+    {
         $className = isset($data['PageType']) ? $data['PageType'] : "Page";
         $parentID = isset($data['ParentID']) ? (int)$data['ParentID'] : 0;
 
         $suffix = isset($data['Suffix']) ? "-" . $data['Suffix'] : null;
 
-        if( ! $parentID && isset($data['Parent'])) {
+        if (! $parentID && isset($data['Parent'])) {
             $page = SiteTree::get_by_link($data['Parent']);
-            if($page) {
+            if ($page) {
                 $parentID = $page->ID;
             }
         }
 
-        if(is_numeric($parentID) && $parentID > 0) {
+        if (is_numeric($parentID) && $parentID > 0) {
             $parentObj = ProductGroup::get()->byID($parentID);
         } else {
             $parentObj = null;
         }
 
-        if(!$parentObj || !$parentObj->ID) {
+        if (!$parentObj || !$parentObj->ID) {
             $parentID = 0;
         }
 
-        if(!singleton($className)->canCreate(
+        if (!singleton($className)->canCreate(
             Member::currentUser(),
             array('Parent' => $parentObj))
         ) {
@@ -132,7 +134,7 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
 
         try {
             $record->write();
-        } catch(ValidationException $ex) {
+        } catch (ValidationException $ex) {
             $form->sessionMessage($ex->getResult()->message(), 'bad');
             return $this->getResponseNegotiator()->respond($this->getRequest());
         }
@@ -146,7 +148,8 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
         return $this->redirect($record->CMSEditLink());
     }
 
-    public function doCancel($data, $form) {
+    public function doCancel($data, $form)
+    {
         return $this->redirect(singleton('SecondHandProductAdmin')->Link());
     }
 

@@ -3,9 +3,10 @@
     "type": "silverstripe-module",
     "description": "Add a second hand product (or similar) to your Silverstripe e-commerce install.",
     "keywords": [
-        "e-commerce",
+        "Silverstripe-CMS",
         "CMS",
         "Silverstripe",
+        "e-commerce",
         "second hand",
         "second-hand",
         "product",
@@ -20,9 +21,10 @@
         }
     ],
     "require": {
-        "silverstripe/framework": "^3.4",
+        "silverstripe/framework": "~3.1",
         "sunnysideup/ecommerce": "*",
-        "sunnysideup/google_address_field": "*"
+        "sunnysideup/google_address_field": "*",
+        "silverstripe/cms": "~3.1"
     },
     "extra": {
         "installer-name": "ecommerce_second_hand_product"
