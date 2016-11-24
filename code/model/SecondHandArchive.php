@@ -17,7 +17,7 @@ class SecondHandArchive extends DataObject
 
     public static function create_from_page($page)
     {
-        if($page->InternalItemID) {
+        if ($page->InternalItemID) {
             $filter = array(
                 'InternalItemID' => $page->InternalItemID
             );
@@ -27,7 +27,7 @@ class SecondHandArchive extends DataObject
             );
         }
         $obj = SecondHandArchive::get()->filter($filter)->first();
-        if( ! $obj) {
+        if (! $obj) {
             $obj = SecondHandArchive::create($filter);
         }
         $obj->Title = $page->Title;
@@ -48,7 +48,8 @@ class SecondHandArchive extends DataObject
      * stadard SS method
      * @return Boolean
      */
-    public function canCreate($member = null) {
+    public function canCreate($member = null)
+    {
         return false;
     }
 
@@ -57,38 +58,45 @@ class SecondHandArchive extends DataObject
      * stadard SS method
      * @return Boolean
      */
-    public function canEdit($member = null) {
+    public function canEdit($member = null)
+    {
         return false;
-
     }
 
     /**
      * stadard SS method
      * @return Boolean
      */
-    public function canView($member = null) {
+    public function canView($member = null)
+    {
         return Permission::check(
             EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code')
         );
-
     }
 
     /**
      * stadard SS method
      * @return Boolean
      */
-    public function canDelete($member = null) {
+    public function canDelete($member = null)
+    {
         return false;
     }
 
 
     private static $singular_name = 'Archived Second Hand Product';
 
-    function i18n_singular_name() { return self::$singular_name;}
+    public function i18n_singular_name()
+    {
+        return self::$singular_name;
+    }
 
     private static $plural_name = 'Archived Second Hand Products';
 
-    function i18n_plural_name() { return self::$plural_name;}
+    public function i18n_plural_name()
+    {
+        return self::$plural_name;
+    }
 
     private static $indexes = array(
         'PageID' => true,

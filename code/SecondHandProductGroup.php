@@ -3,7 +3,6 @@
 
 class SecondHandProductGroup extends ProductGroup
 {
-
     private static $allowed_children = array(
         'SecondHandProductGroup',
         'SecondHandProduct'
@@ -35,18 +34,16 @@ class SecondHandProductGroup extends ProductGroup
      * @var string
      */
     private static $description = 'A product category page specifically for second had products';
-
 }
 
 class SecondHandProductGroup_Controller extends ProductGroup_Controller
 {
-
     private static $allowed_actions = array(
         'SearchSecondHandProducts',
         'search'
     );
 
-    function init()
+    public function init()
     {
         Config::inst()->update(
             'ProductGroup',
@@ -76,20 +73,18 @@ class SecondHandProductGroup_Controller extends ProductGroup_Controller
     public function doSearchSecondHandProducts($data, $form)
     {
         $page = SecondHandProductGroup::get()->first();
-        if($page) {
+        if ($page) {
             return $this->redirect($this->link('search').'?searchterm='.$data['searchterm']);
         }
     }
 
-    function search($request)
+    public function search($request)
     {
         $term = Convert::raw2sql($request->param('searchterm'));
-
     }
 
-    function HasSearchFilterAndSort()
+    public function HasSearchFilterAndSort()
     {
         return true;
     }
-
 }

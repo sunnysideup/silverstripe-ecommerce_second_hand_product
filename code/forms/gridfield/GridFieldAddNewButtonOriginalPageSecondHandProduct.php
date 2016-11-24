@@ -16,7 +16,7 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
     {
         $singleton = singleton($gridField->getModelClass());
 
-        if ( ! $singleton->canCreate()) {
+        if (! $singleton->canCreate()) {
             return array();
         }
 

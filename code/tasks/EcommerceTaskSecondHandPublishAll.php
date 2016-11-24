@@ -10,12 +10,11 @@ class EcommerceTaskSecondHandPublishAll extends BuildTask
     {
         increase_time_limit_to(600);
         $products = SecondHandProduct::get();
-        foreach($products as $product) {
+        foreach ($products as $product) {
             DB::alteration_message('Publish: '.$product->Title);
             $product->writeToStage('Stage');
             $product->publish('Stage', 'Live');
         }
         DB::alteration_message(' ================= Completed =================  ');
-
     }
 }
