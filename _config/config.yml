@@ -20,6 +20,10 @@ SecondHandProductGroup:
       Title: 'Default Order - (Most Recent)'
       SQL: "\"Created\" DESC"
 
+EcommerceRole:
+  admin_role_permission_codes:
+    - CMS_ACCESS_SecondHandProductAdmin
+
 ---
 Only:
   moduleexists: 'grouped-cms-menu'
