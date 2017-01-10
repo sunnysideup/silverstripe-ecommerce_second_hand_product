@@ -1,0 +1,72 @@
+# Silverstripe ecommerce second hand product module
+[![Build Status](https://travis-ci.org/sunnysideup/silverstripe-ecommerce_second_hand_product.svg?branch=master)](https://travis-ci.org/sunnysideup/silverstripe-ecommerce_second_hand_product)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/sunnysideup/silverstripe-ecommerce_second_hand_product/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/sunnysideup/silverstripe-ecommerce_second_hand_product/?branch=master)
+[![codecov.io](https://codecov.io/github/sunnysideup/silverstripe-ecommerce_second_hand_product/coverage.svg?branch=master)](https://codecov.io/github/sunnysideup/silverstripe-ecommerce_second_hand_product?branch=master)
+![helpfulrobot](https://helpfulrobot.io/sunnysideup/ecommerce_second_hand_product/badge)
+
+[![Latest Stable Version](https://poser.pugx.org/sunnysideup/ecommerce_second_hand_product/version)](https://packagist.org/packages/sunnysideup/ecommerce_second_hand_product)
+[![License](https://poser.pugx.org/sunnysideup/ecommerce_second_hand_product/license)](https://packagist.org/packages/sunnysideup/ecommerce_second_hand_product)
+[![Monthly Downloads](https://poser.pugx.org/sunnysideup/ecommerce_second_hand_product/d/monthly)](https://packagist.org/packages/sunnysideup/ecommerce_second_hand_product)
+
+
+## Documentation
+
+
+
+ * [Developer Docs](docs/en/INDEX.md)
+ * [User Guide](docs/en/userguide.md)
+ * [API](http://ssmods.com/apis/ecommerce_second_hand_product/docs/en/api/)
+
+## Requirements
+
+
+
+see [composer.json](composer.json) for details
+
+### Suggested Modules
+
+
+
+see [composer.json](composer.json) for details
+
+
+## Installation
+
+
+```
+composer require sunnysideup/ecommerce_second_hand_product
+```
+
+### Configuration
+
+
+
+In the `_config` folder you will find the `ecommerce_second_hand_product.yml.example`
+file that shows options for the configuration of this module.
+
+We recommend that you:
+
+  1. copy these `ecommerce_second_hand_product.yml.example` files into your
+`mysite/_config` folder
+  2. remove the .example extension
+  3. delete the lines you not care about, and
+  4. adjust the configurations that you would like to use.
+
+
+## Contributing
+
+
+
+We welcome any contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+
+## Paid assistance
+
+
+
+You can pay us to create an improved / adapted version of this module for your own projects.  Please contact us if you like to find out more: [www.sunnysideup.co.nz](http://www.sunnysideup.co.nz)
+
+## Author
+
+
+
+Sunny Side Up Ltd.
