@@ -24,7 +24,8 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
 
     private static $allowed_actions = array(
         "editinsitetree",
-        "ItemEditForm"
+        "ItemEditForm",
+        "restore" => true,
     );
 
     /**
@@ -54,5 +55,28 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
     public function doCancel($data, $form)
     {
         return $this->redirect(singleton('CMSMain')->Link());
+    }
+
+    function restore($request){
+        if(isset($_GET['productid'])){
+            $id = intval($_GET['productid']);
+            if($id) {
+                $restoredPage = Versioned::get_latest_version("SiteTree", $id);
+                if(!$restoredPage) 	return new SS_HTTPResponse("SiteTree #$id not found", 400);
+                $restoredPage = $restoredPage->doRestoreToStage();
+                $restoredPage->doPublish();
+                $this->getResponse()->addHeader(
+                    'X-Status',
+                    rawurlencode(_t(
+                        'CMSMain.RESTORED',
+                        "Restored '{title}' successfully",
+                        array('title' => $restoredPage->Title)
+                    ))
+                );
+                $cmsEditLink = '/admin/secondhandproducts/SecondHandProduct/EditForm/field/SecondHandProduct/item/'.$id.'/edit';
+                return Controller::curr()->redirect($cmsEditLink);
+            }
+        }
+        return new SS_HTTPResponse("ERROR!", 400);
     }
 }
