@@ -85,6 +85,35 @@ class SecondHandProduct extends Product implements PermissionProvider
         'SellersIDPhotocopy'
     );
 
+    private static $searchable_fields = array(
+        'FullName' => array(
+            'title' => 'Keyword',
+            'field' => 'TextField',
+        ),
+        'Price' => array(
+            'title' => 'Price',
+            'field' => 'NumericField',
+        ),
+        'InternalItemID' => array(
+            'title' => 'Internal Item ID',
+            'filter' => 'PartialMatchFilter',
+        ),
+        'SellersName' => array(
+            'title' => 'Sellers Name',
+            'filter' => 'PartialMatchFilter',
+        ),
+        'SellersPhone' => array(
+            'title' => 'Sellers Phone',
+            'filter' => 'PartialMatchFilter',
+        ),
+        'SellersEmail' => array(
+            'title' => 'Sellers Email',
+            'filter' => 'PartialMatchFilter',
+        ),
+        'AllowPurchase',
+        'PurchasePrice' => 'ExactMatchFilter',
+        'SerialNumber' => 'PartialMatchFilter'
+    );
 
     public function getSellerSummary()
     {
