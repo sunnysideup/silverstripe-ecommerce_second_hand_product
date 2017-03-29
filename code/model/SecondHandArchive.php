@@ -139,4 +139,24 @@ class SecondHandArchive extends DataObject
         'OriginalManual' => 'ExactMatchFilter',
         'SerialNumber' => 'PartialMatchFilter'
     );
+
+    /**
+     * stadard SS method
+     * @return FieldList
+     */
+    public function getCMSFields()
+    {
+        $fields = parent::getCMSFields();
+        $fields->addFieldsToTab(
+            'Root.Main',
+            array(
+                EcommerceCMSButtonField::create(
+                    'RestoreButton',
+                    '/admin/secondhandproducts/SecondHandProduct/restore/?productid=' . $this->PageID,
+                    _t('SecondHandArchive.RESTORE_BUTTON', 'Restore Product')
+                )
+            )
+        );
+        return $fields;
+    }
 }
