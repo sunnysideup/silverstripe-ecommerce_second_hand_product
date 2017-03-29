@@ -122,7 +122,7 @@ class SecondHandArchive extends DataObject
         'Title' => 'Title',
         'Price' => 'Sale Price',
         'InternalItemID' => 'Code',
-        'PurchasePrice' => 'Purcahse Price',
+        'PurchasePrice' => 'Purchase Price',
         'ProductQuality' => 'Quality',
         'IncludesBoxOrCase' => 'Includes',
         'OriginalManual' => 'Has Manual',
