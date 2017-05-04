@@ -302,6 +302,7 @@ class SecondHandProduct extends Product implements PermissionProvider
                 $soldDate = DateField::create('DateItemWasSold', 'Date this item was sold'),
                 $mainImageField = UploadField::create("Image", "Main Product Image"),
                 $additionalImagesField = UploadField::create("AdditionalImages", "More Images"),
+                $metaFieldDesc = TextareaField::create("MetaDescription", 'Meta Description')
             )
         );
         $soldDate->setDisabled(true);
@@ -540,6 +541,10 @@ class SecondHandProduct extends Product implements PermissionProvider
             $this->InternalItemID = "S-H-".strtoupper(substr(md5(microtime()), rand(0, 26), 5));
         }
         $this->URLSegment = $this->generateURLSegment($this->Title."-".$this->InternalItemID);
+
+        if ($this->Title && strlen($this->MetaDescription) < 30) {
+            $this->MetaDescription = "Second Hand Product: " . $this->Title;
+        }
 
         // Save the date when the product was sold.
         if ($this->HasBeenSold()) {
