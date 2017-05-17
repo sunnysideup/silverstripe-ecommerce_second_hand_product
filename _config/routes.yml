@@ -1,0 +1,13 @@
+---
+Name: ecommerce_second_hand_product_routes
+Before:
+  - 'mysite/*'
+After:
+  - 'framework/*'
+  - 'cms/*'
+  - 'ecommerce/*'
+---
+
+Director:
+  rules:
+    'secondhandproductlist//$Action/$ID/$OtherID': 'ExportSecondHandProducts'

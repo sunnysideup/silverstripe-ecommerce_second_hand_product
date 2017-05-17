@@ -27,7 +27,7 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
         }
 
         $getSegment = '';
-        if ($page = $this->BestParentPage()) {
+        if ($page = $this->BestRootParentPage()) {
             $getSegment = '?ParentID='.$page->ID;
         }
 
@@ -46,8 +46,10 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
      *
      * @return SiteTree | NULL
      */
-    public function BestParentPage()
+    public function BestRootParentPage()
     {
-        return SecondHandProductGroup::get()->first();
+        $singleton = Injector::inst()->get('SecondHandProductGroup');
+
+        return $singleton->BestRootParentPage();
     }
 }

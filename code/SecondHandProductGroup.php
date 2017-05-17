@@ -3,6 +3,11 @@
 
 class SecondHandProductGroup extends ProductGroup
 {
+
+    private static $db = array(
+        'RootParent' => 'Boolean'
+    );
+
     private static $allowed_children = array(
         'SecondHandProductGroup',
         'SecondHandProduct'
@@ -34,6 +39,74 @@ class SecondHandProductGroup extends ProductGroup
      * @var string
      */
     private static $description = 'A product category page specifically for second had products';
+
+    public function getCMSFields() {
+        $fields = parent::getCMSFields();
+        $fields->addFieldToTab(
+            'Root.SecondHand',
+            CheckboxField::create(
+                'RootParent',
+                _t('SecondHandProductGroup.LANDING_PAGE', 'Landing Page')
+            )
+        );
+        return $fields;
+    }
+
+    /**
+     * Event handler called before writing to the database.
+     */
+    public function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+        if($this->ParentID) {
+            $parent = SiteTree::get()->byID($this->ParentID);
+            if($parent) {
+                if($parent instanceof SecondHandProductGroup) {
+                    $this->RootParent = false;
+                } else {
+                    if(! $this->hasOtherSecondHandProductGroupsOnThisLevel()) {
+                        $this->RootParent = true;
+                    }
+                }
+            }
+        } else {
+            if( ! $this->hasOtherSecondHandProductGroupsOnThisLevel()) {
+                $this->RootParent = true;
+            }
+        }
+    }
+
+    /**
+     * Level is within SiteTree hierarchy
+     * @return boolean
+     */
+    protected function hasOtherSecondHandProductGroupsOnThisLevel()
+    {
+        if(!$this->ParentID) {
+            $this->ParentID = 0;
+        }
+        return SecondHandProductGroup::get()
+            ->filter(array('ParentID' => $this->ParentID))
+            ->exclude(array('ID' => $this->ID))
+            ->count() > 0 ? true : false;
+
+    }
+
+    /**
+     * @return SecondHandProductGroup
+     */
+    function BestRootParentPage()
+    {
+        $obj = DataObject::get_one(
+            'SecondHandProductGroup',
+            array('RootParent' => 1)
+        );
+        if($obj) {
+            $obj;
+        } else {
+            return SecondHandProductGroup::get()->first();
+        }
+    }
 }
 
 class SecondHandProductGroup_Controller extends ProductGroup_Controller

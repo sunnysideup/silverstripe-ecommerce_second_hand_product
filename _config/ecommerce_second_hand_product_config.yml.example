@@ -8,3 +8,13 @@ OrderStep:
     step5: OrderStep_Paid
     step6: OrderStep_RemoveSecondHandProduct
     step7: OrderStep_Archived
+
+ExportSecondHandProducts:
+  #must end in .json
+  location_to_save_contents: '/my/data/folder/file.json'
+  do_not_copy:
+    - MyCustomField
+  secret_codes:
+    'AAA': '1.1.1.1'
+    # all ips
+    'BBB': '*'
