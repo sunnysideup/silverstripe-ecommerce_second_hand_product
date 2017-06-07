@@ -72,15 +72,15 @@ class ExportSecondHandProducts extends Controller
         }
     }
 
-    function groups()
+    function groups ()
     {
         $array = array();
         $groups = SecondHandProductGroup::get()->exclude(array('RootParent' => 1));
         $count = 0;
         $doNotCopy = $this->Config()->get('do_not_copy');
         $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
-        foreach($groups as $groups) {
-            $array[$count] = $groups->toMap();
+        foreach($groups as $group) {
+            $array[$count] = $group->toMap();
             foreach($doNotCopy as $field) {
                 unset($array[$count][$field]);
             }
@@ -119,7 +119,7 @@ class ExportSecondHandProducts extends Controller
                 }
             }
         }
-        return Permission::check('ADMIN', 'any', $member);
+        return Permission::check('ADMIN');
     }
 
 }
