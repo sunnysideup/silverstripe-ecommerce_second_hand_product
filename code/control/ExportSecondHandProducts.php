@@ -6,6 +6,10 @@ class ExportSecondHandProducts extends Controller
     private static $do_not_copy = array(
         'ClassName',
         'ParentID',
+        'Created',
+        'HasBrokenFile',
+        'HasBrokenLink',
+        'HasBrokenFile',
         'ImageID',
         'SellersIDPhotocopy',
         'SellersIDType',
@@ -42,7 +46,7 @@ class ExportSecondHandProducts extends Controller
      *
      * @var string
      */
-    private static $url_segment_of_parent_field_name = '__ParentURLSegment__';
+    private static $url_segment_of_parent_field_name = 'ParentURLSegmentForImportExport';
 
     function products()
     {
