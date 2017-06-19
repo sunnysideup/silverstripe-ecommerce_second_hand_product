@@ -102,7 +102,7 @@ class SecondHandProductGroup extends ProductGroup
             array('RootParent' => 1)
         );
         if($obj) {
-            $obj;
+            return $obj;
         } else {
             return SecondHandProductGroup::get()->first();
         }

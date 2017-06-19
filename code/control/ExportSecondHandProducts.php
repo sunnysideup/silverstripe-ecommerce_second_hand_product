@@ -6,6 +6,10 @@ class ExportSecondHandProducts extends Controller
     private static $do_not_copy = array(
         'ClassName',
         'ParentID',
+        'Created',
+        'HasBrokenFile',
+        'HasBrokenLink',
+        'HasBrokenFile',
         'ImageID',
         'SellersIDPhotocopy',
         'SellersIDType',
@@ -42,66 +46,71 @@ class ExportSecondHandProducts extends Controller
      *
      * @var string
      */
-    private static $url_segment_of_parent_field_name = '__ParentURLSegment__';
+    private static $url_segment_of_parent_field_name = 'ParentURLSegmentForImportExport';
 
-    function products()
+    function init() 
     {
-        if($this->MyPermissionCheck()) {
-            $array = array();
-            $products = SecondHandProduct::get()->filter(array('AllowPurchase' => 1));
-            $count = 0;
-            $doNotCopy = $this->Config()->get('do_not_copy');
-            $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
-            foreach($products as $product) {
-                $array[$count] = $product->toMap();
-                foreach($doNotCopy as $field) {
-                    unset($array[$count][$field]);
-                }
-                if($parent = $product->Parent()) {
-                    $array[$count][$parentURLSegmentField] = $parent->URLSegment;
-                }
-                $count++;
-            }
-            $json = json_encode($array);
-            $fileName = $this->Config()->get('location_to_save_contents');
-            if($fileName) {
-                $fileNameFull = Director::baseFolder().'/'.$fileName;
-                file_put_contents($fileNameFull, $json);
-                die('COMPLETED');
-            } else {
-                return $json;
-            }
+        parent::init();
+        if(!$this->MyPermissionCheck()) {
+            die('you do not have access');
         }
     }
 
-    function groups()
+    function products()
     {
-        if($this->MyPermissionCheck()) {
-            $array = array();
-            $groups = SecondHandProductGroup::get()->exclude(array('RootParent' => 1));
-            $count = 0;
-            $doNotCopy = $this->Config()->get('do_not_copy');
-            $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
-            foreach($groups as $groups) {
-                $array[$count] = $groups->toMap();
-                foreach($doNotCopy as $field) {
-                    unset($array[$count][$field]);
-                }
-                if($parent = $group->Parent()) {
-                    $array[$count][$parentURLSegmentField] = $parent->URLSegment;
-                }
-                $count++;
+        $array = array();
+        $products = SecondHandProduct::get()->filter(array('AllowPurchase' => 1));
+        $count = 0;
+        $doNotCopy = $this->Config()->get('do_not_copy');
+        $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
+        foreach($products as $product) {
+            $array[$count] = $product->toMap();
+            foreach($doNotCopy as $field) {
+                unset($array[$count][$field]);
             }
-            $json = json_encode($array);
-            $fileName = $this->Config()->get('location_to_save_contents');
-            if($fileName) {
-                $fileName = str_replace('.json', '.groups.json', $fileName);
-                $fileNameFull = Director::baseFolder().'/'.$fileName;
-                file_put_contents($fileNameFull, $json);
-                die('COMPLETED');
-            } else {
-                return $json;
+            if($parent = $product->Parent()) {
+                $array[$count][$parentURLSegmentField] = $parent->URLSegment;
             }
+            $count++;
+        }
+        $json = json_encode($array);
+        $fileName = $this->Config()->get('location_to_save_contents');
+        if($fileName) {
+            $fileNameFull = Director::baseFolder().'/'.$fileName;
+            file_put_contents($fileNameFull, $json);
+            die('COMPLETED');
+        } else {
+            return $json;
+        }
+    }
+
+    function groups ()
+    {
+    
+        $array = array();
+        $groups = SecondHandProductGroup::get()->exclude(array('RootParent' => 1));
+        $count = 0;
+        $doNotCopy = $this->Config()->get('do_not_copy');
+        $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
+        foreach($groups as $group) {
+            $array[$count] = $group->toMap();
+            foreach($doNotCopy as $field) {
+                unset($array[$count][$field]);
+            }
+            if($parent = $group->Parent()) {
+                $array[$count][$parentURLSegmentField] = $parent->URLSegment;
+            }
+            $count++;
+        }
+        $json = json_encode($array);
+        $fileName = $this->Config()->get('location_to_save_contents');
+        if($fileName) {
+            $fileName = str_replace('.json', '.groups.json', $fileName);
+            $fileNameFull = Director::baseFolder().'/'.$fileName;
+            file_put_contents($fileNameFull, $json);
+            die('COMPLETED');
+        } else {
+            return $json;
         }
     }
 
