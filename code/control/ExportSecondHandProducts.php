@@ -46,58 +46,62 @@ class ExportSecondHandProducts extends Controller
 
     function products()
     {
-        $array = array();
-        $products = SecondHandProduct::get()->filter(array('AllowPurchase' => 1));
-        $count = 0;
-        $doNotCopy = $this->Config()->get('do_not_copy');
-        $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
-        foreach($products as $product) {
-            $array[$count] = $product->toMap();
-            foreach($doNotCopy as $field) {
-                unset($array[$count][$field]);
+        if($this->MyPermissionCheck()) {
+            $array = array();
+            $products = SecondHandProduct::get()->filter(array('AllowPurchase' => 1));
+            $count = 0;
+            $doNotCopy = $this->Config()->get('do_not_copy');
+            $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
+            foreach($products as $product) {
+                $array[$count] = $product->toMap();
+                foreach($doNotCopy as $field) {
+                    unset($array[$count][$field]);
+                }
+                if($parent = $product->Parent()) {
+                    $array[$count][$parentURLSegmentField] = $parent->URLSegment;
+                }
+                $count++;
             }
-            if($parent = $product->Parent()) {
-                $array[$count][$parentURLSegmentField] = $parent->URLSegment;
+            $json = json_encode($array);
+            $fileName = $this->Config()->get('location_to_save_contents');
+            if($fileName) {
+                $fileNameFull = Director::baseFolder().'/'.$fileName;
+                file_put_contents($fileNameFull, $json);
+                die('COMPLETED');
+            } else {
+                return $json;
             }
-            $count++;
-        }
-        $json = json_encode($array);
-        $fileName = $this->Config()->get('location_to_save_contents');
-        if($fileName) {
-            $fileNameFull = Director::baseFolder().'/'.$fileName;
-            file_put_contents($fileNameFull, $json);
-            die('COMPLETED');
-        } else {
-            return $json;
         }
     }
 
     function groups()
     {
-        $array = array();
-        $groups = SecondHandProductGroup::get()->exclude(array('RootParent' => 1));
-        $count = 0;
-        $doNotCopy = $this->Config()->get('do_not_copy');
-        $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
-        foreach($groups as $groups) {
-            $array[$count] = $groups->toMap();
-            foreach($doNotCopy as $field) {
-                unset($array[$count][$field]);
+        if($this->MyPermissionCheck()) {
+            $array = array();
+            $groups = SecondHandProductGroup::get()->exclude(array('RootParent' => 1));
+            $count = 0;
+            $doNotCopy = $this->Config()->get('do_not_copy');
+            $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
+            foreach($groups as $groups) {
+                $array[$count] = $groups->toMap();
+                foreach($doNotCopy as $field) {
+                    unset($array[$count][$field]);
+                }
+                if($parent = $group->Parent()) {
+                    $array[$count][$parentURLSegmentField] = $parent->URLSegment;
+                }
+                $count++;
             }
-            if($parent = $group->Parent()) {
-                $array[$count][$parentURLSegmentField] = $parent->URLSegment;
+            $json = json_encode($array);
+            $fileName = $this->Config()->get('location_to_save_contents');
+            if($fileName) {
+                $fileName = str_replace('.json', '.groups.json', $fileName);
+                $fileNameFull = Director::baseFolder().'/'.$fileName;
+                file_put_contents($fileNameFull, $json);
+                die('COMPLETED');
+            } else {
+                return $json;
             }
-            $count++;
-        }
-        $json = json_encode($array);
-        $fileName = $this->Config()->get('location_to_save_contents');
-        if($fileName) {
-            $fileName = str_replace('.json', '.groups.json', $fileName);
-            $fileNameFull = Director::baseFolder().'/'.$fileName;
-            file_put_contents($fileNameFull, $json);
-            die('COMPLETED');
-        } else {
-            return $json;
         }
     }
 
@@ -118,8 +122,10 @@ class ExportSecondHandProducts extends Controller
                     }
                 }
             }
+            return Permission::check('ADMIN');
+        } else {
+            return Permission::check('ADMIN');
         }
-        return Permission::check('ADMIN', 'any', $member);
     }
 
 }
