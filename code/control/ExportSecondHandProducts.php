@@ -81,19 +81,21 @@ class ExportSecondHandProducts extends Controller
     function groups ()
     {
         $array = array();
-        $groups = SecondHandProductGroup::get()->filter(array('RootParent' => 0));
+        $groups = SecondHandProductGroup::get();
         $count = 0;
         $doNotCopy = $this->Config()->get('do_not_copy');
         $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
         foreach($groups as $group) {
-            $array[$count] = $group->toMap();
-            foreach($doNotCopy as $field) {
-                unset($array[$count][$field]);
+            if(!$group->RootParent) {
+                $array[$count] = $group->toMap();
+                foreach($doNotCopy as $field) {
+                    unset($array[$count][$field]);
+                }
+                if($parent = $group->Parent()) {
+                    $array[$count][$parentURLSegmentField] = $parent->URLSegment;
+                }
+                $count++;
             }
-            if($parent = $group->Parent()) {
-                $array[$count][$parentURLSegmentField] = $parent->URLSegment;
-            }
-            $count++;
         }
 
         return $this->returnJSONorFile($array, 'groups');
