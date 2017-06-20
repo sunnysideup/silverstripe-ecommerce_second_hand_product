@@ -63,15 +63,23 @@ class ExportSecondHandProducts extends Controller
         $count = 0;
         $doNotCopy = $this->Config()->get('do_not_copy');
         $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
-        foreach($products as $product) {
-            $array[$count] = $product->toMap();
-            foreach($doNotCopy as $field) {
-                unset($array[$count][$field]);
+        $singleton = Injector::inst()->get('SecondHandProductGroup');
+        $rootSecondHandPage = $singleton->BestRootParentPage();
+        if($rootSecondHandPage) {
+            foreach($products as $product) {
+                $array[$count] = $product->toMap();
+                foreach($doNotCopy as $field) {
+                    unset($array[$count][$field]);
+                }
+                if($parent = $product->Parent()) {
+                    if($parent->ID === $rootSecondHandPage) {
+                        $array[$count][$parentURLSegmentField] = false;
+                    } else {
+                        $array[$count][$parentURLSegmentField] = $parent->URLSegment;
+                    }
+                }
+                $count++;
             }
-            if($parent = $product->Parent()) {
-                $array[$count][$parentURLSegmentField] = $parent->URLSegment;
-            }
-            $count++;
         }
 
         return $this->returnJSONorFile($array, '');
@@ -85,19 +93,26 @@ class ExportSecondHandProducts extends Controller
         $count = 0;
         $doNotCopy = $this->Config()->get('do_not_copy');
         $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
-        foreach($groups as $group) {
-            if(!$group->RootParent) {
-                $array[$count] = $group->toMap();
-                foreach($doNotCopy as $field) {
-                    unset($array[$count][$field]);
+        $singleton = Injector::inst()->get('SecondHandProductGroup');
+        $rootSecondHandPage = $singleton->BestRootParentPage();
+        if($rootSecondHandPage) {
+            foreach($groups as $group) {
+                if(! $group->RootParent) {
+                    $array[$count] = $group->toMap();
+                    foreach($doNotCopy as $field) {
+                        unset($array[$count][$field]);
+                    }
+                    if($parent = $group->Parent()) {
+                        if($parent->ID === $rootSecondHandPage) {
+                            $array[$count][$parentURLSegmentField] = false;
+                        } else {
+                            $array[$count][$parentURLSegmentField] = $parent->URLSegment;
+                        }
+                    }
+                    $count++;
                 }
-                if($parent = $group->Parent()) {
-                    $array[$count][$parentURLSegmentField] = $parent->URLSegment;
-                }
-                $count++;
             }
         }
-
         return $this->returnJSONorFile($array, 'groups');
     }
 
