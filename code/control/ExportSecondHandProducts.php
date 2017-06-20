@@ -73,15 +73,15 @@ class ExportSecondHandProducts extends Controller
             }
             $count++;
         }
+
         return $this->returnJSONorFile($array, '');
 
     }
 
     function groups ()
     {
-
         $array = array();
-        $groups = SecondHandProductGroup::get()->exclude(array('RootParent' => 1));
+        $groups = SecondHandProductGroup::get()->filter(array('RootParent' => 0));
         $count = 0;
         $doNotCopy = $this->Config()->get('do_not_copy');
         $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
@@ -105,6 +105,8 @@ class ExportSecondHandProducts extends Controller
     function MyPermissionCheck()
     {
         $codesWithIPs = $this->Config()->get('secret_codes');
+
+        //with a code you do not have to be logged in ...
         if(count($codesWithIPs)) {
             $ip = EcommerceCountry::get_ip();
             $code = $this->request->param('ID');
@@ -116,10 +118,8 @@ class ExportSecondHandProducts extends Controller
                     }
                 }
             }
-            return Permission::check('ADMIN');
-        } else {
-            return Permission::check('ADMIN');
         }
+        return Permission::check('ADMIN');
     }
 
     protected function returnJSONorFile($array, $filenameAppendix = '')
