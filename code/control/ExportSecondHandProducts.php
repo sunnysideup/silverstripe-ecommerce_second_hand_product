@@ -72,7 +72,7 @@ class ExportSecondHandProducts extends Controller
                     unset($array[$count][$field]);
                 }
                 if($parent = $product->Parent()) {
-                    if($parent->ID === $rootSecondHandPage) {
+                    if($parent->ID === $rootSecondHandPage->ID) {
                         $array[$count][$parentURLSegmentField] = false;
                     } else {
                         $array[$count][$parentURLSegmentField] = $parent->URLSegment;
@@ -103,7 +103,7 @@ class ExportSecondHandProducts extends Controller
                         unset($array[$count][$field]);
                     }
                     if($parent = $group->Parent()) {
-                        if($parent->ID === $rootSecondHandPage) {
+                        if($parent->ID === $rootSecondHandPage->ID) {
                             $array[$count][$parentURLSegmentField] = false;
                         } else {
                             $array[$count][$parentURLSegmentField] = $parent->URLSegment;
