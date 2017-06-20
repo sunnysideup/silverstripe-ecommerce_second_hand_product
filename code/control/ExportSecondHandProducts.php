@@ -48,7 +48,7 @@ class ExportSecondHandProducts extends Controller
      */
     private static $url_segment_of_parent_field_name = 'ParentURLSegmentForImportExport';
 
-    function init() 
+    function init()
     {
         parent::init();
         if(!$this->MyPermissionCheck()) {
@@ -73,20 +73,13 @@ class ExportSecondHandProducts extends Controller
             }
             $count++;
         }
-        $json = json_encode($array);
-        $fileName = $this->Config()->get('location_to_save_contents');
-        if($fileName) {
-            $fileNameFull = Director::baseFolder().'/'.$fileName;
-            file_put_contents($fileNameFull, $json);
-            die('COMPLETED');
-        } else {
-            return $json;
-        }
+        return $this->returnJSONorFile($array, '');
+
     }
 
     function groups ()
     {
-    
+
         $array = array();
         $groups = SecondHandProductGroup::get()->exclude(array('RootParent' => 1));
         $count = 0;
@@ -102,16 +95,8 @@ class ExportSecondHandProducts extends Controller
             }
             $count++;
         }
-        $json = json_encode($array);
-        $fileName = $this->Config()->get('location_to_save_contents');
-        if($fileName) {
-            $fileName = str_replace('.json', '.groups.json', $fileName);
-            $fileNameFull = Director::baseFolder().'/'.$fileName;
-            file_put_contents($fileNameFull, $json);
-            die('COMPLETED');
-        } else {
-            return $json;
-        }
+
+        return $this->returnJSONorFile($array, 'groups');
     }
 
     /**
@@ -134,6 +119,30 @@ class ExportSecondHandProducts extends Controller
             return Permission::check('ADMIN');
         } else {
             return Permission::check('ADMIN');
+        }
+    }
+
+    protected function returnJSONorFile($array, $filenameAppendix = '')
+    {
+        $json = json_encode($array);
+        $fileName = $this->Config()->get('location_to_save_contents');
+        if($fileName) {
+            if($filenameAppendix) {
+                $fileName = str_replace('.json', '.'.$filenameAppendix.'.json', $fileName);
+            }
+            $fileNameFull = Director::baseFolder().'/'.$fileName;
+            file_put_contents($fileNameFull, $json);
+            die('COMPLETED');
+        } else {
+            $this->response->addHeader('Content-Type', 'application/json');
+            $json = str_replace('\t', ' ', $json);
+            $json = str_replace('\r', ' ', $json);
+            $json = str_replace('\n', ' ', $json);
+            $json = preg_replace('/\s\s+/', ' ', $json);
+            if (Director::isDev()) {
+                $json = str_replace('{', "\r\n{", $json);
+            }
+            return $json;
         }
     }
 
