@@ -23,6 +23,14 @@ class ExportSecondHandProducts extends Controller
         'parser'
     );
 
+    /**
+     * list of relations and their fields that need to be included ...
+     * @var array
+     */
+    private static $also_copy = array(
+        'ProductGroups' => 'URLSegment'
+    );
+
     private static $allowed_actions = array(
         'products' => '->MyPermissionCheck',
         'groups' => '->MyPermissionCheck'
