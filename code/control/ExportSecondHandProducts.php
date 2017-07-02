@@ -201,7 +201,8 @@ class ExportSecondHandProducts extends Controller
      *
      * @return array
      */
-    protected function addRelations($currentObject, $relations) {
+    protected function addRelations($currentObject, $relations)
+    {
         $dataToBeAdded = array();
         foreach($relations as $myField => $relFields) {
             $innerDataToBeAdded = array();
