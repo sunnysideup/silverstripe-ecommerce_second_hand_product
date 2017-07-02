@@ -24,11 +24,26 @@ class ExportSecondHandProducts extends Controller
     );
 
     /**
-     * list of relations and their fields that need to be included ...
+     * in the following format:
+     *
+     * AnyRelationA => (ForeignDBField1, ForeignDBField2, etc...)
+     * AnyRelationB => (ForeignDBField1, ForeignDBField2, etc...)
+     * d
      * @var array
      */
-    private static $also_copy = array(
-        'ProductGroups' => 'URLSegment'
+    private static $relationships_to_include_with_groups = array();
+
+
+    /**
+     * in the following format:
+     *
+     * AnyRelationA => (ForeignDBField1, ForeignDBField2, etc...)
+     * AnyRelationB => (ForeignDBField1, ForeignDBField2, etc...)
+     *
+     * @var array
+     */
+    private static $relationships_to_include_with_products = array(
+        'ProductGroups' => array('URLSegment')
     );
 
     private static $allowed_actions = array(
@@ -73,6 +88,7 @@ class ExportSecondHandProducts extends Controller
         $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
         $singleton = Injector::inst()->get('SecondHandProductGroup');
         $rootSecondHandPage = $singleton->BestRootParentPage();
+        $relations = Config::inst()->get('ExportSecondHandProducts', 'relationships_to_include_with_products');
         if($rootSecondHandPage) {
             foreach($products as $product) {
                 $array[$count] = $product->toMap();
@@ -86,6 +102,9 @@ class ExportSecondHandProducts extends Controller
                         $array[$count][$parentURLSegmentField] = $parent->URLSegment;
                     }
                 }
+                $array[$count] += $this->addRelations($product, $relations);
+
+                //next one
                 $count++;
             }
         }
@@ -103,6 +122,7 @@ class ExportSecondHandProducts extends Controller
         $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
         $singleton = Injector::inst()->get('SecondHandProductGroup');
         $rootSecondHandPage = $singleton->BestRootParentPage();
+        $relations = Config::inst()->get('ExportSecondHandProducts', 'relationships_to_include_with_groups');
         if($rootSecondHandPage) {
             foreach($groups as $group) {
                 if(! $group->RootParent) {
@@ -117,10 +137,15 @@ class ExportSecondHandProducts extends Controller
                             $array[$count][$parentURLSegmentField] = $parent->URLSegment;
                         }
                     }
+                    $array[$count] += $this->addRelations($group, $relations);
+
+                    //next one
                     $count++;
                 }
+
             }
         }
+
         return $this->returnJSONorFile($array, 'groups');
     }
 
@@ -149,7 +174,13 @@ class ExportSecondHandProducts extends Controller
 
     protected function returnJSONorFile($array, $filenameAppendix = '')
     {
-        $json = json_encode($array);
+        if(Director::isDev()) {
+            $json = json_encode($array, JSON_PRETTY_PRINT);
+        } else {
+            $json = json_encode($array);
+            $json = str_replace(array("\t", "\r", "\n"), array(" ", " ", " "), $json);
+            $json = preg_replace('/\s\s+/', ' ', $json);
+        }
         $fileName = $this->Config()->get('location_to_save_contents');
         if($fileName) {
             if($filenameAppendix) {
@@ -160,15 +191,40 @@ class ExportSecondHandProducts extends Controller
             die('COMPLETED');
         } else {
             $this->response->addHeader('Content-Type', 'application/json');
-            $json = str_replace('\t', ' ', $json);
-            $json = str_replace('\r', ' ', $json);
-            $json = str_replace('\n', ' ', $json);
-            $json = preg_replace('/\s\s+/', ' ', $json);
-            if (Director::isDev()) {
-                $json = str_replace('{', "\r\n{", $json);
-            }
             return $json;
         }
+    }
+
+    /**
+     * @param DataObject $currentObject the object we are exporting
+     * @param array $relations  the array of fields to be added
+     *
+     * @return array
+     */
+    protected function addRelations($currentObject, $relations) {
+        $dataToBeAdded = array();
+        foreach($relations as $myField => $relFields) {
+            $innerDataToBeAdded = array();
+            $relData = $currentObject->$myField();
+            if($relData instanceof SS_List) {
+                $count = 0;
+                foreach($relData as $relItem) {
+                    foreach($relFields as $relField) {
+                        $innerDataToBeAdded[$count][$relField] = $relItem->$relField;
+                    }
+                    $count++;
+                }
+            } elseif($relData instanceof DataObject) {
+                foreach($relFields as $relField) {
+                    $innerDataToBeAdded = array($relField => $relData->$relField);
+                }
+            } else {
+                //do nothing
+            }
+            $dataToBeAdded[$myField] = $innerDataToBeAdded;
+        }
+
+        return $dataToBeAdded;
     }
 
 }
