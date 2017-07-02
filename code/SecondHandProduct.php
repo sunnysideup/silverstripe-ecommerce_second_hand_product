@@ -649,21 +649,7 @@ class SecondHandProduct extends Product implements PermissionProvider
 
 class SecondHandProduct_Controller extends Product_Controller
 {
-    private static $fields_to_remove_from_print = array(
-        'CUS',
-        'SPC',
-        'MGP',
-        'ZOR',
-        'FPS',
-        'SPE',
-        'IOS',
-        'PRO',
-        'FER',
-        'POA',
-        'PHT',
-        'NotForSaleMessage',
-        'KeepRecordEvenThoughItIsNotForSale'
-    );
+    private static $fields_to_remove_from_print = array();
 
     private static $allowed_actions = array(
         'printview' => true
