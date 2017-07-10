@@ -163,8 +163,8 @@ class ExportSecondHandProducts extends Controller
         $array = array();
         $folderName = Config::inst()->get('ExportSecondHandProducts', 'folder_for_second_hand_images');
         $folder = Folder::find_or_make($folderName);
-        $seondHandProducts = SecondHandProduct::get()->where('ImageID IS NOT NULL and ImageID > 0');
-        foreach($seondHandProducts as $secondHandProduct) {
+        $secondHandProducts = SecondHandProduct::get()->filter(array('AllowPurchase' => 1))->exclude(array('ImageID' => 0));
+        foreach($secondHandProducts as $secondHandProduct) {
             $arrayInner = array();
             if($secondHandProduct->ImageID) {
                 $image = $secondHandProduct->Image(); //see Product::has_one()
