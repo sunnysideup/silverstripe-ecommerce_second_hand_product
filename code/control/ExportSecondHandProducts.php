@@ -48,7 +48,8 @@ class ExportSecondHandProducts extends Controller
 
     private static $allowed_actions = array(
         'products' => '->MyPermissionCheck',
-        'groups' => '->MyPermissionCheck'
+        'groups' => '->MyPermissionCheck',
+        'images' => '->MyPermissionCheck'
     );
 
     /**
@@ -56,6 +57,12 @@ class ExportSecondHandProducts extends Controller
      * @var string
      */
     private static $location_to_save_contents = '';
+
+    /**
+     * where will the data be saved (if any)
+     * @var string
+     */
+    private static $folder_for_second_hand_images = 'second-hand-images';
 
     /**
      * make the page less easy to access
@@ -147,6 +154,61 @@ class ExportSecondHandProducts extends Controller
         }
 
         return $this->returnJSONorFile($array, 'groups');
+    }
+
+    function images()
+    {
+
+        $err = 0;
+        $array = array();
+        $folderName = Config::inst()->get('ExportSecondHandProducts', 'folder_for_second_hand_images');
+        $folder = Folder::find_or_make($folderName);
+        $baseFolder = ASSETS_PATH;
+        $seondHandProducts = SecondHandProduct::get()->where('ImageID IS NOT NULL and ImageID > 0');
+        foreach($seondHandProducts as $secondHandProduct) {
+            $arrayInner = array();
+            if($secondHandProduct->ImageID) {
+                $image = $secondHandProduct->Image(); //see Product::has_one()
+                if($image && $image->exists()) {
+                    $arrayInner[$image->ID] = $image;
+                }
+            }
+            $otherImages = $secondHandProduct->AdditionalImages(); //see Product::many_many()
+            foreach($otherImages as $otherImage) {
+                if($otherImage && $otherImage->exists()) {
+                    $arrayInner[$otherImage->ID] = $otherImage;
+                }
+            }
+            $count = 0;
+            foreach($arrayInner as $imageID => $image) {
+                $fileName = $image->FileName;
+                $oldFileLocationAbsolute = Director::baseFolder().'/'.$image->FileName;
+                if(file_exists($oldFileLocationAbsolute)) {
+                    $extension = pathinfo($image->FileName, PATHINFO_EXTENSION);
+                    if(!$extension) {
+                        $extension = 'jpg';
+                    }
+                    $extension = strtolower($extension);
+                    $image->ParentID = $folder->ID;
+                    $name = $secondHandProduct->InternalItemID.'_'.$count.'.'.$extension;
+                    $image->Name = $name;
+                    $image->FileName = $folder->FileName.$name;
+                    $newAbsoluteLocation = Director::baseFolder().'/'.$image->FileName;
+                    if($oldFileLocationAbsolute !== $newAbsoluteLocation) {
+                        $image->write();
+                    }
+                    if(! file_exists($newAbsoluteLocation)) {
+                        $err++;
+                    } else {
+                        $array[$secondHandProduct->InternalItemID][] = $name;
+                    }
+                } else {
+                    $err++;
+                }
+                $count++;
+            }
+        }
+        return $this->returnJSONorFile($array, 'images');
     }
 
     /**
