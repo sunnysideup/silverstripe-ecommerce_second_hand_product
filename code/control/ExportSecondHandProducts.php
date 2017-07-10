@@ -163,7 +163,6 @@ class ExportSecondHandProducts extends Controller
         $array = array();
         $folderName = Config::inst()->get('ExportSecondHandProducts', 'folder_for_second_hand_images');
         $folder = Folder::find_or_make($folderName);
-        $baseFolder = ASSETS_PATH;
         $seondHandProducts = SecondHandProduct::get()->where('ImageID IS NOT NULL and ImageID > 0');
         foreach($seondHandProducts as $secondHandProduct) {
             $arrayInner = array();
@@ -187,16 +186,19 @@ class ExportSecondHandProducts extends Controller
                     $extension = pathinfo($image->FileName, PATHINFO_EXTENSION);
                     if(!$extension) {
                         $extension = 'jpg';
+                    } else {
+                        $extension = strtolower($extension);
                     }
-                    $extension = strtolower($extension);
-                    $image->ParentID = $folder->ID;
                     $name = $secondHandProduct->InternalItemID.'_'.$count.'.'.$extension;
+                    $fileName = $folder->FileName.$name;
+                    $title =  $secondHandProduct->Title. ' #'.($count + 1);
+                    $image->ParentID = $folder->ID;
                     $image->Name = $name;
-                    $image->FileName = $folder->FileName.$name;
+                    $image->FileName = $fileName;
+                    $image->Title = $title;
+                    $image->ClassName = 'Product_Image';
+                    $image->write();
                     $newAbsoluteLocation = Director::baseFolder().'/'.$image->FileName;
-                    if($oldFileLocationAbsolute !== $newAbsoluteLocation) {
-                        $image->write();
-                    }
                     if(! file_exists($newAbsoluteLocation)) {
                         $err++;
                     } else {
