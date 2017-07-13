@@ -1,6 +1,6 @@
 ---
 Name: ecommerce_second_hand_product
-Before: 
+Before:
   - 'mysite/*'
 After:
   - 'framework/*'
@@ -8,14 +8,12 @@ After:
   - 'ecommerce/*'
 ---
 
-SecondHandProductGroup:
-  base_buyable_class: SecondHandProduct
-
 EcommerceDBConfig:
   extensions:
     - SecondHandEcommerceConfigExtension
 
 SecondHandProductGroup:
+  base_buyable_class: SecondHandProduct
   sort_options:
     default:
       Title: 'Default Order - (Most Recent)'
