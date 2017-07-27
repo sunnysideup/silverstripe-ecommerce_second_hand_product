@@ -81,7 +81,7 @@ class ExportSecondHandProducts extends Controller
     function init()
     {
         parent::init();
-        if(!$this->MyPermissionCheck()) {
+        if(! $this->MyPermissionCheck()) {
             die('you do not have access');
         }
     }
@@ -117,7 +117,6 @@ class ExportSecondHandProducts extends Controller
         }
 
         return $this->returnJSONorFile($array, '');
-
     }
 
     function groups ()
@@ -210,6 +209,7 @@ class ExportSecondHandProducts extends Controller
                 $count++;
             }
         }
+        
         return $this->returnJSONorFile($array, 'images');
     }
 
