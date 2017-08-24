@@ -154,6 +154,7 @@ class SecondHandProductGroup_Controller extends ProductGroup_Controller
     public function search($request)
     {
         $term = Convert::raw2sql($request->param('searchterm'));
+        //uncompleted
     }
 
     public function HasSearchFilterAndSort()
