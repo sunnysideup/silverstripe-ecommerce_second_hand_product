@@ -107,6 +107,17 @@ class SecondHandProductGroup extends ProductGroup
             return SecondHandProductGroup::get()->first();
         }
     }
+
+    /**
+     * Returns the class we are working with.
+     *
+     * @return string
+     */
+    protected function getBuyableClassName()
+    {
+        return 'SecondHandProduct';
+    }
+
 }
 
 class SecondHandProductGroup_Controller extends ProductGroup_Controller
