@@ -25,6 +25,7 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
     private static $allowed_actions = array(
         "editinsitetree",
         "ItemEditForm",
+        "archive" => true,
         "restore" => true,
     );
 
@@ -55,6 +56,37 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
     public function doCancel($data, $form)
     {
         return $this->redirect(singleton('CMSMain')->Link());
+    }
+
+    function archive($request){
+        if(isset($_GET['productid'])){
+            $id = intval($_GET['productid']);
+            if($id) {
+                $secondHandProduct = SecondHandProduct::get()->byID($id);
+                $internalItemID = $secondHandProduct->InternalItemID;
+                if (is_a($secondHandProduct, Object::getCustomClass('SiteTree'))) {
+                    $secondHandProduct->deleteFromStage('Live');
+                    $secondHandProduct->deleteFromStage('Stage');
+                } else {
+                    $secondHandProduct->delete();
+                }
+                //after deleting the product redirect to the archived page
+                $archivedProduct = SecondHandArchive::get()->filter(['InternalItemID' => $internalItemID])->first();
+                if($archivedProduct){
+                    $this->getResponse()->addHeader(
+                        'X-Status',
+                        rawurlencode(_t(
+                            'CMSMain.RESTORED',
+                            "Archived '{title}' successfully",
+                            array('title' => $archivedProduct->Title)
+                        ))
+                    );
+                    $cmsEditLink = '/admin/secondhandproducts/SecondHandArchive/EditForm/field/SecondHandArchive/item/'.$archivedProduct->ID.'/edit';
+                    return Controller::curr()->redirect($cmsEditLink);
+                }
+            }
+        }
+        return new SS_HTTPResponse("ERROR!", 400);
     }
 
     function restore($request){

@@ -302,7 +302,12 @@ class SecondHandProduct extends Product implements PermissionProvider
                 $soldDate = DateField::create('DateItemWasSold', 'Date this item was sold'),
                 $mainImageField = UploadField::create("Image", "Main Product Image"),
                 $additionalImagesField = UploadField::create("AdditionalImages", "More Images"),
-                $metaFieldDesc = TextareaField::create("MetaDescription", 'Meta Description')
+                $metaFieldDesc = TextareaField::create("MetaDescription", 'Meta Description'),
+                EcommerceCMSButtonField::create(
+                    'ArchiveButton',
+                    '/admin/secondhandproducts/SecondHandProduct/archive/?productid=' . $this->ID,
+                    _t('SecondHandProduct.ARCHIVE_BUTTON', 'Archive Product')
+                )
             )
         );
         $soldDate->setDisabled(true);
