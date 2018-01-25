@@ -18,3 +18,9 @@ ExportSecondHandProducts:
     'AAA': '1.1.1.1'
     # all ips
     'BBB': '*'
+
+UpdateSecondHandProducts:
+  secret_codes:
+    'AAA': '1.1.1.1'
+    # all ips
+    'BBB': '*'
