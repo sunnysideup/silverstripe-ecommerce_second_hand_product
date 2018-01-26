@@ -23,6 +23,7 @@ class SecondHandProduct extends Product implements PermissionProvider
      * @var Array
      */
     private static $db = array(
+        'SoldPrice' => 'Currency',
         'PurchasePrice' => 'Currency',
         'ProductQuality' => 'ENUM("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
         'IncludesBoxOrCase' => "ENUM('No, Box, Case, Both','No')",
@@ -283,8 +284,9 @@ class SecondHandProduct extends Product implements PermissionProvider
                 ReadonlyField::create('CanBeSold', "For Sale", DBField::create_field('Boolean', $this->canPurchase())->Nice()),
                 ReadonlyField::create('CreatedNice', "First Entered", $this->getCreatedNice()),
                 TextField::create('InternalItemID', "Product Code"),
-                $salePriceField = NumericField::create('Price', 'Sale Price'),
                 $purchasePriceField = NumericField::create('PurchasePrice', 'Purchase Price'),
+                $salePriceField = NumericField::create('Price', 'Sale Price'),
+                $soldPriceField = NumericField::create('SoldPrice', 'Sold Price'),
                 $serialNumberField = TextField::create('SerialNumber', 'Serial Number'),
                 $productQualityField = DropdownField::create(
                     "ProductQuality",
@@ -316,8 +318,9 @@ class SecondHandProduct extends Product implements PermissionProvider
         $featuredProductField->setDescription('If this box is ticked then this product will appear in the "Featured Products" box on the home page');
         $allowPurchaseField->setDescription("This box must be ticked to allow a customer to purchase it");
         $sellinOnBehalf->setDescription('This box must be ticked if this product is being sold on behalf');
-        $salePriceField->setRightTitle("Selling price");
         $purchasePriceField->setRightTitle("Price paid for the product");
+        $salePriceField->setRightTitle("Selling price");
+        $soldPriceField->setRightTitle("The price that the product actually sold for");
         $serialNumberField->setRightTitle("Enter the serial number of the product here");
         $originalManualField->setDescription("Tick this box if the product includes the original manual, otherwise leave it empty");
         $boxOrCaseField->setRightTitle("Does this product come with a box, case or both?");
@@ -461,7 +464,7 @@ class SecondHandProduct extends Product implements PermissionProvider
             );
         }
 
-        if ($this->HasBeenSold() && Permission::check('ADMIN')) {
+        if (Permission::check('ADMIN')) {
             $fields->replaceField('AllowPurchase', CheckboxField::create('AllowPurchase', '<strong>Allow product to be purchased</strong>'));
             $fields->replaceField('DateItemWasSold', DateField::create('DateItemWasSold', 'Date this item was sold'));
         }

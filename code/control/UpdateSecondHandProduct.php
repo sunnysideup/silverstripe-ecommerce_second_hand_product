@@ -28,29 +28,33 @@ class UpdateSecondHandProduct extends Controller
 
     function unpublish($request)
     {
+        $unpublished = false;
         $otherID = $request->param("OtherID");
         if(isset($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
             $secondHandProduct = SecondHandProduct::get()->filter(['internalItemID' => $internalItemID])->first();
             if($secondHandProduct){
-                $secondHandProduct->deleteFromStage('Live');
+                $unpublished = $secondHandProduct->deleteFromStage('Live');
             }
         }
+        return json_encode($unpublished);
     }
 
     function archive($request)
     {
+        $archived = false;
         $otherID = $request->param("OtherID");
         if(isset($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
             $secondHandProduct = SecondHandProduct::get()->filter(['internalItemID' => $internalItemID])->first();
             if (is_a($secondHandProduct, Object::getCustomClass('SiteTree'))) {
-                $secondHandProduct->deleteFromStage('Live');
-                $secondHandProduct->deleteFromStage('Stage');
+                $archived = $secondHandProduct->deleteFromStage('Live');
+                $archived = $secondHandProduct->deleteFromStage('Stage');
             } else {
-                $secondHandProduct->delete();
+                $archived = $secondHandProduct->delete();
             }
         }
+        return json_encode($archived);
     }
 
     /**
