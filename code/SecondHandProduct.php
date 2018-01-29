@@ -232,7 +232,13 @@ class SecondHandProduct extends Product implements PermissionProvider
 
     public function onBeforeDelete()
     {
-        SecondHandArchive::create_from_page($this);
+        if(Versioned::current_stage() !== 'Stage') {
+            //do nothing
+        }
+        else {
+            //page is being deleted permanently so create archived version
+            SecondHandArchive::create_from_page($this);
+        }
         parent::onBeforeDelete();
     }
 
