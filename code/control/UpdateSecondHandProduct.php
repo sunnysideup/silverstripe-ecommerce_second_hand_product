@@ -32,7 +32,7 @@ class UpdateSecondHandProduct extends Controller
         $otherID = $request->param("OtherID");
         if(isset($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
-            $secondHandProduct = SecondHandProduct::get()->filter(['internalItemID' => $internalItemID])->first();
+            $secondHandProduct = SecondHandProduct::get()->filter(['InternalItemID' => $internalItemID])->first();
             if($secondHandProduct){
                 $unpublished = $secondHandProduct->deleteFromStage('Live');
             }
