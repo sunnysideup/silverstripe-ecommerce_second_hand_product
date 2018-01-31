@@ -209,7 +209,7 @@ class ExportSecondHandProducts extends Controller
                 $count++;
             }
         }
-        
+
         return $this->returnJSONorFile($array, 'images');
     }
 
@@ -219,21 +219,8 @@ class ExportSecondHandProducts extends Controller
     function MyPermissionCheck()
     {
         $codesWithIPs = $this->Config()->get('secret_codes');
-
-        //with a code you do not have to be logged in ...
-        if(count($codesWithIPs)) {
-            $ip = EcommerceCountry::get_ip();
-            $code = $this->request->param('ID');
-            if($code) {
-                $testIP = isset($codesWithIPs[$code]) ? $codesWithIPs[$code] : false;
-                if($testIP) {
-                    if($testIP === $ip || $testIP === '*') {
-                        return true;
-                    }
-                }
-            }
-        }
-        return Permission::check('ADMIN');
+        $code = $this->request->param('ID');
+        return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
     }
 
     protected function returnJSONorFile($array, $filenameAppendix = '')

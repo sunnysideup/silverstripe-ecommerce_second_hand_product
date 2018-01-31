@@ -32,7 +32,7 @@ class UpdateSecondHandProduct extends Controller
         $otherID = $request->param("OtherID");
         if(isset($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
-            $secondHandProduct = SecondHandProduct::get()->filter(['InternalItemID' => $internalItemID])->first();
+            $secondHandProduct = DataObject::get_one('SecondHandProduct', ['InternalItemID' => $internalItemID]);
             if($secondHandProduct){
                 $unpublished = $secondHandProduct->deleteFromStage('Live');
             }
@@ -46,7 +46,10 @@ class UpdateSecondHandProduct extends Controller
         $otherID = $request->param("OtherID");
         if(isset($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
-            $secondHandProduct = SecondHandProduct::get()->filter(['InternalItemID' => $internalItemID])->first();
+            $secondHandProduct = DataObject::get_one('SecondHandProduct', ['InternalItemID' => $internalItemID]);
+            if(!$secondHandProduct){
+                $secondHandProduct = Versioned::get_one_by_stage('SecondHandProduct', 'Stage', ['InternalItemID' => $internalItemID]);
+            }
             if (is_a($secondHandProduct, Object::getCustomClass('SiteTree'))) {
                 $archived = $secondHandProduct->deleteFromStage('Live');
                 $archived = $secondHandProduct->deleteFromStage('Stage');
@@ -63,20 +66,7 @@ class UpdateSecondHandProduct extends Controller
     function MyPermissionCheck()
     {
         $codesWithIPs = $this->Config()->get('secret_codes');
-
-        //with a code you do not have to be logged in ...
-        if(count($codesWithIPs)) {
-            $ip = EcommerceCountry::get_ip();
-            $code = $this->request->param('ID');
-            if($code) {
-                $testIP = isset($codesWithIPs[$code]) ? $codesWithIPs[$code] : false;
-                if($testIP) {
-                    if($testIP === $ip || $testIP === '*') {
-                        return true;
-                    }
-                }
-            }
-        }
-        return Permission::check('ADMIN');
+        $code = $this->request->param('ID');
+        return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
     }
 }
