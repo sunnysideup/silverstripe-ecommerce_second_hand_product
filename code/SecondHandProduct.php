@@ -264,6 +264,7 @@ class SecondHandProduct extends Product implements PermissionProvider
         $fields->removeFieldFromTab('Root', 'Metadata');
         $fields->removeFieldFromTab('Root', 'AddToCartLink');
 
+
         $fields->addFieldsToTab(
             'Root.Main',
             array(
@@ -310,12 +311,7 @@ class SecondHandProduct extends Product implements PermissionProvider
                 $soldDate = DateField::create('DateItemWasSold', 'Date this item was sold'),
                 $mainImageField = UploadField::create("Image", "Main Product Image"),
                 $additionalImagesField = UploadField::create("AdditionalImages", "More Images"),
-                $metaFieldDesc = TextareaField::create("MetaDescription", 'Meta Description'),
-                EcommerceCMSButtonField::create(
-                    'ArchiveButton',
-                    '/admin/secondhandproducts/SecondHandProduct/archive/?productid=' . $this->ID,
-                    _t('SecondHandProduct.ARCHIVE_BUTTON', 'Archive Product')
-                )
+                $metaFieldDesc = TextareaField::create("MetaDescription", 'Meta Description')
             )
         );
         $soldDate->setDisabled(true);
@@ -456,6 +452,14 @@ class SecondHandProduct extends Product implements PermissionProvider
         // If the product has been sold all fields should be disabled
         // Only the shop administrator is allowed to undo this.
         if ($this->HasBeenSold()) {
+            $fields->insertAfter(
+                'AllowPurchase',
+                EcommerceCMSButtonField::create(
+                    'ArchiveButton',
+                    '/admin/secondhandproducts/SecondHandProduct/archive/?productid=' . $this->ID,
+                    _t('SecondHandProduct.ARCHIVE_BUTTON', 'Archive Product')
+                )
+            );
             $fields = $fields->makeReadonly();
             $fields->replaceField($categoriesTable->Name, $categoriesTable);
             $categoriesTable->setConfig(GridFieldConfig_RecordViewer::create());
