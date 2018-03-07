@@ -474,7 +474,7 @@ class SecondHandProduct extends Product implements PermissionProvider
             );
         }
 
-        if (Permission::check('ADMIN')) {
+        if ($this->canEdit()) {
             $fields->replaceField('AllowPurchase', CheckboxField::create('AllowPurchase', '<strong>Allow product to be purchased</strong>'));
             $fields->replaceField('DateItemWasSold', DateField::create('DateItemWasSold', 'Date this item was sold'));
         }
