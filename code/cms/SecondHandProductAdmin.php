@@ -94,21 +94,44 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
             $id = intval($_GET['productid']);
             if($id) {
                 $restoredPage = Versioned::get_latest_version("SiteTree", $id);
-                if(!$restoredPage) 	return new SS_HTTPResponse("SiteTree #$id not found", 400);
-                $restoredPage = $restoredPage->doRestoreToStage();
-                $restoredPage->doPublish();
-                $this->getResponse()->addHeader(
-                    'X-Status',
-                    rawurlencode(_t(
-                        'CMSMain.RESTORED',
-                        "Restored '{title}' successfully",
-                        array('title' => $restoredPage->Title)
-                    ))
-                );
-                $cmsEditLink = '/admin/secondhandproducts/SecondHandProduct/EditForm/field/SecondHandProduct/item/'.$id.'/edit';
-                return Controller::curr()->redirect($cmsEditLink);
+                $parentID = $restoredPage->ParentID;
+                if($parentID){
+                    var_dump($parentID);
+                    $this->ensureParentHasVersion($parentID);
+                    if(!$restoredPage) 	return new SS_HTTPResponse("SiteTree #$id not found", 400);
+                    $restoredPage = $restoredPage->doRestoreToStage();
+                    //$restoredPage->doPublish();
+                    $this->getResponse()->addHeader(
+                        'X-Status',
+                        rawurlencode(_t(
+                            'CMSMain.RESTORED',
+                            "Restored '{title}' successfully",
+                            array('title' => $restoredPage->Title)
+                        ))
+                    );
+                    $cmsEditLink = '/admin/secondhandproducts/SecondHandProduct/EditForm/field/SecondHandProduct/item/'.$id.'/edit';
+                    return Controller::curr()->redirect($cmsEditLink);
+                }
+                else {
+                    return new SS_HTTPResponse("Parent Page #$parentID is missing", 400);
+                }
             }
         }
         return new SS_HTTPResponse("ERROR!", 400);
+    }
+
+    /**
+     * little hack to fix parent if it is not versioned into versions table
+     */
+    public function ensureParentHasVersion($parentID)
+    {
+        $parentPage = Versioned::get_latest_version("SiteTree", $parentID);
+        if(!$parentPage) {
+            $parentPage = SiteTree::get()->byID($parentID);
+            if($parentPage) {
+                $parentPage->writeToStage('Stage');
+                $parentPage->publish('Stage', 'Live', true);
+            }
+        }
     }
 }

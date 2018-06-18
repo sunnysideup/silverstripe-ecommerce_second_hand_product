@@ -45,6 +45,7 @@ class UpdateSecondHandProduct extends Controller
         $archived = false;
         $otherID = $request->param("OtherID");
         if(isset($otherID)) {
+            $archived = null;
             $internalItemID = Convert::raw2sql($otherID);
             $secondHandProduct = DataObject::get_one('SecondHandProduct', ['InternalItemID' => $internalItemID]);
             if(!$secondHandProduct){
@@ -53,7 +54,7 @@ class UpdateSecondHandProduct extends Controller
             if (is_a($secondHandProduct, Object::getCustomClass('SiteTree'))) {
                 $archived = $secondHandProduct->deleteFromStage('Live');
                 $archived = $secondHandProduct->deleteFromStage('Stage');
-            } else {
+            } elseif(! is_null($secondHandProduct) ) {
                 $archived = $secondHandProduct->delete();
             }
         }
