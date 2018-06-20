@@ -39,28 +39,28 @@ class OrderStep_DisableSecondHandProduct extends OrderStep implements OrderStepI
         return true;
     }
 
-     /**
-      * Add a member to the order - in case he / she is not a shop admin.
-      *
-      * @param Order object
-      *
-      * @return bool - true if run correctly.
-      **/
-     public function doStep(Order $order)
-     {
-         foreach ($order->Buyables() as $buyable) {
-             if ($buyable instanceof SecondHandProduct) {
-                 $buyable->AllowPurchase = 0;
-                 if (is_a($buyable, Object::getCustomClass('SiteTree'))) {
-                     $buyable->writeToStage('Stage');
-                     $buyable->publish('Stage', 'Live');
-                 } else {
-                     $buyable->write();
-                 }
-             }
-         }
-         return true;
-     }
+    /**
+     * Add a member to the order - in case he / she is not a shop admin.
+     *
+     * @param Order object
+     *
+     * @return bool - true if run correctly.
+     **/
+    public function doStep(Order $order)
+    {
+        foreach ($order->Buyables() as $buyable) {
+            if ($buyable instanceof SecondHandProduct) {
+                $buyable->AllowPurchase = 0;
+                if (is_a($buyable, Object::getCustomClass('SiteTree'))) {
+                    $buyable->writeToStage('Stage');
+                    $buyable->publish('Stage', 'Live');
+                } else {
+                    $buyable->write();
+                }
+            }
+        }
+        return true;
+    }
 
     /**
      * go to next step if order has been submitted.

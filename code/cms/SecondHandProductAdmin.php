@@ -58,10 +58,11 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
         return $this->redirect(singleton('CMSMain')->Link());
     }
 
-    function archive($request){
-        if(isset($_GET['productid'])){
+    public function archive($request)
+    {
+        if (isset($_GET['productid'])) {
             $id = intval($_GET['productid']);
-            if($id) {
+            if ($id) {
                 $secondHandProduct = SecondHandProduct::get()->byID($id);
                 $internalItemID = $secondHandProduct->InternalItemID;
                 if (is_a($secondHandProduct, Object::getCustomClass('SiteTree'))) {
@@ -72,7 +73,7 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
                 }
                 //after deleting the product redirect to the archived page
                 $archivedProduct = SecondHandArchive::get()->filter(['InternalItemID' => $internalItemID])->first();
-                if($archivedProduct){
+                if ($archivedProduct) {
                     $this->getResponse()->addHeader(
                         'X-Status',
                         rawurlencode(_t(
@@ -89,12 +90,15 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
         return new SS_HTTPResponse("ERROR!", 400);
     }
 
-    function restore($request){
-        if(isset($_GET['productid'])){
+    public function restore($request)
+    {
+        if (isset($_GET['productid'])) {
             $id = intval($_GET['productid']);
-            if($id) {
+            if ($id) {
                 $restoredPage = Versioned::get_latest_version("SiteTree", $id);
-                if(!$restoredPage) 	return new SS_HTTPResponse("SiteTree #$id not found", 400);
+                if (!$restoredPage) {
+                    return new SS_HTTPResponse("SiteTree #$id not found", 400);
+                }
                 $restoredPage = $restoredPage->doRestoreToStage();
                 $restoredPage->doPublish();
                 $this->getResponse()->addHeader(

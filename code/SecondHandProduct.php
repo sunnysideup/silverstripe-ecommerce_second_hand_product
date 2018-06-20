@@ -232,10 +232,9 @@ class SecondHandProduct extends Product implements PermissionProvider
 
     public function onBeforeDelete()
     {
-        if(Versioned::current_stage() !== 'Stage') {
+        if (Versioned::current_stage() !== 'Stage') {
             //do nothing
-        }
-        else {
+        } else {
             //page is being deleted permanently so create archived version
             SecondHandArchive::create_from_page($this);
         }
@@ -373,14 +372,16 @@ class SecondHandProduct extends Product implements PermissionProvider
                 DropdownField::create(
                     'BasedOnID',
                     'Autocomplete from saved items',
-                    $lastItems),
+                    $lastItems
+                ),
                 TextField::create('SellersName', 'Name'),
                 TextField::create('SellersPhone', 'Phone'),
                 TextField::create('SellersEmail', 'Email Address'),
                 DropdownField::create(
                     'SellersIDType',
                     'ID Type',
-                    $this->dbObject('SellersIDType')->enumValues()),
+                    $this->dbObject('SellersIDType')->enumValues()
+                ),
                 TextField::create('SellersIDNumber', 'ID Number'),
                 DateField::create('SellersDateOfBirth', 'Date of Birth'),
                 DateField::create('SellersIDExpiryDate', 'ID Expiry Date'),

@@ -39,27 +39,27 @@ class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepIn
         return true;
     }
 
-     /**
-      * Add a member to the order - in case he / she is not a shop admin.
-      *
-      * @param Order object
-      *
-      * @return bool - true if run correctly.
-      **/
-     public function doStep(Order $order)
-     {
-         foreach ($order->Buyables() as $buyable) {
-             if ($buyable instanceof SecondHandProduct) {
-                 if (is_a($buyable, Object::getCustomClass('SiteTree'))) {
-                     $buyable->deleteFromStage('Live');
-                     $buyable->deleteFromStage('Stage');
-                 } else {
-                     $buyable->delete();
-                 }
-             }
-         }
-         return true;
-     }
+    /**
+     * Add a member to the order - in case he / she is not a shop admin.
+     *
+     * @param Order object
+     *
+     * @return bool - true if run correctly.
+     **/
+    public function doStep(Order $order)
+    {
+        foreach ($order->Buyables() as $buyable) {
+            if ($buyable instanceof SecondHandProduct) {
+                if (is_a($buyable, Object::getCustomClass('SiteTree'))) {
+                    $buyable->deleteFromStage('Live');
+                    $buyable->deleteFromStage('Stage');
+                } else {
+                    $buyable->delete();
+                }
+            }
+        }
+        return true;
+    }
 
     /**
      * go to next step if order has been submitted.

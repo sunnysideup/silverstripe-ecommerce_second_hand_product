@@ -26,7 +26,8 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
     {
         $pageTypes = array();
         foreach ($this->PageTypes() as $type) {
-            $html = sprintf('<span class="page-icon class-%s"></span><strong class="title">%s</strong><span class="description">%s</span>',
+            $html = sprintf(
+                '<span class="page-icon class-%s"></span><strong class="title">%s</strong><span class="description">%s</span>',
                 $type->getField('ClassName'),
                 $type->getField('AddAction'),
                 $type->getField('Description')
@@ -86,7 +87,8 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
         $this->extend('updatePageOptions', $fields);
 
         $form = CMSForm::create(
-            $this, "AddForm",
+            $this,
+            "AddForm",
             $fields,
             $actions
         )->setHTMLID('Form_AddForm');
@@ -124,7 +126,8 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
 
         if (!singleton($className)->canCreate(
             Member::currentUser(),
-            array('Parent' => $parentObj))
+            array('Parent' => $parentObj)
+        )
         ) {
             return Security::permissionFailure($this);
         }

@@ -3,7 +3,6 @@
 
 class UpdateSecondHandProduct extends Controller
 {
-
     private static $allowed_actions = array(
         'unpublish' => '->MyPermissionCheck',
         'archive' => '->MyPermissionCheck'
@@ -18,36 +17,36 @@ class UpdateSecondHandProduct extends Controller
      */
     private static $secret_codes = array();
 
-    function init()
+    public function init()
     {
         parent::init();
-        if(! $this->MyPermissionCheck()) {
+        if (! $this->MyPermissionCheck()) {
             die('you do not have access');
         }
     }
 
-    function unpublish($request)
+    public function unpublish($request)
     {
         $unpublished = false;
         $otherID = $request->param("OtherID");
-        if(isset($otherID)) {
+        if (isset($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
             $secondHandProduct = DataObject::get_one('SecondHandProduct', ['InternalItemID' => $internalItemID]);
-            if($secondHandProduct){
+            if ($secondHandProduct) {
                 $unpublished = $secondHandProduct->deleteFromStage('Live');
             }
         }
         return json_encode($unpublished);
     }
 
-    function archive($request)
+    public function archive($request)
     {
         $archived = false;
         $otherID = $request->param("OtherID");
-        if(isset($otherID)) {
+        if (isset($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
             $secondHandProduct = DataObject::get_one('SecondHandProduct', ['InternalItemID' => $internalItemID]);
-            if(!$secondHandProduct){
+            if (!$secondHandProduct) {
                 $secondHandProduct = Versioned::get_one_by_stage('SecondHandProduct', 'Stage', ['InternalItemID' => $internalItemID]);
             }
             if (is_a($secondHandProduct, Object::getCustomClass('SiteTree'))) {
@@ -63,7 +62,7 @@ class UpdateSecondHandProduct extends Controller
     /**
      * @return Boolean
      */
-    function MyPermissionCheck()
+    public function MyPermissionCheck()
     {
         $codesWithIPs = $this->Config()->get('secret_codes');
         $code = $this->request->param('ID');

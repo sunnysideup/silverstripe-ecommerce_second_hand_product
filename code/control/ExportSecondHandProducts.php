@@ -78,15 +78,15 @@ class ExportSecondHandProducts extends Controller
      */
     private static $url_segment_of_parent_field_name = 'ParentURLSegmentForImportExport';
 
-    function init()
+    public function init()
     {
         parent::init();
-        if(! $this->MyPermissionCheck()) {
+        if (! $this->MyPermissionCheck()) {
             die('you do not have access');
         }
     }
 
-    function products()
+    public function products()
     {
         $array = array();
         $products = SecondHandProduct::get()->filter(array('AllowPurchase' => 1));
@@ -96,14 +96,14 @@ class ExportSecondHandProducts extends Controller
         $singleton = Injector::inst()->get('SecondHandProductGroup');
         $rootSecondHandPage = $singleton->BestRootParentPage();
         $relations = Config::inst()->get('ExportSecondHandProducts', 'relationships_to_include_with_products');
-        if($rootSecondHandPage) {
-            foreach($products as $product) {
+        if ($rootSecondHandPage) {
+            foreach ($products as $product) {
                 $array[$count] = $product->toMap();
-                foreach($doNotCopy as $field) {
+                foreach ($doNotCopy as $field) {
                     unset($array[$count][$field]);
                 }
-                if($parent = $product->Parent()) {
-                    if($parent->ID === $rootSecondHandPage->ID) {
+                if ($parent = $product->Parent()) {
+                    if ($parent->ID === $rootSecondHandPage->ID) {
                         $array[$count][$parentURLSegmentField] = false;
                     } else {
                         $array[$count][$parentURLSegmentField] = $parent->URLSegment;
@@ -119,7 +119,7 @@ class ExportSecondHandProducts extends Controller
         return $this->returnJSONorFile($array, '');
     }
 
-    function groups ()
+    public function groups()
     {
         $array = array();
         $groups = SecondHandProductGroup::get();
@@ -129,15 +129,15 @@ class ExportSecondHandProducts extends Controller
         $singleton = Injector::inst()->get('SecondHandProductGroup');
         $rootSecondHandPage = $singleton->BestRootParentPage();
         $relations = Config::inst()->get('ExportSecondHandProducts', 'relationships_to_include_with_groups');
-        if($rootSecondHandPage) {
-            foreach($groups as $group) {
-                if(! $group->RootParent) {
+        if ($rootSecondHandPage) {
+            foreach ($groups as $group) {
+                if (! $group->RootParent) {
                     $array[$count] = $group->toMap();
-                    foreach($doNotCopy as $field) {
+                    foreach ($doNotCopy as $field) {
                         unset($array[$count][$field]);
                     }
-                    if($parent = $group->Parent()) {
-                        if($parent->ID === $rootSecondHandPage->ID) {
+                    if ($parent = $group->Parent()) {
+                        if ($parent->ID === $rootSecondHandPage->ID) {
                             $array[$count][$parentURLSegmentField] = false;
                         } else {
                             $array[$count][$parentURLSegmentField] = $parent->URLSegment;
@@ -148,42 +148,40 @@ class ExportSecondHandProducts extends Controller
                     //next one
                     $count++;
                 }
-
             }
         }
 
         return $this->returnJSONorFile($array, 'groups');
     }
 
-    function images()
+    public function images()
     {
-
         $err = 0;
         $array = array();
         $folderName = Config::inst()->get('ExportSecondHandProducts', 'folder_for_second_hand_images');
         $folder = Folder::find_or_make($folderName);
         $secondHandProducts = SecondHandProduct::get()->filter(array('AllowPurchase' => 1))->exclude(array('ImageID' => 0));
-        foreach($secondHandProducts as $secondHandProduct) {
+        foreach ($secondHandProducts as $secondHandProduct) {
             $arrayInner = array();
-            if($secondHandProduct->ImageID) {
+            if ($secondHandProduct->ImageID) {
                 $image = $secondHandProduct->Image(); //see Product::has_one()
-                if($image && $image->exists()) {
+                if ($image && $image->exists()) {
                     $arrayInner[$image->ID] = $image;
                 }
             }
             $otherImages = $secondHandProduct->AdditionalImages(); //see Product::many_many()
-            foreach($otherImages as $otherImage) {
-                if($otherImage && $otherImage->exists()) {
+            foreach ($otherImages as $otherImage) {
+                if ($otherImage && $otherImage->exists()) {
                     $arrayInner[$otherImage->ID] = $otherImage;
                 }
             }
             $count = 0;
-            foreach($arrayInner as $imageID => $image) {
+            foreach ($arrayInner as $imageID => $image) {
                 $fileName = $image->FileName;
                 $oldFileLocationAbsolute = Director::baseFolder().'/'.$image->FileName;
-                if(file_exists($oldFileLocationAbsolute)) {
+                if (file_exists($oldFileLocationAbsolute)) {
                     $extension = pathinfo($image->FileName, PATHINFO_EXTENSION);
-                    if(!$extension) {
+                    if (!$extension) {
                         $extension = 'jpg';
                     } else {
                         $extension = strtolower($extension);
@@ -198,7 +196,7 @@ class ExportSecondHandProducts extends Controller
                     $image->ClassName = 'Product_Image';
                     $image->write();
                     $newAbsoluteLocation = Director::baseFolder().'/'.$image->FileName;
-                    if(! file_exists($newAbsoluteLocation)) {
+                    if (! file_exists($newAbsoluteLocation)) {
                         $err++;
                     } else {
                         $array[$secondHandProduct->InternalItemID][] = $name;
@@ -216,7 +214,7 @@ class ExportSecondHandProducts extends Controller
     /**
      * @return Boolean
      */
-    function MyPermissionCheck()
+    public function MyPermissionCheck()
     {
         $codesWithIPs = $this->Config()->get('secret_codes');
         $code = $this->request->param('ID');
@@ -225,7 +223,7 @@ class ExportSecondHandProducts extends Controller
 
     protected function returnJSONorFile($array, $filenameAppendix = '')
     {
-        if(Director::isDev()) {
+        if (Director::isDev()) {
             $json = json_encode($array, JSON_PRETTY_PRINT);
         } else {
             $json = json_encode($array);
@@ -233,8 +231,8 @@ class ExportSecondHandProducts extends Controller
             $json = preg_replace('/\s\s+/', ' ', $json);
         }
         $fileName = $this->Config()->get('location_to_save_contents');
-        if($fileName) {
-            if($filenameAppendix) {
+        if ($fileName) {
+            if ($filenameAppendix) {
                 $fileName = str_replace('.json', '.'.$filenameAppendix.'.json', $fileName);
             }
             $fileNameFull = Director::baseFolder().'/'.$fileName;
@@ -255,19 +253,19 @@ class ExportSecondHandProducts extends Controller
     protected function addRelations($currentObject, $relations)
     {
         $dataToBeAdded = array();
-        foreach($relations as $myField => $relFields) {
+        foreach ($relations as $myField => $relFields) {
             $innerDataToBeAdded = array();
             $relData = $currentObject->$myField();
-            if($relData instanceof SS_List) {
+            if ($relData instanceof SS_List) {
                 $count = 0;
-                foreach($relData as $relItem) {
-                    foreach($relFields as $relField) {
+                foreach ($relData as $relItem) {
+                    foreach ($relFields as $relField) {
                         $innerDataToBeAdded[$count][$relField] = $relItem->$relField;
                     }
                     $count++;
                 }
-            } elseif($relData instanceof DataObject) {
-                foreach($relFields as $relField) {
+            } elseif ($relData instanceof DataObject) {
+                foreach ($relFields as $relField) {
                     $innerDataToBeAdded = array($relField => $relData->$relField);
                 }
             } else {
@@ -278,5 +276,4 @@ class ExportSecondHandProducts extends Controller
 
         return $dataToBeAdded;
     }
-
 }

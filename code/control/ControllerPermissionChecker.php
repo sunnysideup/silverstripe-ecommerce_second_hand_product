@@ -1,6 +1,7 @@
 <?php
 
-class ControllerPermissionChecker extends Controller {
+class ControllerPermissionChecker extends Controller
+{
 
 
     /**
@@ -9,14 +10,15 @@ class ControllerPermissionChecker extends Controller {
      * @var array $code - ID parameter in URL
      * @return Boolean
      */
-    public static function permissionCheck($codesWithIPs, $code) {
+    public static function permissionCheck($codesWithIPs, $code)
+    {
         //with a code you do not have to be logged in ...
-        if(count($codesWithIPs)) {
+        if (count($codesWithIPs)) {
             $ip = EcommerceCountry::get_ip();
-            if($code) {
+            if ($code) {
                 $testIP = isset($codesWithIPs[$code]) ? $codesWithIPs[$code] : false;
-                if($testIP) {
-                    if($testIP === $ip || $testIP === '*') {
+                if ($testIP) {
+                    if ($testIP === $ip || $testIP === '*') {
                         return true;
                     }
                 }
@@ -24,5 +26,4 @@ class ControllerPermissionChecker extends Controller {
         }
         return Permission::check('ADMIN');
     }
-
 }
