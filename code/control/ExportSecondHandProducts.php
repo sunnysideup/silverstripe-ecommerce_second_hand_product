@@ -116,7 +116,7 @@ class ExportSecondHandProducts extends Controller
                 }
                 $array[$count] += $this->addRelations($product, $relations);
                 if ($withImageData && isset($imageData[$product->InternalItemID])) {
-                    $array['count']['ImageSize'] = $imageData[$product->InternalItemID]
+                    $array[$count]['ImagesFileSize'] = $imageData[$product->InternalItemID];
                 }
                 //next one
                 $count++;
@@ -160,8 +160,6 @@ class ExportSecondHandProducts extends Controller
 
         return $this->returnJSONorFile($array, 'groups');
     }
-
-    private static $imageCache = null;
 
     public function images()
     {
