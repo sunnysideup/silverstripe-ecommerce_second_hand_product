@@ -88,6 +88,11 @@ class ExportSecondHandProducts extends Controller
 
     public function products()
     {
+        $withImageData = false;
+        if (! empty($_GET['withimagedata'])) {
+            $withImageData = true;
+            $imageData = $this->getImageArray(true);
+        }
         $array = array();
         $products = SecondHandProduct::get()->filter(array('AllowPurchase' => 1));
         $count = 0;
@@ -110,7 +115,9 @@ class ExportSecondHandProducts extends Controller
                     }
                 }
                 $array[$count] += $this->addRelations($product, $relations);
-
+                if ($withImageData && isset($imageData[$product->InternalItemID])) {
+                    $array['count']['ImageSize'] = $imageData[$product->InternalItemID]
+                }
                 //next one
                 $count++;
             }
@@ -154,60 +161,11 @@ class ExportSecondHandProducts extends Controller
         return $this->returnJSONorFile($array, 'groups');
     }
 
+    private static $imageCache = null;
+
     public function images()
     {
-        $err = 0;
-        $array = array();
-        $folderName = Config::inst()->get('ExportSecondHandProducts', 'folder_for_second_hand_images');
-        $folder = Folder::find_or_make($folderName);
-        $secondHandProducts = SecondHandProduct::get()->filter(array('AllowPurchase' => 1))->exclude(array('ImageID' => 0));
-        foreach ($secondHandProducts as $secondHandProduct) {
-            $arrayInner = array();
-            if ($secondHandProduct->ImageID) {
-                $image = $secondHandProduct->Image(); //see Product::has_one()
-                if ($image && $image->exists()) {
-                    $arrayInner[$image->ID] = $image;
-                }
-            }
-            $otherImages = $secondHandProduct->AdditionalImages(); //see Product::many_many()
-            foreach ($otherImages as $otherImage) {
-                if ($otherImage && $otherImage->exists()) {
-                    $arrayInner[$otherImage->ID] = $otherImage;
-                }
-            }
-            $count = 0;
-            foreach ($arrayInner as $imageID => $image) {
-                $fileName = $image->FileName;
-                $oldFileLocationAbsolute = Director::baseFolder().'/'.$image->FileName;
-                if (file_exists($oldFileLocationAbsolute)) {
-                    $extension = pathinfo($image->FileName, PATHINFO_EXTENSION);
-                    if (!$extension) {
-                        $extension = 'jpg';
-                    } else {
-                        $extension = strtolower($extension);
-                    }
-                    $name = $secondHandProduct->InternalItemID.'_'.$count.'.'.$extension;
-                    $fileName = $folder->FileName.$name;
-                    $title =  $secondHandProduct->Title. ' #'.($count + 1);
-                    $image->ParentID = $folder->ID;
-                    $image->Name = $name;
-                    $image->FileName = $fileName;
-                    $image->Title = $title;
-                    $image->ClassName = 'Product_Image';
-                    $image->write();
-                    $newAbsoluteLocation = Director::baseFolder().'/'.$image->FileName;
-                    if (! file_exists($newAbsoluteLocation)) {
-                        $err++;
-                    } else {
-                        $array[$secondHandProduct->InternalItemID][] = $name;
-                    }
-                } else {
-                    $err++;
-                }
-                $count++;
-            }
-        }
-
+        $array = $this->getImageArray(false);
         return $this->returnJSONorFile($array, 'images');
     }
 
@@ -275,5 +233,72 @@ class ExportSecondHandProducts extends Controller
         }
 
         return $dataToBeAdded;
+    }
+
+    protected function getImageArray($imageSizesOnly = false)
+    {
+        $err = 0;
+        $array = array();
+        $folderName = Config::inst()->get('ExportSecondHandProducts', 'folder_for_second_hand_images');
+        $folder = Folder::find_or_make($folderName);
+        $secondHandProducts = SecondHandProduct::get()->filter(array('AllowPurchase' => 1))->exclude(array('ImageID' => 0));
+        foreach ($secondHandProducts as $secondHandProduct) {
+            $arrayInner = array();
+            if ($secondHandProduct->ImageID) {
+                $image = $secondHandProduct->Image(); //see Product::has_one()
+                if ($image && $image->exists()) {
+                    $arrayInner[$image->ID] = $image;
+                }
+            }
+            $otherImages = $secondHandProduct->AdditionalImages(); //see Product::many_many()
+            foreach ($otherImages as $otherImage) {
+                if ($otherImage && $otherImage->exists()) {
+                    $arrayInner[$otherImage->ID] = $otherImage;
+                }
+            }
+            $count = 0;
+            foreach ($arrayInner as $imageID => $image) {
+                $fileName = $image->FileName;
+                $oldFileLocationAbsolute = Director::baseFolder().'/'.$image->FileName;
+                if (file_exists($oldFileLocationAbsolute)) {
+                    $extension = pathinfo($image->FileName, PATHINFO_EXTENSION);
+                    if (!$extension) {
+                        $extension = 'jpg';
+                    } else {
+                        $extension = strtolower($extension);
+                    }
+                    $name = $secondHandProduct->InternalItemID.'_'.$count.'.'.$extension;
+                    $fileName = $folder->FileName.$name;
+                    $title =  $secondHandProduct->Title. ' #'.($count + 1);
+                    $image->ParentID = $folder->ID;
+                    $image->Name = $name;
+                    $image->FileName = $fileName;
+                    $image->Title = $title;
+                    $image->ClassName = 'Product_Image';
+                    $image->write();
+                    $newAbsoluteLocation = Director::baseFolder().'/'.$image->FileName;
+                    if (! file_exists($newAbsoluteLocation)) {
+                        $err++;
+                    } else {
+                        if ($imageSizesOnly) {
+                            if (! isset($array[$secondHandProduct->InternalItemID])) {
+                                $array[$secondHandProduct->InternalItemID] = 0;
+                            }
+                            $array[$secondHandProduct->InternalItemID] += filesize($newAbsoluteLocation);
+                        } else {
+                            if (! isset($array[$secondHandProduct->InternalItemID])) {
+                                $array[$secondHandProduct->InternalItemID] = [];
+                            }
+                            $array[$secondHandProduct->InternalItemID][] = $name;
+                        }
+                    }
+                } else {
+                    $err++;
+                }
+                $count++;
+            }
+        }
+
+        return $array;
     }
 }
