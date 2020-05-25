@@ -183,6 +183,8 @@ class SecondHandArchive extends DataObject
         'SerialNumber' => 'PartialMatchFilter'
     );
 
+    private static $show_restore_button = false;
+
     /**
      * stadard SS method
      * @return FieldList
@@ -190,16 +192,18 @@ class SecondHandArchive extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->addFieldsToTab(
-            'Root.Main',
-            [
-                EcommerceCMSButtonField::create(
-                    'RestoreButton',
-                    '/admin/secondhandproducts/SecondHandProduct/restore/?productid=' . $this->PageID,
-                    _t('SecondHandArchive.RESTORE_BUTTON', 'Restore Product')
-                )
-            ]
-        );
+        if(Config::inst()->get(SecondHandArchive::class, 'show_restore_button')){
+            $fields->addFieldsToTab(
+                'Root.Main',
+                [
+                    EcommerceCMSButtonField::create(
+                        'RestoreButton',
+                        '/admin/secondhandproducts/SecondHandProduct/restore/?productid=' . $this->PageID,
+                        _t('SecondHandArchive.RESTORE_BUTTON', 'Restore Product')
+                    )
+                ]
+            );
+        }
         $fields->addFieldsToTab(
             'Root.SellersDetails',
             [
