@@ -69,6 +69,18 @@ class SecondHandProduct extends Product implements PermissionProvider
         'CreatedNice' => 'Varchar'
     );
 
+    /**
+     * Standard SS variable.
+     */
+    private static $summary_fields = [
+        'Image.CMSThumbnail' => 'Image',
+        'Title' => 'Title',
+        'InternalItemID' => 'Code',
+        'Price' => 'Price',
+        'AllowPurchaseNice' => 'For Sale',
+        'CreatedNice' => 'Entered',
+    ];
+
     private static $seller_summary_detail_fields = array(
         'SellersName',
         'SellersPhone',
@@ -633,15 +645,10 @@ class SecondHandProduct extends Product implements PermissionProvider
         $this->doPublish();
     }
 
-
-    /**
-     * adds created as a summary field as we are sorting by created
-     * @return array
-     */
-    public function summaryFields()
+    public function exportFields()
     {
-        $fields = parent::summaryFields();
-        $fields['CreatedNice'] = 'Entered';
+        $fields = $this->summaryFields();
+        unset($fields['Image.CMSThumbnail']);
         return $fields;
     }
 
