@@ -70,7 +70,7 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
                 if (is_a($secondHandProduct, Object::getCustomClass('SiteTree'))) {
                     $secondHandProduct->deleteFromStage('Live');
                     $secondHandProduct->deleteFromStage('Stage');
-                } else {
+                } else if($secondHandProduct) {
                     $secondHandProduct->delete();
                 }
                 //after deleting the product redirect to the archived page
