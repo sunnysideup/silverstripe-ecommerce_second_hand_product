@@ -105,11 +105,7 @@ class ExportSecondHandProducts extends Controller
             foreach ($products as $product) {
                 $productData = $product->toMap();
                 $archivedVersion = SecondHandArchive::get()->filter(['InternalItemID' => $product->InternalItemID])->first();
-                $productData['HasBeenArchived'] = $archivedVersion ? true : false; 
-                echo '<pre>';
-                var_export($productData);
-                echo '</pre>';
-                die('sdfsf');
+                $productData['HasBeenArchived'] = $archivedVersion ? true : false;
                 $array[$count] = $productData;
                 foreach ($doNotCopy as $field) {
                     unset($array[$count][$field]);
