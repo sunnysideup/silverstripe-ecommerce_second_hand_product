@@ -103,7 +103,14 @@ class ExportSecondHandProducts extends Controller
         $relations = Config::inst()->get('ExportSecondHandProducts', 'relationships_to_include_with_products');
         if ($rootSecondHandPage) {
             foreach ($products as $product) {
-                $array[$count] = $product->toMap();
+                $productData = $product->toMap();
+                $archivedVersion = SecondHandArchive::get()->filter(['InternalItemID' => $product->InternalItemID])->first();
+                $productData['HasBeenArchived'] = $archivedVersion ? true : false; 
+                echo '<pre>';
+                var_export($productData);
+                echo '</pre>';
+                die('sdfsf');
+                $array[$count] = $productData;
                 foreach ($doNotCopy as $field) {
                     unset($array[$count][$field]);
                 }
