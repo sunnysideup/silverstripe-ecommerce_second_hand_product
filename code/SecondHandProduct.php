@@ -48,9 +48,10 @@ class SecondHandProduct extends Product implements PermissionProvider
         'SellersIDPhotocopy' => 'Boolean'
     );
 
-    private static $has_one = array(
-        'BasedOn' => 'SecondHandProduct'
-    );
+    private static $has_one = [
+        'BasedOn' => 'SecondHandProduct',
+        'ArchivedBy' => Member::class,
+    ];
 
     private static $default_sort = array(
         'Created' => 'DESC'

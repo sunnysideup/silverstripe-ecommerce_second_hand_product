@@ -66,11 +66,16 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
             $id = intval($_GET['productid']);
             if ($id) {
                 $secondHandProduct = SecondHandProduct::get()->byID($id);
+                $currentMember = Member::currentUser();
+                $secondHandProduct->ArchivedByID = $currentMember->ID;
                 $internalItemID = $secondHandProduct->InternalItemID;
                 if (is_a($secondHandProduct, Object::getCustomClass('SiteTree'))) {
+                    $secondHandProduct->write();
+                    $secondHandProduct->doPublish();
                     $secondHandProduct->deleteFromStage('Live');
                     $secondHandProduct->deleteFromStage('Stage');
                 } else if($secondHandProduct) {
+                    $secondHandProduct->write();
                     $secondHandProduct->delete();
                 }
                 //after deleting the product redirect to the archived page

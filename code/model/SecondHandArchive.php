@@ -34,6 +34,10 @@ class SecondHandArchive extends DataObject
         'SellersIDPhotocopy' => 'Boolean'
     );
 
+    private static $has_one = [
+        'ArchivedBy' => Member::class,
+    ];
+
     public static function create_from_page($page)
     {
         if ($page->InternalItemID) {
@@ -63,6 +67,7 @@ class SecondHandArchive extends DataObject
         $obj->OriginalManual = $page->OriginalManual;
         $obj->PageID = $page->ID;
         $obj->Description = $page->ShortDescription;
+        $obj->ArchivedByID = $page->ArchivedByID;
 
         //sellers details
         $obj->SellersName = $page->SellersName;
@@ -204,6 +209,12 @@ class SecondHandArchive extends DataObject
                 ]
             );
         }
+        $fields->addFieldsToTab(
+            'Root.Main',
+            [
+                ReadOnlyField::create('Created', 'Created')
+            ]
+        );
         $fields->addFieldsToTab(
             'Root.SellersDetails',
             [

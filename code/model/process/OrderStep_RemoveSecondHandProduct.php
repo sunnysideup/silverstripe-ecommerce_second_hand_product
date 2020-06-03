@@ -50,10 +50,15 @@ class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepIn
     {
         foreach ($order->Buyables() as $buyable) {
             if ($buyable instanceof SecondHandProduct) {
+                $currentMember = Member::currentUser();
+                $buyable->ArchivedByID = $order->MemberID;
                 if (is_a($buyable, Object::getCustomClass('SiteTree'))) {
+                    $buyable->write();
+                    $buyable->doPublish();
                     $buyable->deleteFromStage('Live');
                     $buyable->deleteFromStage('Stage');
                 } else {
+                    $buyable->write();
                     $buyable->delete();
                 }
             }
