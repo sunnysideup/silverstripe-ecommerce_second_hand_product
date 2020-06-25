@@ -1,5 +1,17 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct;
+
+use ProductGroupController;
+use Config;
+use FieldList;
+use TextField;
+use FormAction;
+use RequiredFields;
+use Form;
+use Convert;
+
+
 class SecondHandProductGroupController extends ProductGroupController
 {
     private static $allowed_actions = array(

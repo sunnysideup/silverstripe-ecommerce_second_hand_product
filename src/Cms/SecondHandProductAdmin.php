@@ -1,5 +1,22 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
+
+use ModelAdminEcommerceBaseClass;
+use GoogleAddressField;
+use Requirements;
+use SiteTree;
+use GridField;
+use GridFieldEditOriginalPageConfigSecondHandPage;
+use GridFieldExportButton;
+use SecondHandProduct;
+use Member;
+use SecondHandArchive;
+use Controller;
+use SS_HTTPResponse;
+use Versioned;
+
+
 /**
  * @description: for the management of Product and Product Groups only
  *

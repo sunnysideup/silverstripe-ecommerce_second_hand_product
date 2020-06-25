@@ -1,5 +1,12 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct\Model;
+
+use DataExtension;
+use FieldList;
+use TreeDropdownField;
+
+
 
 /**
  *

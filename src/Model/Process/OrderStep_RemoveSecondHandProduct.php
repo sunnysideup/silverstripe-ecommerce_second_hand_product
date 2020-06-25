@@ -1,5 +1,14 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct\Model\Process;
+
+use OrderStep;
+use OrderStepInterface;
+use Order;
+use SecondHandProduct;
+use Member;
+
+
 class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepInterface
 {
     public function HideFromEveryone()

@@ -1,4 +1,10 @@
 <?php
+
+namespace Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs;
+
+use GridFieldConfig_RecordEditor;
+use GridFieldAddNewButtonOriginalPageSecondHandProduct;
+
 /**
  * @author nicolaas <github@sunnysideup.co.nz>
  */

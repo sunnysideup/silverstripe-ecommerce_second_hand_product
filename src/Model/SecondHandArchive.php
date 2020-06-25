@@ -1,5 +1,16 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct\Model;
+
+use DataObject;
+use Member;
+use Permission;
+use EcommerceConfig;
+use Config;
+use EcommerceCMSButtonField;
+use ReadonlyField;
+
+
 
 class SecondHandArchive extends DataObject
 {

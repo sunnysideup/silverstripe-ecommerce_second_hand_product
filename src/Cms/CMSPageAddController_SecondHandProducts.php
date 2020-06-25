@@ -1,5 +1,26 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
+
+use CMSPageAddController;
+use DBField;
+use FieldList;
+use LiteralField;
+use DropdownField;
+use SecondHandProductGroup;
+use OptionsetField;
+use FormAction;
+use CMSForm;
+use SiteTree;
+use ProductGroup;
+use Member;
+use Security;
+use ValidationException;
+use Controller;
+use ArrayList;
+use ClassInfo;
+
+
 
 class CMSPageAddController_SecondHandProducts extends CMSPageAddController
 {

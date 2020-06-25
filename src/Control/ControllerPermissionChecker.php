@@ -1,5 +1,12 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct\Control;
+
+use Controller;
+use EcommerceCountry;
+use Permission;
+
+
 class ControllerPermissionChecker extends Controller
 {
 

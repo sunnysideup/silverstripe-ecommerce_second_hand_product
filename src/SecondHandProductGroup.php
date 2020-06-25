@@ -1,5 +1,13 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct;
+
+use ProductGroup;
+use CheckboxField;
+use SiteTree;
+use DataObject;
+
+
 
 class SecondHandProductGroup extends ProductGroup
 {

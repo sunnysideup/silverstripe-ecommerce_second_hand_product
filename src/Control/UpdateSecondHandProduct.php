@@ -1,5 +1,13 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct\Control;
+
+use Controller;
+use Convert;
+use DataObject;
+use Versioned;
+
+
 
 class UpdateSecondHandProduct extends Controller
 {

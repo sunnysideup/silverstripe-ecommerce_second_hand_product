@@ -1,5 +1,12 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct\Reports;
+
+use SS_Report;
+use Currency;
+use SecondHandProduct;
+
+
 
 class SecondHandProductValue extends SS_Report
 {

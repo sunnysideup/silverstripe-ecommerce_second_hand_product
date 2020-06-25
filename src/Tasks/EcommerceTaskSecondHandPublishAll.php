@@ -1,5 +1,13 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
+
+use BuildTask;
+use Environment;
+use SecondHandProduct;
+use DB;
+
+
 class EcommerceTaskSecondHandPublishAll extends BuildTask
 {
     protected $title = '(Re)publish all second hand products';

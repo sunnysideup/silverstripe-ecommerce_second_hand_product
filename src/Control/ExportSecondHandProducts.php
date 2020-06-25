@@ -1,5 +1,19 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct\Control;
+
+use Controller;
+use SecondHandProduct;
+use Injector;
+use Config;
+use SecondHandArchive;
+use SecondHandProductGroup;
+use Director;
+use SS_List;
+use DataObject;
+use Folder;
+
+
 
 class ExportSecondHandProducts extends Controller
 {

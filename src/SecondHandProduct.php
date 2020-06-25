@@ -1,5 +1,35 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct;
+
+use Product;
+use PermissionProvider;
+use Member;
+use Config;
+use Permission;
+use EcommerceConfig;
+use Versioned;
+use SecondHandArchive;
+use CheckboxField;
+use TextField;
+use DropdownField;
+use ReadonlyField;
+use DBField;
+use NumericField;
+use DateField;
+use UploadField;
+use TextareaField;
+use HeaderField;
+use GoogleAddressField;
+use Controller;
+use EcommerceCMSButtonField;
+use GridFieldConfig_RecordViewer;
+use GridField;
+use SS_Datetime;
+use Injector;
+use DB;
+
+
 
 class SecondHandProduct extends Product implements PermissionProvider
 {

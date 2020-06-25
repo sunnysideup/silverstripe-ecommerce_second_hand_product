@@ -1,5 +1,15 @@
 <?php
 
+namespace Sunnysideup\EcommerceSecondHandProduct;
+
+use ProductController;
+use Permission;
+use Security;
+use ArrayList;
+use DBField;
+use ArrayData;
+
+
 class SecondHandProductController extends ProductController
 {
     private static $fields_to_remove_from_print = [];
