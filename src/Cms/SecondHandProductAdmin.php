@@ -2,19 +2,34 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
 
-use ModelAdminEcommerceBaseClass;
-use GoogleAddressField;
-use Requirements;
-use SiteTree;
-use GridField;
-use GridFieldEditOriginalPageConfigSecondHandPage;
-use GridFieldExportButton;
-use SecondHandProduct;
-use Member;
-use SecondHandArchive;
-use Controller;
-use SS_HTTPResponse;
-use Versioned;
+
+
+
+
+
+
+
+
+
+
+
+
+
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
+use Sunnysideup\GoogleAddressField\GoogleAddressField;
+use SilverStripe\View\Requirements;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Forms\GridField\GridField;
+use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs\GridFieldEditOriginalPageConfigSecondHandPage;
+use SilverStripe\Forms\GridField\GridFieldExportButton;
+use SilverStripe\CMS\Controllers\CMSMain;
+use SilverStripe\Security\Member;
+use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Versioned\Versioned;
+use Sunnysideup\Ecommerce\Cms\ModelAdminEcommerceBaseClass;
+
 
 
 /**
@@ -35,8 +50,8 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
     private static $menu_title = 'Second Hand';
 
     private static $managed_models = array(
-        'SecondHandProduct',
-        'SecondHandArchive'
+        SecondHandProduct::class,
+        SecondHandArchive::class
     );
 
     private static $allowed_actions = array(
@@ -74,7 +89,7 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
 
     public function doCancel($data, $form)
     {
-        return $this->redirect(singleton('CMSMain')->Link());
+        return $this->redirect(singleton(CMSMain::class)->Link());
     }
 
     public function archive($request)
@@ -95,7 +110,7 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
   * EXP: Check if this is the right implementation, this is highly speculative.
   * ### @@@@ STOP REPLACEMENT @@@@ ###
   */
-                if (is_a($secondHandProduct, SilverStripe\Core\Injector\Injector::inst()->getCustomClass('SiteTree'))) {
+                if (is_a($secondHandProduct, SilverStripe\Core\Injector\Injector::inst()->getCustomClass(SiteTree::class))) {
                     $secondHandProduct->write();
                     $secondHandProduct->doPublish();
                     $secondHandProduct->deleteFromStage('Live');
@@ -120,7 +135,7 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
                 }
             }
         }
-        return new SS_HTTPResponse("ERROR!", 400);
+        return new HTTPResponse("ERROR!", 400);
     }
 
     public function restore($request)
@@ -128,13 +143,13 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
         if (isset($_GET['productid'])) {
             $id = intval($_GET['productid']);
             if ($id) {
-                $restoredPage = Versioned::get_latest_version("SiteTree", $id);
+                $restoredPage = Versioned::get_latest_version(SiteTree::class, $id);
                 $parentID = $restoredPage->ParentID;
                 if ($parentID) {
                     var_dump($parentID);
                     $this->ensureParentHasVersion($parentID);
                     if (!$restoredPage) {
-                        return new SS_HTTPResponse("SiteTree #$id not found", 400);
+                        return new HTTPResponse("SiteTree #$id not found", 400);
                     }
                     $restoredPage = $restoredPage->doRestoreToStage();
                     //$restoredPage->doPublish();
@@ -149,11 +164,11 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
                     $cmsEditLink = '/admin/secondhandproducts/SecondHandProduct/EditForm/field/SecondHandProduct/item/'.$id.'/edit';
                     return Controller::curr()->redirect($cmsEditLink);
                 } else {
-                    return new SS_HTTPResponse("Parent Page #$parentID is missing", 400);
+                    return new HTTPResponse("Parent Page #$parentID is missing", 400);
                 }
             }
         }
-        return new SS_HTTPResponse("ERROR!", 400);
+        return new HTTPResponse("ERROR!", 400);
     }
 
     /**
@@ -161,7 +176,7 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
      */
     public function ensureParentHasVersion($parentID)
     {
-        $parentPage = Versioned::get_latest_version("SiteTree", $parentID);
+        $parentPage = Versioned::get_latest_version(SiteTree::class, $parentID);
         if (!$parentPage) {
             $parentPage = SiteTree::get()->byID($parentID);
             if ($parentPage) {

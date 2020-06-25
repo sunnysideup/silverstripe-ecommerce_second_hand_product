@@ -2,32 +2,65 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
-use Product;
-use PermissionProvider;
-use Member;
-use Config;
-use Permission;
-use EcommerceConfig;
-use Versioned;
-use SecondHandArchive;
-use CheckboxField;
-use TextField;
-use DropdownField;
-use ReadonlyField;
-use DBField;
-use NumericField;
-use DateField;
-use UploadField;
-use TextareaField;
-use HeaderField;
-use GoogleAddressField;
-use Controller;
-use EcommerceCMSButtonField;
-use GridFieldConfig_RecordViewer;
-use GridField;
-use SS_Datetime;
-use Injector;
-use DB;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use SilverStripe\Security\Member;
+use SilverStripe\Core\Config\Config;
+use Sunnysideup\Ecommerce\Config\EcommerceConfig;
+use SilverStripe\Security\Permission;
+use SilverStripe\Versioned\Versioned;
+use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\DateField;
+use SilverStripe\Assets\Image;
+use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\Forms\TextareaField;
+use SilverStripe\Forms\HeaderField;
+use Sunnysideup\GoogleAddressField\GoogleAddressField;
+use SilverStripe\Control\Controller;
+use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
+use SilverStripe\Forms\GridField\GridField;
+use Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin;
+use SilverStripe\ORM\FieldType\DBDatetime;
+use SilverStripe\Core\Injector\Injector;
+use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\FieldType\DBDate;
+use Sunnysideup\Ecommerce\Pages\Product;
+use SilverStripe\Security\PermissionProvider;
+
 
 
 
@@ -93,7 +126,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     );
 
     private static $has_one = [
-        'BasedOn' => 'SecondHandProduct',
+        'BasedOn' => SecondHandProduct::class,
         'ArchivedBy' => Member::class,
     ];
 
@@ -184,7 +217,7 @@ class SecondHandProduct extends Product implements PermissionProvider
 
     public function getSellerSummary()
     {
-        $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
+        $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
         $array = [];
         foreach ($list as $field) {
             if (trim($this->$field)) {
@@ -251,7 +284,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     public function canCreate($member = null, $context = [])
     {
         return Permission::check(
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
+            EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
             'any',
             $member
         );
@@ -264,7 +297,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     public function canPublish($member = null)
     {
         return Permission::check(
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
+            EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
             'any',
             $member
         );
@@ -277,7 +310,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     public function canEdit($member = null, $context = [])
     {
         return Permission::check(
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
+            EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
             'any',
             $member
         );
@@ -290,7 +323,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     public function canDelete($member = null, $context = [])
     {
         return Permission::check(
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
+            EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
             'any',
             $member
         );
@@ -353,7 +386,7 @@ class SecondHandProduct extends Product implements PermissionProvider
         $fields->addFieldsToTab(
             'Root.Main',
             array(
-                ReadonlyField::create('CanBeSold', "For Sale", DBField::create_field('Boolean', $this->canPurchase())->Nice()),
+                ReadonlyField::create('CanBeSold', "For Sale", DBField::create_field(DBBoolean::class, $this->canPurchase())->Nice()),
                 ReadonlyField::create('CreatedNice', "First Entered", $this->getCreatedNice()),
                 TextField::create('InternalItemID', "Product Code"),
 
@@ -401,7 +434,7 @@ class SecondHandProduct extends Product implements PermissionProvider
                 $contentField = TextField::create("ShortDescription", "Description"),
                 $boughtDate = DateField::create('DateItemWasBought', 'Date this item was bought'),
                 $soldDate = DateField::create('DateItemWasSold', 'Date this item was sold'),
-                $mainImageField = UploadField::create("Image", "Main Product Image"),
+                $mainImageField = UploadField::create(Image::class, "Main Product Image"),
                 $additionalImagesField = UploadField::create("AdditionalImages", "More Images"),
                 $metaFieldDesc = TextareaField::create("MetaDescription", 'Meta Description')
             )
@@ -482,7 +515,7 @@ class SecondHandProduct extends Product implements PermissionProvider
             )
         );
 
-        if (class_exists('GoogleAddressField')) {
+        if (class_exists(GoogleAddressField::class)) {
             $mappingArray = $this->Config()->get('fields_to_google_geocode_conversion');
             if (is_array($mappingArray) && count($mappingArray)) {
                 $fields->addFieldToTab(
@@ -504,7 +537,7 @@ class SecondHandProduct extends Product implements PermissionProvider
                 );
                 $geocodingField->setFieldMap($mappingArray);
 
-                $country_code = Config::inst()->get('SecondHandProduct', 'country_code');
+                $country_code = Config::inst()->get(SecondHandProduct::class, 'country_code');
                 if ($country_code) {
                     $geocodingField->setRestrictToCountryCode($country_code);
                 }
@@ -534,7 +567,7 @@ class SecondHandProduct extends Product implements PermissionProvider
             )
         );
         if ($this->BasedOnID) {
-            $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
+            $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
             $labels = $this->FieldLabels();
             foreach ($list as $listField) {
                 $fields->replaceField(
@@ -593,7 +626,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     public function CMSEditLink()
     {
         return Controller::join_links(
-            singleton('SecondHandProductAdmin')->Link(),
+            singleton(SecondHandProductAdmin::class)->Link(),
 
 /**
   * ### @@@@ START REPLACEMENT @@@@ ###
@@ -634,7 +667,7 @@ class SecondHandProduct extends Product implements PermissionProvider
         if ($this->HasBeenSold()) {
             return false;
         }
-        $embargoDays = Config::inst()->get('SecondHandProduct', 'embargo_number_of_days');
+        $embargoDays = Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
         if (intval($embargoDays) > 0) {
             if ($this->DateItemWasBought) {
                 $date = $this->DateItemWasBought;
@@ -666,13 +699,13 @@ class SecondHandProduct extends Product implements PermissionProvider
         if ($this->BasedOnID) {
             $basedOn = $this->BasedOn();
             if ($basedOn && $basedOn->exists()) {
-                $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
+                $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
                 foreach ($list as $field) {
                     $this->$field = $basedOn->$field;
                 }
             }
         }
-        $list = Config::inst()->get('SecondHandProduct', 'seller_summary_detail_fields');
+        $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
 
         //set the IternatlItemID if it doesn't already exist
         if (! $this->InternalItemID) {
@@ -688,7 +721,7 @@ class SecondHandProduct extends Product implements PermissionProvider
         // Save the date when the product was sold.
         if ($this->HasBeenSold()) {
             if (! $this->DateItemWasSold) {
-                $this->DateItemWasSold = SS_Datetime::now()->Rfc2822();
+                $this->DateItemWasSold = DBDatetime::now()->Rfc2822();
             }
         }
         parent::onBeforeWrite();
@@ -706,10 +739,10 @@ class SecondHandProduct extends Product implements PermissionProvider
 
     public function providePermissions()
     {
-        $perms[EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code')] = array(
-            'name' => EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_title'),
+        $perms[EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code')] = array(
+            'name' => EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_title'),
             'category' => 'E-commerce',
-            'help' => EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_help'),
+            'help' => EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_help'),
             'sort' => 250,
         );
         return $perms;
@@ -718,23 +751,23 @@ class SecondHandProduct extends Product implements PermissionProvider
     public function requireDefaultRecords()
     {
         parent::requireDefaultRecords();
-        $permissionProviderFactory = Injector::inst()->get('PermissionProviderFactory');
+        $permissionProviderFactory = Injector::inst()->get(PermissionProviderFactory::class);
         $member = $permissionProviderFactory->CreateDefaultMember(
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_user_email'),
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_user_firstname'),
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_user_surname'),
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_user_password')
+            EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email'),
+            EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_firstname'),
+            EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_surname'),
+            EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_password')
         );
         $permissionProviderFactory->CreateGroup(
-            $code = EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_group_code'),
-            $name = EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_group_name'),
+            $code = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_code'),
+            $name = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_name'),
             $parentGroup = null,
             $permissionCode = EcommerceConfig::get(
-                'SecondHandProduct',
+                SecondHandProduct::class,
                 'second_hand_admin_permission_code'
             ),
             $roleTitle = EcommerceConfig::get(
-                'SecondHandProduct',
+                SecondHandProduct::class,
                 'second_hand_admin_permission_title'
             ),
             $permissionArray = array(
@@ -765,7 +798,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     {
         parent::populateDefaults();
         if (! $this->DateItemWasBought) {
-            $this->DateItemWasBought = SS_Datetime::now()->Rfc2822();
+            $this->DateItemWasBought = DBDatetime::now()->Rfc2822();
         }
     }
 
@@ -777,7 +810,7 @@ class SecondHandProduct extends Product implements PermissionProvider
         } else {
             $date = $this->Created;
         }
-        return $date.' = '.DBField::create_field('Date', $date)->Ago();
+        return $date.' = '.DBField::create_field(DBDate::class, $date)->Ago();
     }
 }
 

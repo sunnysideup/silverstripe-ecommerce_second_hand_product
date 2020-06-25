@@ -2,19 +2,23 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Reports;
 
-use SS_Report;
+
 use Currency;
-use SecondHandProduct;
+
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use SilverStripe\Forms\GridField\GridFieldExportButton;
+use SilverStripe\Reports\Report;
 
 
 
-class SecondHandProductValue extends SS_Report
+
+class SecondHandProductValue extends Report
 {
     /**
      * The class of object being managed by this report.
      * Set by overriding in your subclass.
      */
-    protected $dataClass = 'SecondHandProduct';
+    protected $dataClass = SecondHandProduct::class;
 
     /**
      * @return string
@@ -86,7 +90,7 @@ class SecondHandProductValue extends SS_Report
     {
         $field = parent::getReportField();
         $config = $field->getConfig();
-        $exportButton = $config->getComponentByType('GridFieldExportButton');
+        $exportButton = $config->getComponentByType(GridFieldExportButton::class);
         $exportButton->setExportColumns($field->getColumns());
         
         return $field;

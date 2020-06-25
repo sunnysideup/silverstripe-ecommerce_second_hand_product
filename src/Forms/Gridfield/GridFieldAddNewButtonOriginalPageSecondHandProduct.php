@@ -2,10 +2,17 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield;
 
-use GridFieldAddNewButtonOriginalPage;
-use ArrayData;
-use Config;
-use Injector;
+
+
+
+
+use SilverStripe\Core\Config\Config;
+use Sunnysideup\EcommerceSecondHandProduct\Cms\CMSPageAddController_SecondHandProducts;
+use SilverStripe\View\ArrayData;
+use SilverStripe\Core\Injector\Injector;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
+use Sunnysideup\Ecommerce\Forms\Gridfield\GridFieldAddNewButtonOriginalPage;
+
 
 
 /**
@@ -40,7 +47,7 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
         }
 
         $data = new ArrayData(array(
-            'NewLink' => '/admin/'.Config::inst()->get('CMSPageAddController_SecondHandProducts', 'url_segment').'/'.$getSegment,
+            'NewLink' => '/admin/'.Config::inst()->get(CMSPageAddController_SecondHandProducts::class, 'url_segment').'/'.$getSegment,
             'ButtonName' => $this->buttonName,
         ));
 
@@ -65,7 +72,7 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
      */
     public function BestRootParentPage()
     {
-        $singleton = Injector::inst()->get('SecondHandProductGroup');
+        $singleton = Injector::inst()->get(SecondHandProductGroup::class);
 
         return $singleton->BestRootParentPage();
     }

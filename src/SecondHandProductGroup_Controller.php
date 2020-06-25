@@ -2,14 +2,25 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
-use ProductGroupController;
-use Config;
-use FieldList;
-use TextField;
-use FormAction;
-use RequiredFields;
-use Form;
-use Convert;
+
+
+
+
+
+
+
+
+use SilverStripe\Core\Config\Config;
+use Sunnysideup\Ecommerce\Pages\ProductGroup;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\Forms\RequiredFields;
+use SilverStripe\Forms\Form;
+use SilverStripe\Core\Convert;
+use Sunnysideup\Ecommerce\Pages\ProductGroupController;
+
 
 
 class SecondHandProductGroupController extends ProductGroupController
@@ -30,9 +41,9 @@ class SecondHandProductGroupController extends ProductGroupController
     protected function init()
     {
         Config::modify()->update(
-            'ProductGroup',
+            ProductGroup::class,
             'base_buyable_class',
-            'SecondHandProduct'
+            SecondHandProduct::class
         );
         parent::init();
         $this->showFullList = true;

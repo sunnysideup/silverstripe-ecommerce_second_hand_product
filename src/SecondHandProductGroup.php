@@ -2,10 +2,17 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
-use ProductGroup;
-use CheckboxField;
-use SiteTree;
-use DataObject;
+
+
+
+
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use SilverStripe\Forms\CheckboxField;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\ORM\DataObject;
+use Sunnysideup\Ecommerce\Pages\ProductGroup;
+
 
 
 
@@ -30,8 +37,8 @@ class SecondHandProductGroup extends ProductGroup
     );
 
     private static $allowed_children = array(
-        'SecondHandProductGroup',
-        'SecondHandProduct'
+        SecondHandProductGroup::class,
+        SecondHandProduct::class
     );
 
     private static $icon = 'ecommerce_second_hand_product/images/treeicons/SecondHandProductGroup';
@@ -119,7 +126,7 @@ class SecondHandProductGroup extends ProductGroup
     public function BestRootParentPage()
     {
         $obj = DataObject::get_one(
-            'SecondHandProductGroup',
+            SecondHandProductGroup::class,
             array('RootParent' => 1)
         );
         if ($obj) {
@@ -136,7 +143,7 @@ class SecondHandProductGroup extends ProductGroup
      */
     protected function getBuyableClassName()
     {
-        return 'SecondHandProduct';
+        return SecondHandProduct::class;
     }
 }
 

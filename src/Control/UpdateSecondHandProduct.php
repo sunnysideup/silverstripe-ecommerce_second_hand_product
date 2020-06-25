@@ -2,10 +2,17 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
-use Controller;
-use Convert;
-use DataObject;
-use Versioned;
+
+
+
+
+use SilverStripe\Core\Convert;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Versioned\Versioned;
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Control\Controller;
+
 
 
 
@@ -39,7 +46,7 @@ class UpdateSecondHandProduct extends Controller
         $otherID = $request->param("OtherID");
         if (isset($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
-            $secondHandProduct = DataObject::get_one('SecondHandProduct', ['InternalItemID' => $internalItemID]);
+            $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
             if ($secondHandProduct) {
                 $unpublished = $secondHandProduct->deleteFromStage('Live');
             }
@@ -54,9 +61,9 @@ class UpdateSecondHandProduct extends Controller
         if (isset($otherID)) {
             $archived = null;
             $internalItemID = Convert::raw2sql($otherID);
-            $secondHandProduct = DataObject::get_one('SecondHandProduct', ['InternalItemID' => $internalItemID]);
+            $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
             if (!$secondHandProduct) {
-                $secondHandProduct = Versioned::get_one_by_stage('SecondHandProduct', 'Stage', ['InternalItemID' => $internalItemID]);
+                $secondHandProduct = Versioned::get_one_by_stage(SecondHandProduct::class, 'Stage', ['InternalItemID' => $internalItemID]);
             }
 
 /**
@@ -67,7 +74,7 @@ class UpdateSecondHandProduct extends Controller
   * EXP: Check if this is the right implementation, this is highly speculative.
   * ### @@@@ STOP REPLACEMENT @@@@ ###
   */
-            if (is_a($secondHandProduct, SilverStripe\Core\Injector\Injector::inst()->getCustomClass('SiteTree'))) {
+            if (is_a($secondHandProduct, SilverStripe\Core\Injector\Injector::inst()->getCustomClass(SiteTree::class))) {
                 $archived = $secondHandProduct->deleteFromStage('Live');
                 $archived = $secondHandProduct->deleteFromStage('Stage');
             } elseif (! is_null($secondHandProduct)) {

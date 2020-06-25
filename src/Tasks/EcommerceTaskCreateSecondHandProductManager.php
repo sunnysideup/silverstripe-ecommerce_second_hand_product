@@ -2,10 +2,16 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
-use BuildTask;
-use Injector;
+
+
 use db;
-use EcommerceConfig;
+
+use SilverStripe\Core\Injector\Injector;
+use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use Sunnysideup\Ecommerce\Config\EcommerceConfig;
+use SilverStripe\Dev\BuildTask;
+
 
 
 
@@ -25,17 +31,17 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask
 
     public function run($request)
     {
-        $permissionProviderFactory = Injector::inst()->get('PermissionProviderFactory');
+        $permissionProviderFactory = Injector::inst()->get(PermissionProviderFactory::class);
         db::alteration_message('========================== <br />creating second hand products sales manager', 'created');
-        $email = EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_user_email');
+        $email = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email');
         if (! $email) {
             $email = 'secondhandproducts@'.$_SERVER['HTTP_HOST'];
         }
-        $firstName = EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_user_first_name');
+        $firstName = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_first_name');
         if (!$firstName) {
             $firstName = 'Second Hand';
         }
-        $surname = EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_user_surname');
+        $surname = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_surname');
         if (!$surname) {
             $surname = 'Sales';
         }
@@ -48,11 +54,11 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask
         db::alteration_message('================================<br />creating shop admin group ', 'created');
 
         $permissionProviderFactory->CreateGroup(
-            $code = EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_group_code'),
-            $name = EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_group_name'),
+            $code = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_code'),
+            $name = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_name'),
             $parentGroup = null,
-            $permissionCode = EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code'),
-            $roleTitle = EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_role_title'),
+            $permissionCode = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
+            $roleTitle = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_role_title'),
             $otherPermissionCodes = array(),
             $member
         );

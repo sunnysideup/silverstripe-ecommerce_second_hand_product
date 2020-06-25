@@ -2,13 +2,22 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Model;
 
-use DataObject;
-use Member;
-use Permission;
-use EcommerceConfig;
-use Config;
-use EcommerceCMSButtonField;
-use ReadonlyField;
+
+
+
+
+
+
+
+use SilverStripe\Security\Member;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use Sunnysideup\Ecommerce\Config\EcommerceConfig;
+use SilverStripe\Security\Permission;
+use SilverStripe\Core\Config\Config;
+use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
+use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\ORM\DataObject;
+
 
 
 
@@ -141,7 +150,7 @@ class SecondHandArchive extends DataObject
     public function canView($member = null, $context = [])
     {
         return Permission::check(
-            EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code')
+            EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code')
         );
     }
 

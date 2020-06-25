@@ -2,9 +2,14 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Model;
 
-use DataExtension;
-use FieldList;
-use TreeDropdownField;
+
+
+
+use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\TreeDropdownField;
+use SilverStripe\ORM\DataExtension;
+
 
 
 
@@ -26,7 +31,7 @@ use TreeDropdownField;
 class SecondHandEcommerceConfigExtension extends DataExtension
 {
     private static $has_one = array(
-        "SecondHandExplanationPage" => 'SiteTree'
+        "SecondHandExplanationPage" => SiteTree::class
     );
 
     /**
@@ -40,7 +45,7 @@ class SecondHandEcommerceConfigExtension extends DataExtension
             TreeDropdownField::create(
                 'SecondHandExplanationPageID',
                 'Second Hand Explanation Page',
-                'SiteTree'
+                SiteTree::class
             )
         );
         return $fields;

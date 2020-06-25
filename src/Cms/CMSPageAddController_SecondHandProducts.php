@@ -2,23 +2,42 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
 
-use CMSPageAddController;
-use DBField;
-use FieldList;
-use LiteralField;
-use DropdownField;
-use SecondHandProductGroup;
-use OptionsetField;
-use FormAction;
+
+
+
+
+
+
+
+
 use CMSForm;
-use SiteTree;
-use ProductGroup;
-use Member;
-use Security;
-use ValidationException;
-use Controller;
-use ArrayList;
-use ClassInfo;
+
+
+
+
+
+
+
+
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\Forms\LiteralField;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
+use SilverStripe\Forms\DropdownField;
+use SilverStripe\Forms\OptionsetField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\FormAction;
+use SilverStripe\CMS\Model\SiteTree;
+use Sunnysideup\Ecommerce\Pages\ProductGroup;
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Security;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\Control\Controller;
+use Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin;
+use SilverStripe\ORM\ArrayList;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use SilverStripe\Core\ClassInfo;
+use SilverStripe\CMS\Controllers\CMSPageAddController;
+
 
 
 
@@ -228,7 +247,7 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
 
     public function doCancel($data, $form)
     {
-        return $this->redirect(singleton('SecondHandProductAdmin')->Link());
+        return $this->redirect(singleton(SecondHandProductAdmin::class)->Link());
     }
 
     /**
@@ -247,7 +266,7 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
   * EXP: Check if this is the right implementation, this is highly speculative.
   * ### @@@@ STOP REPLACEMENT @@@@ ###
   */
-        $productClass = SilverStripe\Core\Injector\Injector::inst()->getCustomClass('SecondHandProduct');
+        $productClass = SilverStripe\Core\Injector\Injector::inst()->getCustomClass(SecondHandProduct::class);
         $acceptedClasses = ClassInfo::subclassesFor($productClass);
         foreach ($pageTypes as $type) {
             if (in_array($type->ClassName, $acceptedClasses)) {

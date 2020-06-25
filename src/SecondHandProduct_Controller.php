@@ -2,12 +2,19 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
-use ProductController;
-use Permission;
-use Security;
-use ArrayList;
-use DBField;
-use ArrayData;
+
+
+
+
+
+
+use SilverStripe\Security\Permission;
+use SilverStripe\Security\Security;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\View\ArrayData;
+use Sunnysideup\Ecommerce\Pages\ProductController;
+
 
 
 class SecondHandProductController extends ProductController

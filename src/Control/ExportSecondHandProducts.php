@@ -2,16 +2,29 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
-use Controller;
-use SecondHandProduct;
-use Injector;
-use Config;
-use SecondHandArchive;
-use SecondHandProductGroup;
-use Director;
-use SS_List;
-use DataObject;
-use Folder;
+
+
+
+
+
+
+
+
+
+
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use SilverStripe\Core\Injector\Injector;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
+use SilverStripe\Core\Config\Config;
+use Sunnysideup\EcommerceSecondHandProduct\Control\ExportSecondHandProducts;
+use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
+use SilverStripe\Control\Director;
+use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Assets\Folder;
+use Sunnysideup\Ecommerce\Filesystem\ProductImage;
+use SilverStripe\Control\Controller;
+
 
 
 
@@ -112,9 +125,9 @@ class ExportSecondHandProducts extends Controller
         $count = 0;
         $doNotCopy = $this->Config()->get('do_not_copy');
         $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
-        $singleton = Injector::inst()->get('SecondHandProductGroup');
+        $singleton = Injector::inst()->get(SecondHandProductGroup::class);
         $rootSecondHandPage = $singleton->BestRootParentPage();
-        $relations = Config::inst()->get('ExportSecondHandProducts', 'relationships_to_include_with_products');
+        $relations = Config::inst()->get(ExportSecondHandProducts::class, 'relationships_to_include_with_products');
         if ($rootSecondHandPage) {
             foreach ($products as $product) {
                 $productData = $product->toMap();
@@ -150,9 +163,9 @@ class ExportSecondHandProducts extends Controller
         $count = 0;
         $doNotCopy = $this->Config()->get('do_not_copy');
         $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
-        $singleton = Injector::inst()->get('SecondHandProductGroup');
+        $singleton = Injector::inst()->get(SecondHandProductGroup::class);
         $rootSecondHandPage = $singleton->BestRootParentPage();
-        $relations = Config::inst()->get('ExportSecondHandProducts', 'relationships_to_include_with_groups');
+        $relations = Config::inst()->get(ExportSecondHandProducts::class, 'relationships_to_include_with_groups');
         if ($rootSecondHandPage) {
             foreach ($groups as $group) {
                 if (! $group->RootParent) {
@@ -254,7 +267,7 @@ class ExportSecondHandProducts extends Controller
     {
         $err = 0;
         $array = [];
-        $folderName = Config::inst()->get('ExportSecondHandProducts', 'folder_for_second_hand_images');
+        $folderName = Config::inst()->get(ExportSecondHandProducts::class, 'folder_for_second_hand_images');
         $folder = Folder::find_or_make($folderName);
         $secondHandProducts = SecondHandProduct::get()->filter(array('AllowPurchase' => 1))->exclude(array('ImageID' => 0));
         foreach ($secondHandProducts as $secondHandProduct) {
@@ -289,7 +302,7 @@ class ExportSecondHandProducts extends Controller
                     $image->Name = $name;
                     $image->FileName = $fileName;
                     $image->Title = $title;
-                    $image->ClassName = 'ProductImage';
+                    $image->ClassName = ProductImage::class;
                     $image->write();
                     $newAbsoluteLocation = Director::baseFolder().'/'.$image->FileName;
                     if (! file_exists($newAbsoluteLocation)) {

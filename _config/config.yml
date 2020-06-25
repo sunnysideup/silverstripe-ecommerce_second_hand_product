@@ -7,25 +7,18 @@ After:
   - 'cms/*'
   - 'ecommerce/*'
 ---
-
-EcommerceDBConfig:
+Sunnysideup\Ecommerce\Model\Config\EcommerceDBConfig:
   extensions:
-    - SecondHandEcommerceConfigExtension
-
-SecondHandProductGroup:
-  base_buyable_class: SecondHandProduct
+    - Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandEcommerceConfigExtension
+Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup:
+  base_buyable_class: Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct
   sort_options:
     default:
       Title: 'Default Order - (Most Recent)'
-      SQL: "\"Created\" DESC"
-
-EcommerceRole:
+      SQL: '"Created" DESC'
+Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole:
   admin_role_permission_codes:
     - CMS_ACCESS_SecondHandProductAdmin
-
-
-
-
 ---
 Only:
   moduleexists: 'grouped-cms-menu'
@@ -33,4 +26,4 @@ Only:
 SilverStripe\Admin\LeftAndMain:
   menu_groups:
     Shop:
-      - SecondHandProductAdmin
+      - Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin

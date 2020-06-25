@@ -7,8 +7,7 @@ After:
   - 'cms/*'
   - 'ecommerce/*'
 ---
-
 SilverStripe\Control\Director:
   rules:
-    'secondhandproductlist//$Action/$ID/$OtherID': 'ExportSecondHandProducts'
-    'updatesecondhandproduct//$Action/$ID/$OtherID': 'UpdateSecondHandProduct'
+    secondhandproductlist//$Action/$ID/$OtherID: Sunnysideup\EcommerceSecondHandProduct\Control\ExportSecondHandProducts
+    updatesecondhandproduct//$Action/$ID/$OtherID: Sunnysideup\EcommerceSecondHandProduct\Control\UpdateSecondHandProduct
