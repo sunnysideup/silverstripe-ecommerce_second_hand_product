@@ -2,52 +2,22 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
-
-
-
-
-
-
-
-
 use SilverStripe\Core\Config\Config;
-use Sunnysideup\Ecommerce\Pages\ProductGroup;
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-use SilverStripe\Forms\TextField;
+use SilverStripe\Core\Convert;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\RequiredFields;
-use SilverStripe\Forms\Form;
-use SilverStripe\Core\Convert;
+use SilverStripe\Forms\TextField;
+use Sunnysideup\Ecommerce\Pages\ProductGroup;
 use Sunnysideup\Ecommerce\Pages\ProductGroupController;
 
-
-
-class SecondHandProductGroupController extends ProductGroupController
+class SecondHandProductGroup_Controller extends ProductGroupController
 {
-    private static $allowed_actions = array(
+    private static $allowed_actions = [
         'SearchSecondHandProducts',
-        'search'
-    );
-
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * OLD:     public function init() (ignore case)
-  * NEW:     protected function init() (COMPLEX)
-  * EXP: Controller init functions are now protected  please check that is a controller.
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-    protected function init()
-    {
-        Config::modify()->update(
-            ProductGroup::class,
-            'base_buyable_class',
-            SecondHandProduct::class
-        );
-        parent::init();
-        $this->showFullList = true;
-    }
+        'search',
+    ];
 
     public function SearchSecondHandProducts()
     {
@@ -69,7 +39,7 @@ class SecondHandProductGroupController extends ProductGroupController
     {
         $page = SecondHandProductGroup::get()->first();
         if ($page) {
-            return $this->redirect($this->link('search').'?searchterm='.$data['searchterm']);
+            return $this->redirect($this->link('search') . '?searchterm=' . $data['searchterm']);
         }
     }
 
@@ -82,5 +52,23 @@ class SecondHandProductGroupController extends ProductGroupController
     public function HasSearchFilterAndSort()
     {
         return true;
+    }
+
+    /**
+     * ### @@@@ START REPLACEMENT @@@@ ###
+     * OLD:     public function init() (ignore case)
+     * NEW:     protected function init() (COMPLEX)
+     * EXP: Controller init functions are now protected  please check that is a controller.
+     * ### @@@@ STOP REPLACEMENT @@@@ ###
+     */
+    protected function init()
+    {
+        Config::modify()->update(
+            ProductGroup::class,
+            'base_buyable_class',
+            SecondHandProduct::class
+        );
+        parent::init();
+        $this->showFullList = true;
     }
 }

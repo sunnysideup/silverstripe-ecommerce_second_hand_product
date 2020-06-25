@@ -2,42 +2,28 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Model;
 
-
-
-
-
-
-
-
-use SilverStripe\Security\Member;
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-use Sunnysideup\Ecommerce\Config\EcommerceConfig;
-use SilverStripe\Security\Permission;
 use SilverStripe\Core\Config\Config;
-use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
-
-
-
+use SilverStripe\Security\Member;
+use SilverStripe\Security\Permission;
+use Sunnysideup\Ecommerce\Config\EcommerceConfig;
+use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 class SecondHandArchive extends DataObject
 {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * OLD: private static $db (case sensitive)
-  * NEW: 
-    private static $table_name = '[SEARCH_REPLACE_CLASS_NAME_GOES_HERE]';
-
+    /**
+     * ### @@@@ START REPLACEMENT @@@@ ###
+     * OLD: private static $db (case sensitive)
+     * NEW:
     private static $db (COMPLEX)
-  * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-    
+     * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
+     * ### @@@@ STOP REPLACEMENT @@@@ ###
+     */
     private static $table_name = 'SecondHandArchive';
 
-    private static $db = array(
+    private static $db = [
         'Title' => 'Varchar(255)',
         'InternalItemID' => 'Varchar(50)',
         'SerialNumber' => 'Varchar(50)',
@@ -52,10 +38,10 @@ class SecondHandArchive extends DataObject
         'OriginalManual' => 'Boolean',
         'PageID' => 'Int',
         'Description' => 'Varchar(255)',
-        'SellersName' =>  'Varchar(50)',
-        'SellersPhone' =>  'Varchar(30)',
-        'SellersEmail' =>  'Varchar(255)',
-        'SellersAddress' =>  'Varchar(255)',
+        'SellersName' => 'Varchar(50)',
+        'SellersPhone' => 'Varchar(30)',
+        'SellersEmail' => 'Varchar(255)',
+        'SellersAddress' => 'Varchar(255)',
         'SellersAddress2' => 'Varchar(255)',
         'SellersCity' => 'Varchar(100)',
         'SellersPostalCode' => 'Varchar(50)',
@@ -65,23 +51,73 @@ class SecondHandArchive extends DataObject
         'SellersIDNumber' => 'Varchar(50)',
         'SellersDateOfBirth' => 'Date',
         'SellersIDExpiryDate' => 'Date',
-        'SellersIDPhotocopy' => 'Boolean'
-    );
+        'SellersIDPhotocopy' => 'Boolean',
+    ];
 
     private static $has_one = [
         'ArchivedBy' => Member::class,
     ];
 
+    private static $singular_name = 'Archived Second Hand Product';
+
+    private static $plural_name = 'Archived Second Hand Products';
+
+    private static $indexes = [
+        'PageID' => true,
+        'InternalItemID' => true,
+    ];
+
+    private static $default_sort = [
+        'LastEdited' => 'DESC',
+    ];
+
+    private static $summary_fields = [
+        'Title' => 'Title',
+        'InternalItemID' => 'Code',
+        'SerialNumber' => 'Serial',
+        'DateItemWasBought' => 'Date Entered',
+        'DateItemWasSold' => 'Date Sold',
+        'ProductQuality' => 'Quality',
+        'SoldOnBehalf.Nice' => 'On Behalf',
+        'PurchasePrice' => 'Purchase Price',
+        'Price' => 'Sale/Ticket Price',
+        'SoldPrice' => 'Sold Price',
+    ];
+
+    private static $field_labels = [
+        'Title' => 'Title',
+        'Price' => 'Sale Price',
+        'InternalItemID' => 'Code',
+        'PurchasePrice' => 'Purchase Price',
+        'ProductQuality' => 'Quality',
+        'IncludesBoxOrCase' => 'Includes',
+        'OriginalManual' => 'Has Manual',
+        'SerialNumber' => 'Serial Number',
+    ];
+
+    private static $searchable_fields = [
+        'Title' => 'PartialMatchFilter',
+        'Price' => 'ExactMatchFilter',
+        'InternalItemID' => 'PartialMatchFilter',
+        'PurchasePrice' => 'ExactMatchFilter',
+        'ProductQuality' => 'ExactMatchFilter',
+        'IncludesBoxOrCase' => 'ExactMatchFilter',
+        'OriginalManual' => 'ExactMatchFilter',
+        'SerialNumber' => 'PartialMatchFilter',
+    ];
+
+    private static $show_restore_button = false;
+
     public static function create_from_page($page)
     {
         if ($page->InternalItemID) {
-            $filter = array(
-                'InternalItemID' => $page->InternalItemID
-            );
+            $filter = [
+                'InternalItemID' => $page->InternalItemID,
+            ];
         } else {
-            $filter = array(
-                'PageID' => $page->ID
-            );
+            $filter = [
+                'PageID' => $page->ID,
+            ];
         }
         $obj = SecondHandArchive::get()->filter($filter)->first();
         if (! $obj) {
@@ -123,20 +159,18 @@ class SecondHandArchive extends DataObject
         return $obj;
     }
 
-
     /**
      * stadard SS method
-     * @return Boolean
+     * @return boolean
      */
     public function canCreate($member = null, $context = [])
     {
         return false;
     }
 
-
     /**
      * stadard SS method
-     * @return Boolean
+     * @return boolean
      */
     public function canEdit($member = null, $context = [])
     {
@@ -145,7 +179,7 @@ class SecondHandArchive extends DataObject
 
     /**
      * stadard SS method
-     * @return Boolean
+     * @return boolean
      */
     public function canView($member = null, $context = [])
     {
@@ -156,73 +190,22 @@ class SecondHandArchive extends DataObject
 
     /**
      * stadard SS method
-     * @return Boolean
+     * @return boolean
      */
     public function canDelete($member = null, $context = [])
     {
         return false;
     }
 
-
-    private static $singular_name = 'Archived Second Hand Product';
-
     public function i18n_singular_name()
     {
         return self::$singular_name;
     }
 
-    private static $plural_name = 'Archived Second Hand Products';
-
     public function i18n_plural_name()
     {
         return self::$plural_name;
     }
-
-    private static $indexes = array(
-        'PageID' => true,
-        'InternalItemID' => true
-    );
-
-    private static $default_sort = array(
-        'LastEdited' => 'DESC'
-    );
-
-    private static $summary_fields = array(
-        'Title' => 'Title',
-        'InternalItemID' => 'Code',
-        'SerialNumber' => 'Serial',
-        'DateItemWasBought' => 'Date Entered',
-        'DateItemWasSold' => 'Date Sold',
-        'ProductQuality' => 'Quality',
-        'SoldOnBehalf.Nice' => 'On Behalf',
-        'PurchasePrice' => 'Purchase Price',
-        'Price' => 'Sale/Ticket Price',
-        'SoldPrice' => 'Sold Price',
-    );
-
-    private static $field_labels = array(
-        'Title' => 'Title',
-        'Price' => 'Sale Price',
-        'InternalItemID' => 'Code',
-        'PurchasePrice' => 'Purchase Price',
-        'ProductQuality' => 'Quality',
-        'IncludesBoxOrCase' => 'Includes',
-        'OriginalManual' => 'Has Manual',
-        'SerialNumber' => 'Serial Number'
-    );
-
-    private static $searchable_fields = array(
-        'Title' => 'PartialMatchFilter',
-        'Price' => 'ExactMatchFilter',
-        'InternalItemID' => 'PartialMatchFilter',
-        'PurchasePrice' => 'ExactMatchFilter',
-        'ProductQuality' => 'ExactMatchFilter',
-        'IncludesBoxOrCase' => 'ExactMatchFilter',
-        'OriginalManual' => 'ExactMatchFilter',
-        'SerialNumber' => 'PartialMatchFilter'
-    );
-
-    private static $show_restore_button = false;
 
     /**
      * stadard SS method
@@ -231,7 +214,7 @@ class SecondHandArchive extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        if(Config::inst()->get(SecondHandArchive::class, 'show_restore_button')){
+        if (Config::inst()->get(SecondHandArchive::class, 'show_restore_button')) {
             $fields->addFieldsToTab(
                 'Root.Main',
                 [
@@ -239,36 +222,35 @@ class SecondHandArchive extends DataObject
                         'RestoreButton',
                         '/admin/secondhandproducts/SecondHandProduct/restore/?productid=' . $this->PageID,
                         _t('SecondHandArchive.RESTORE_BUTTON', 'Restore Product')
-                    )
+                    ),
                 ]
             );
         }
         $fields->addFieldsToTab(
             'Root.Main',
             [
-                ReadonlyField::create('Created', 'Created')
+                ReadonlyField::create('Created', 'Created'),
             ]
         );
         $fields->addFieldsToTab(
             'Root.SellersDetails',
             [
-                $fields->dataFieldByName("SellersName"),
-                $fields->dataFieldByName("SellersPhone"),
-                $fields->dataFieldByName("SellersEmail"),
-                $fields->dataFieldByName("SellersAddress"),
-                $fields->dataFieldByName("SellersAddress2"),
-                $fields->dataFieldByName("SellersCity"),
-                $fields->dataFieldByName("SellersPostalCode"),
-                $fields->dataFieldByName("SellersRegionCode"),
-                $fields->dataFieldByName("SellersCountry"),
-                $fields->dataFieldByName("SellersIDType"),
-                $fields->dataFieldByName("SellersIDNumber"),
-                $fields->dataFieldByName("SellersDateOfBirth"),
-                $fields->dataFieldByName("SellersIDExpiryDate"),
-                $fields->dataFieldByName("SellersIDPhotocopy")
+                $fields->dataFieldByName('SellersName'),
+                $fields->dataFieldByName('SellersPhone'),
+                $fields->dataFieldByName('SellersEmail'),
+                $fields->dataFieldByName('SellersAddress'),
+                $fields->dataFieldByName('SellersAddress2'),
+                $fields->dataFieldByName('SellersCity'),
+                $fields->dataFieldByName('SellersPostalCode'),
+                $fields->dataFieldByName('SellersRegionCode'),
+                $fields->dataFieldByName('SellersCountry'),
+                $fields->dataFieldByName('SellersIDType'),
+                $fields->dataFieldByName('SellersIDNumber'),
+                $fields->dataFieldByName('SellersDateOfBirth'),
+                $fields->dataFieldByName('SellersIDExpiryDate'),
+                $fields->dataFieldByName('SellersIDPhotocopy'),
             ]
         );
         return $fields;
     }
 }
-

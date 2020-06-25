@@ -2,24 +2,17 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
-
-
-
-use Sunnysideup\Ecommerce\Model\Address\EcommerceCountry;
-use SilverStripe\Security\Permission;
 use SilverStripe\Control\Controller;
-
-
+use SilverStripe\Security\Permission;
+use Sunnysideup\Ecommerce\Model\Address\EcommerceCountry;
 
 class ControllerPermissionChecker extends Controller
 {
-
-
     /**
      * checks that the url is contains the secret code and is coming from the correct IP address (if not set to wildcard)
-     * @var array $codesWithIPs
-     * @var array $code - ID parameter in URL
-     * @return Boolean
+     * @var array
+     * @var array - ID parameter in URL
+     * @return boolean
      */
     public static function permissionCheck($codesWithIPs, $code)
     {
@@ -38,4 +31,3 @@ class ControllerPermissionChecker extends Controller
         return Permission::check('ADMIN');
     }
 }
-

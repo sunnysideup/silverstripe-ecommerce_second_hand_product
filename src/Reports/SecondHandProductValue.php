@@ -2,15 +2,11 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Reports;
 
-
 use Currency;
 
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use SilverStripe\Forms\GridField\GridFieldExportButton;
 use SilverStripe\Reports\Report;
-
-
-
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 class SecondHandProductValue extends Report
 {
@@ -32,7 +28,7 @@ class SecondHandProductValue extends Report
         $name = _t(
             'EcommerceSideReport.SECOND_HAND_REPORT_TOTAL_STOCK_VALUE',
             'Second Hand Products, total stock value'
-         );
+        );
         return $name . ': ' . $object->Nice();
     }
 
@@ -62,10 +58,10 @@ class SecondHandProductValue extends Report
     public function sourceRecords($params = null)
     {
         return SecondHandProduct::get()->filter(
-            array(
+            [
                 'AllowPurchase' => 1,
-                'SellingOnBehalf' => 0
-            )
+                'SellingOnBehalf' => 0,
+            ]
         );
     }
 
@@ -74,16 +70,16 @@ class SecondHandProductValue extends Report
      */
     public function columns()
     {
-        return array(
+        return [
             'InternalItemID' => 'ID',
-            'Title' => array(
+            'Title' => [
                 'title' => 'Product Name',
                 'link' => true,
-            ),
+            ],
             'Created' => 'Created Time',
             'Price' => 'Selling Price',
-            'PurchasePrice' => 'Purchase Price'
-        );
+            'PurchasePrice' => 'Purchase Price',
+        ];
     }
 
     public function getReportField()
@@ -92,8 +88,7 @@ class SecondHandProductValue extends Report
         $config = $field->getConfig();
         $exportButton = $config->getComponentByType(GridFieldExportButton::class);
         $exportButton->setExportColumns($field->getColumns());
-        
+
         return $field;
     }
 }
-

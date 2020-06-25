@@ -2,18 +2,13 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
-
-
 use db;
 
 use SilverStripe\Core\Injector\Injector;
-use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use SilverStripe\Dev\BuildTask;
-
-
-
+use Sunnysideup\Ecommerce\Config\EcommerceConfig;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 
 /**
  * create the e-commerce specific Member Groups.
@@ -35,14 +30,14 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask
         db::alteration_message('========================== <br />creating second hand products sales manager', 'created');
         $email = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email');
         if (! $email) {
-            $email = 'secondhandproducts@'.$_SERVER['HTTP_HOST'];
+            $email = 'secondhandproducts@' . $_SERVER['HTTP_HOST'];
         }
         $firstName = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_first_name');
-        if (!$firstName) {
+        if (! $firstName) {
             $firstName = 'Second Hand';
         }
         $surname = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_surname');
-        if (!$surname) {
+        if (! $surname) {
             $surname = 'Sales';
         }
 
@@ -59,9 +54,8 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask
             $parentGroup = null,
             $permissionCode = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
             $roleTitle = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_role_title'),
-            $otherPermissionCodes = array(),
+            $otherPermissionCodes = [],
             $member
         );
     }
 }
-

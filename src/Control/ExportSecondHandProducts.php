@@ -2,35 +2,21 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
-
-
-
-
-
-
-
-
-
-
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-use SilverStripe\Core\Injector\Injector;
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
-use SilverStripe\Core\Config\Config;
-use Sunnysideup\EcommerceSecondHandProduct\Control\ExportSecondHandProducts;
-use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
-use SilverStripe\Control\Director;
-use SilverStripe\ORM\SS_List;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\Assets\Folder;
-use Sunnysideup\Ecommerce\Filesystem\ProductImage;
 use SilverStripe\Control\Controller;
-
-
-
+use SilverStripe\Control\Director;
+use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\SS_List;
+use Sunnysideup\Ecommerce\Filesystem\ProductImage;
+use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 
 class ExportSecondHandProducts extends Controller
 {
-    private static $do_not_copy = array(
+    private static $do_not_copy = [
         'ClassName',
         'ParentID',
         'Created',
@@ -47,8 +33,8 @@ class ExportSecondHandProducts extends Controller
         'FullName',
         'ID',
         'RecordClassName',
-        'parser'
-    );
+        'parser',
+    ];
 
     /**
      * in the following format:
@@ -60,7 +46,6 @@ class ExportSecondHandProducts extends Controller
      */
     private static $relationships_to_include_with_groups = [];
 
-
     /**
      * in the following format:
      *
@@ -69,15 +54,15 @@ class ExportSecondHandProducts extends Controller
      *
      * @var array
      */
-    private static $relationships_to_include_with_products = array(
-        'ProductGroups' => array('URLSegment')
-    );
+    private static $relationships_to_include_with_products = [
+        'ProductGroups' => ['URLSegment'],
+    ];
 
-    private static $allowed_actions = array(
+    private static $allowed_actions = [
         'products' => '->MyPermissionCheck',
         'groups' => '->MyPermissionCheck',
-        'images' => '->MyPermissionCheck'
-    );
+        'images' => '->MyPermissionCheck',
+    ];
 
     /**
      * where will the data be saved (if any)
@@ -100,7 +85,6 @@ class ExportSecondHandProducts extends Controller
     private static $secret_codes = [];
 
     /**
-     *
      * @var string
      */
     private static $url_segment_of_parent_field_name = 'ParentURLSegmentForImportExport';
@@ -121,7 +105,7 @@ class ExportSecondHandProducts extends Controller
             $imageData = $this->getImageArray(true);
         }
         $array = [];
-        $products = SecondHandProduct::get()->filter(array('AllowPurchase' => 1));
+        $products = SecondHandProduct::get()->filter(['AllowPurchase' => 1]);
         $count = 0;
         $doNotCopy = $this->Config()->get('do_not_copy');
         $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
@@ -198,7 +182,7 @@ class ExportSecondHandProducts extends Controller
     }
 
     /**
-     * @return Boolean
+     * @return boolean
      */
     public function MyPermissionCheck()
     {
@@ -213,21 +197,20 @@ class ExportSecondHandProducts extends Controller
             $json = json_encode($array, JSON_PRETTY_PRINT);
         } else {
             $json = json_encode($array);
-            $json = str_replace(array("\t", "\r", "\n"), array(" ", " ", " "), $json);
+            $json = str_replace(["\t", "\r", "\n"], [' ', ' ', ' '], $json);
             $json = preg_replace('/\s\s+/', ' ', $json);
         }
         $fileName = $this->Config()->get('location_to_save_contents');
         if ($fileName) {
             if ($filenameAppendix) {
-                $fileName = str_replace('.json', '.'.$filenameAppendix.'.json', $fileName);
+                $fileName = str_replace('.json', '.' . $filenameAppendix . '.json', $fileName);
             }
-            $fileNameFull = Director::baseFolder().'/'.$fileName;
+            $fileNameFull = Director::baseFolder() . '/' . $fileName;
             file_put_contents($fileNameFull, $json);
             die('COMPLETED');
-        } else {
-            $this->response->addHeader('Content-Type', 'application/json');
-            return $json;
         }
+        $this->response->addHeader('Content-Type', 'application/json');
+        return $json;
     }
 
     /**
@@ -241,22 +224,22 @@ class ExportSecondHandProducts extends Controller
         $dataToBeAdded = [];
         foreach ($relations as $myField => $relFields) {
             $innerDataToBeAdded = [];
-            $relData = $currentObject->$myField();
+            $relData = $currentObject->{$myField}();
             if ($relData instanceof SS_List) {
                 $count = 0;
                 foreach ($relData as $relItem) {
                     foreach ($relFields as $relField) {
-                        $innerDataToBeAdded[$count][$relField] = $relItem->$relField;
+                        $innerDataToBeAdded[$count][$relField] = $relItem->{$relField};
                     }
                     $count++;
                 }
             } elseif ($relData instanceof DataObject) {
                 foreach ($relFields as $relField) {
-                    $innerDataToBeAdded = array($relField => $relData->$relField);
+                    $innerDataToBeAdded = [$relField => $relData->{$relField}];
                 }
-            } else {
-                //do nothing
             }
+            //do nothing
+
             $dataToBeAdded[$myField] = $innerDataToBeAdded;
         }
 
@@ -269,7 +252,7 @@ class ExportSecondHandProducts extends Controller
         $array = [];
         $folderName = Config::inst()->get(ExportSecondHandProducts::class, 'folder_for_second_hand_images');
         $folder = Folder::find_or_make($folderName);
-        $secondHandProducts = SecondHandProduct::get()->filter(array('AllowPurchase' => 1))->exclude(array('ImageID' => 0));
+        $secondHandProducts = SecondHandProduct::get()->filter(['AllowPurchase' => 1])->exclude(['ImageID' => 0]);
         foreach ($secondHandProducts as $secondHandProduct) {
             $arrayInner = [];
             if ($secondHandProduct->ImageID) {
@@ -287,24 +270,24 @@ class ExportSecondHandProducts extends Controller
             $count = 0;
             foreach ($arrayInner as $imageID => $image) {
                 $fileName = $image->FileName;
-                $oldFileLocationAbsolute = Director::baseFolder().'/'.$image->FileName;
+                $oldFileLocationAbsolute = Director::baseFolder() . '/' . $image->FileName;
                 if (file_exists($oldFileLocationAbsolute)) {
                     $extension = pathinfo($image->FileName, PATHINFO_EXTENSION);
-                    if (!$extension) {
+                    if (! $extension) {
                         $extension = 'jpg';
                     } else {
                         $extension = strtolower($extension);
                     }
-                    $name = $secondHandProduct->InternalItemID.'_'.$count.'.'.$extension;
-                    $fileName = $folder->FileName.$name;
-                    $title =  $secondHandProduct->Title. ' #'.($count + 1);
+                    $name = $secondHandProduct->InternalItemID . '_' . $count . '.' . $extension;
+                    $fileName = $folder->FileName . $name;
+                    $title = $secondHandProduct->Title . ' #' . ($count + 1);
                     $image->ParentID = $folder->ID;
                     $image->Name = $name;
                     $image->FileName = $fileName;
                     $image->Title = $title;
                     $image->ClassName = ProductImage::class;
                     $image->write();
-                    $newAbsoluteLocation = Director::baseFolder().'/'.$image->FileName;
+                    $newAbsoluteLocation = Director::baseFolder() . '/' . $image->FileName;
                     if (! file_exists($newAbsoluteLocation)) {
                         $err++;
                     } else {
@@ -330,4 +313,3 @@ class ExportSecondHandProducts extends Controller
         return $array;
     }
 }
-

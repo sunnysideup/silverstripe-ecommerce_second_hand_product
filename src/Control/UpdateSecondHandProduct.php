@@ -2,27 +2,19 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
-
-
-
-
-use SilverStripe\Core\Convert;
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-use SilverStripe\ORM\DataObject;
-use SilverStripe\Versioned\Versioned;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
-
-
-
+use SilverStripe\Core\Convert;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Versioned\Versioned;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 class UpdateSecondHandProduct extends Controller
 {
-    private static $allowed_actions = array(
+    private static $allowed_actions = [
         'unpublish' => '->MyPermissionCheck',
-        'archive' => '->MyPermissionCheck'
-    );
-
+        'archive' => '->MyPermissionCheck',
+    ];
 
     /**
      * make the page less easy to access
@@ -43,7 +35,7 @@ class UpdateSecondHandProduct extends Controller
     public function unpublish($request)
     {
         $unpublished = false;
-        $otherID = $request->param("OtherID");
+        $otherID = $request->param('OtherID');
         if (isset($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
             $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
@@ -57,27 +49,27 @@ class UpdateSecondHandProduct extends Controller
     public function archive($request)
     {
         $archived = false;
-        $otherID = $request->param("OtherID");
+        $otherID = $request->param('OtherID');
         if (isset($otherID)) {
             $archived = null;
             $internalItemID = Convert::raw2sql($otherID);
             $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
-            if (!$secondHandProduct) {
+            if (! $secondHandProduct) {
                 $secondHandProduct = Versioned::get_one_by_stage(SecondHandProduct::class, 'Stage', ['InternalItemID' => $internalItemID]);
             }
 
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: automated upgrade
-  * OLD:  Object:: (case sensitive)
-  * NEW:  SilverStripe\\Core\\Injector\\Injector::inst()-> (COMPLEX)
-  * EXP: Check if this is the right implementation, this is highly speculative.
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
+            /**
+             * ### @@@@ START REPLACEMENT @@@@ ###
+             * WHY: automated upgrade
+             * OLD:  Object:: (case sensitive)
+             * NEW:  SilverStripe\\Core\\Injector\\Injector::inst()-> (COMPLEX)
+             * EXP: Check if this is the right implementation, this is highly speculative.
+             * ### @@@@ STOP REPLACEMENT @@@@ ###
+             */
             if (is_a($secondHandProduct, SilverStripe\Core\Injector\Injector::inst()->getCustomClass(SiteTree::class))) {
                 $archived = $secondHandProduct->deleteFromStage('Live');
                 $archived = $secondHandProduct->deleteFromStage('Stage');
-            } elseif (! is_null($secondHandProduct)) {
+            } elseif ($secondHandProduct !== null) {
                 $archived = $secondHandProduct->delete();
             }
         }
@@ -85,7 +77,7 @@ class UpdateSecondHandProduct extends Controller
     }
 
     /**
-     * @return Boolean
+     * @return boolean
      */
     public function MyPermissionCheck()
     {
@@ -94,4 +86,3 @@ class UpdateSecondHandProduct extends Controller
         return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
     }
 }
-

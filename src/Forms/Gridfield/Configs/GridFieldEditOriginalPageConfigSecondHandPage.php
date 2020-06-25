@@ -2,14 +2,11 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs;
 
-
-
-use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
+use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
+use SilverStripe\Forms\GridField\GridFieldDeleteAction;
 use Sunnysideup\Ecommerce\Forms\Gridfield\GridFieldAddNewButtonOriginalPage;
 use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\GridFieldAddNewButtonOriginalPageSecondHandProduct;
-use SilverStripe\Forms\GridField\GridFieldConfig_RecordEditor;
-
 
 /**
  * @author nicolaas <github@sunnysideup.co.nz>
@@ -29,4 +26,3 @@ class GridFieldEditOriginalPageConfigSecondHandPage extends GridFieldConfig_Reco
             ->addComponent(new GridFieldAddNewButtonOriginalPageSecondHandProduct());
     }
 }
-

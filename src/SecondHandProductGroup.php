@@ -2,44 +2,31 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
-
-
-
-
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-use SilverStripe\Forms\CheckboxField;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Forms\CheckboxField;
 use SilverStripe\ORM\DataObject;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 
-
-
-
 class SecondHandProductGroup extends ProductGroup
 {
-
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * OLD: private static $db (case sensitive)
-  * NEW: 
-    private static $table_name = '[SEARCH_REPLACE_CLASS_NAME_GOES_HERE]';
-
+    /**
+     * ### @@@@ START REPLACEMENT @@@@ ###
+     * OLD: private static $db (case sensitive)
+     * NEW:
     private static $db (COMPLEX)
-  * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
-    
+     * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
+     * ### @@@@ STOP REPLACEMENT @@@@ ###
+     */
     private static $table_name = 'SecondHandProductGroup';
 
-    private static $db = array(
-        'RootParent' => 'Boolean'
-    );
+    private static $db = [
+        'RootParent' => 'Boolean',
+    ];
 
-    private static $allowed_children = array(
+    private static $allowed_children = [
         SecondHandProductGroup::class,
-        SecondHandProduct::class
-    );
+        SecondHandProduct::class,
+    ];
 
     private static $icon = 'ecommerce_second_hand_product/images/treeicons/SecondHandProductGroup';
 
@@ -47,19 +34,11 @@ class SecondHandProductGroup extends ProductGroup
      * Standard SS variable.
      */
     private static $singular_name = 'Second Hand Product Holder';
-    public function i18n_singular_name()
-    {
-        return self::$singular_name;
-    }
 
     /**
      * Standard SS variable.
      */
     private static $plural_name = 'Second Hand Product Holders';
-    public function i18n_plural_name()
-    {
-        return self::$plural_name;
-    }
 
     /**
      * Standard SS variable.
@@ -67,6 +46,16 @@ class SecondHandProductGroup extends ProductGroup
      * @var string
      */
     private static $description = 'A product category page specifically for second had products';
+
+    public function i18n_singular_name()
+    {
+        return self::$singular_name;
+    }
+
+    public function i18n_plural_name()
+    {
+        return self::$plural_name;
+    }
 
     public function getCMSFields()
     {
@@ -106,34 +95,33 @@ class SecondHandProductGroup extends ProductGroup
     }
 
     /**
-     * Level is within SiteTree hierarchy
-     * @return boolean
-     */
-    protected function hasOtherSecondHandProductGroupsOnThisLevel()
-    {
-        if (!$this->ParentID) {
-            $this->ParentID = 0;
-        }
-        return SecondHandProductGroup::get()
-            ->filter(array('ParentID' => $this->ParentID))
-            ->exclude(array('ID' => $this->ID))
-            ->count() > 0 ? true : false;
-    }
-
-    /**
      * @return SecondHandProductGroup
      */
     public function BestRootParentPage()
     {
         $obj = DataObject::get_one(
             SecondHandProductGroup::class,
-            array('RootParent' => 1)
+            ['RootParent' => 1]
         );
         if ($obj) {
             return $obj;
-        } else {
-            return SecondHandProductGroup::get()->first();
         }
+        return SecondHandProductGroup::get()->first();
+    }
+
+    /**
+     * Level is within SiteTree hierarchy
+     * @return boolean
+     */
+    protected function hasOtherSecondHandProductGroupsOnThisLevel()
+    {
+        if (! $this->ParentID) {
+            $this->ParentID = 0;
+        }
+        return SecondHandProductGroup::get()
+            ->filter(['ParentID' => $this->ParentID])
+            ->exclude(['ID' => $this->ID])
+            ->count() > 0 ? true : false;
     }
 
     /**
@@ -146,4 +134,3 @@ class SecondHandProductGroup extends ProductGroup
         return SecondHandProduct::class;
     }
 }
-

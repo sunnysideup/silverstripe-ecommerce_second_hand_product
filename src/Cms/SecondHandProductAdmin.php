@@ -2,39 +2,23 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
-use Sunnysideup\GoogleAddressField\GoogleAddressField;
-use SilverStripe\View\Requirements;
-use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Forms\GridField\GridField;
-use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs\GridFieldEditOriginalPageConfigSecondHandPage;
-use SilverStripe\Forms\GridField\GridFieldExportButton;
 use SilverStripe\CMS\Controllers\CMSMain;
-use SilverStripe\Security\Member;
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldExportButton;
+use SilverStripe\Security\Member;
 use SilverStripe\Versioned\Versioned;
+use SilverStripe\View\Requirements;
 use Sunnysideup\Ecommerce\Cms\ModelAdminEcommerceBaseClass;
-
-
+use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs\GridFieldEditOriginalPageConfigSecondHandPage;
+use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use Sunnysideup\GoogleAddressField\GoogleAddressField;
 
 /**
  * @description: for the management of Product and Product Groups only
- *
  *
  * @authors: Nicolaas [at] Sunny Side Up .co.nz
  * @package: ecommerce
@@ -49,24 +33,23 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
 
     private static $menu_title = 'Second Hand';
 
-    private static $managed_models = array(
+    private static $managed_models = [
         SecondHandProduct::class,
-        SecondHandArchive::class
-    );
+        SecondHandArchive::class,
+    ];
 
-    private static $allowed_actions = array(
-        "editinsitetree",
-        "ItemEditForm",
-        "archive" => true,
-        "restore" => true,
-    );
+    private static $allowed_actions = [
+        'editinsitetree',
+        'ItemEditForm',
+        'archive' => true,
+        'restore' => true,
+    ];
 
     /**
      * standard SS variable
-     * @var String
+     * @var string
      */
-    private static $menu_icon = "ecommerce/images/icons/product-file.gif";
-
+    private static $menu_icon = 'ecommerce/images/icons/product-file.gif';
 
     public function getEditForm($id = null, $fields = null)
     {
@@ -77,7 +60,7 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
         if (singleton($this->modelClass) instanceof SiteTree) {
             if ($gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass))) {
                 if ($gridField instanceof GridField) {
-                    $gridField->setConfig(GridFieldEditOriginalPageConfigSecondHandPage::create()); 
+                    $gridField->setConfig(GridFieldEditOriginalPageConfigSecondHandPage::create());
                     $gridField->getConfig()->addComponent($exportButton = new GridFieldExportButton('buttons-before-left'));
                     $exportButton->setExportColumns(singleton($this->modelClass)->exportFields());
                 }
@@ -85,7 +68,6 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
         }
         return $form;
     }
-
 
     public function doCancel($data, $form)
     {
@@ -102,20 +84,20 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
                 $secondHandProduct->ArchivedByID = $currentMember->ID;
                 $internalItemID = $secondHandProduct->InternalItemID;
 
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: automated upgrade
-  * OLD:  Object:: (case sensitive)
-  * NEW:  SilverStripe\\Core\\Injector\\Injector::inst()-> (COMPLEX)
-  * EXP: Check if this is the right implementation, this is highly speculative.
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
+                /**
+                 * ### @@@@ START REPLACEMENT @@@@ ###
+                 * WHY: automated upgrade
+                 * OLD:  Object:: (case sensitive)
+                 * NEW:  SilverStripe\\Core\\Injector\\Injector::inst()-> (COMPLEX)
+                 * EXP: Check if this is the right implementation, this is highly speculative.
+                 * ### @@@@ STOP REPLACEMENT @@@@ ###
+                 */
                 if (is_a($secondHandProduct, SilverStripe\Core\Injector\Injector::inst()->getCustomClass(SiteTree::class))) {
                     $secondHandProduct->write();
                     $secondHandProduct->publishRecursive();
                     $secondHandProduct->deleteFromStage('Live');
                     $secondHandProduct->deleteFromStage('Stage');
-                } else if($secondHandProduct) {
+                } elseif ($secondHandProduct) {
                     $secondHandProduct->write();
                     $secondHandProduct->delete();
                 }
@@ -127,15 +109,15 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
                         rawurlencode(_t(
                             'CMSMain.RESTORED',
                             "Archived '{title}' successfully",
-                            array('title' => $archivedProduct->Title)
+                            ['title' => $archivedProduct->Title]
                         ))
                     );
-                    $cmsEditLink = '/admin/secondhandproducts/SecondHandArchive/EditForm/field/SecondHandArchive/item/'.$archivedProduct->ID.'/edit';
+                    $cmsEditLink = '/admin/secondhandproducts/SecondHandArchive/EditForm/field/SecondHandArchive/item/' . $archivedProduct->ID . '/edit';
                     return Controller::curr()->redirect($cmsEditLink);
                 }
             }
         }
-        return new HTTPResponse("ERROR!", 400);
+        return new HTTPResponse('ERROR!', 400);
     }
 
     public function restore($request)
@@ -148,8 +130,8 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
                 if ($parentID) {
                     var_dump($parentID);
                     $this->ensureParentHasVersion($parentID);
-                    if (!$restoredPage) {
-                        return new HTTPResponse("SiteTree #$id not found", 400);
+                    if (! $restoredPage) {
+                        return new HTTPResponse("SiteTree #${id} not found", 400);
                     }
                     $restoredPage = $restoredPage->doRestoreToStage();
                     //$restoredPage->doPublish();
@@ -158,17 +140,16 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
                         rawurlencode(_t(
                             'CMSMain.RESTORED',
                             "Restored '{title}' successfully",
-                            array('title' => $restoredPage->Title)
+                            ['title' => $restoredPage->Title]
                         ))
                     );
-                    $cmsEditLink = '/admin/secondhandproducts/SecondHandProduct/EditForm/field/SecondHandProduct/item/'.$id.'/edit';
+                    $cmsEditLink = '/admin/secondhandproducts/SecondHandProduct/EditForm/field/SecondHandProduct/item/' . $id . '/edit';
                     return Controller::curr()->redirect($cmsEditLink);
-                } else {
-                    return new HTTPResponse("Parent Page #$parentID is missing", 400);
                 }
+                return new HTTPResponse("Parent Page #${parentID} is missing", 400);
             }
         }
-        return new HTTPResponse("ERROR!", 400);
+        return new HTTPResponse('ERROR!', 400);
     }
 
     /**
@@ -177,7 +158,7 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
     public function ensureParentHasVersion($parentID)
     {
         $parentPage = Versioned::get_latest_version(SiteTree::class, $parentID);
-        if (!$parentPage) {
+        if (! $parentPage) {
             $parentPage = SiteTree::get()->byID($parentID);
             if ($parentPage) {
                 $parentPage->writeToStage('Stage');
@@ -186,4 +167,3 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
         }
     }
 }
-

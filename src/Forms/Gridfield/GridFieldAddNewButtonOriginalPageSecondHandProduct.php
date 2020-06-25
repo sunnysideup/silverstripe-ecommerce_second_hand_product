@@ -2,18 +2,12 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield;
 
-
-
-
-
 use SilverStripe\Core\Config\Config;
-use Sunnysideup\EcommerceSecondHandProduct\Cms\CMSPageAddController_SecondHandProducts;
-use SilverStripe\View\ArrayData;
 use SilverStripe\Core\Injector\Injector;
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
+use SilverStripe\View\ArrayData;
 use Sunnysideup\Ecommerce\Forms\Gridfield\GridFieldAddNewButtonOriginalPage;
-
-
+use Sunnysideup\EcommerceSecondHandProduct\Cms\CMSPageAddController_SecondHandProducts;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 
 /**
  * Provides the entry point to editing a single record presented by the
@@ -32,37 +26,37 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
         $singleton = singleton($gridField->getModelClass());
 
         if (! $singleton->canCreate()) {
-            return array();
+            return [];
         }
 
-        if (!$this->buttonName) {
+        if (! $this->buttonName) {
             // provide a default button name, can be changed by calling {@link setButtonName()} on this component
             $objectName = $singleton->i18n_singular_name();
-            $this->buttonName = _t('GridField.Add_USING_PAGES_SECTION', 'Add {name}', array('name' => $objectName));
+            $this->buttonName = _t('GridField.Add_USING_PAGES_SECTION', 'Add {name}', ['name' => $objectName]);
         }
 
         $getSegment = '';
         if ($page = $this->BestRootParentPage()) {
-            $getSegment = '?ParentID='.$page->ID;
+            $getSegment = '?ParentID=' . $page->ID;
         }
 
-        $data = new ArrayData(array(
-            'NewLink' => '/admin/'.Config::inst()->get(CMSPageAddController_SecondHandProducts::class, 'url_segment').'/'.$getSegment,
+        $data = new ArrayData([
+            'NewLink' => '/admin/' . Config::inst()->get(CMSPageAddController_SecondHandProducts::class, 'url_segment') . '/' . $getSegment,
             'ButtonName' => $this->buttonName,
-        ));
+        ]);
 
-        return array(
+        return [
 
-/**
-  * ### @@@@ START REPLACEMENT @@@@ ###
-  * WHY: automated upgrade
-  * OLD: ->RenderWith( (ignore case)
-  * NEW: ->RenderWith( (COMPLEX)
-  * EXP: Check that the template location is still valid!
-  * ### @@@@ STOP REPLACEMENT @@@@ ###
-  */
+            /**
+             * ### @@@@ START REPLACEMENT @@@@ ###
+             * WHY: automated upgrade
+             * OLD: ->RenderWith( (ignore case)
+             * NEW: ->RenderWith( (COMPLEX)
+             * EXP: Check that the template location is still valid!
+             * ### @@@@ STOP REPLACEMENT @@@@ ###
+             */
             $this->targetFragment => $data->RenderWith('GridFieldAddNewbutton'),
-        );
+        ];
     }
 
     /**
@@ -77,4 +71,3 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
         return $singleton->BestRootParentPage();
     }
 }
-
