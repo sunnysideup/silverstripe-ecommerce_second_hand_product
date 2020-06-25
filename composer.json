@@ -1,6 +1,6 @@
 {
     "name": "sunnysideup/ecommerce_second_hand_product",
-    "type": "silverstripe-module",
+    "type": "silverstripe-vendormodule",
     "description": "Add a second hand product (or similar) to your Silverstripe e-commerce install.",
     "keywords": [
         "Silverstripe-CMS",
