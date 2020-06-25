@@ -112,7 +112,7 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
   */
                 if (is_a($secondHandProduct, SilverStripe\Core\Injector\Injector::inst()->getCustomClass(SiteTree::class))) {
                     $secondHandProduct->write();
-                    $secondHandProduct->doPublish();
+                    $secondHandProduct->publishRecursive();
                     $secondHandProduct->deleteFromStage('Live');
                     $secondHandProduct->deleteFromStage('Stage');
                 } else if($secondHandProduct) {

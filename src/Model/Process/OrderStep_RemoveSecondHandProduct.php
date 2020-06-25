@@ -70,7 +70,7 @@ class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepIn
                 $buyable->ArchivedByID = $order->MemberID;
                 if (is_a($buyable, Object::getCustomClass(SiteTree::class))) {
                     $buyable->write();
-                    $buyable->doPublish();
+                    $buyable->publishRecursive();
                     $buyable->deleteFromStage('Live');
                     $buyable->deleteFromStage('Stage');
                 } else {

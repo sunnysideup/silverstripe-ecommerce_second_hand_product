@@ -331,7 +331,7 @@ class SecondHandProduct extends Product implements PermissionProvider
 
     public function onBeforeDelete()
     {
-        if (Versioned::current_stage() !== 'Stage') {
+        if (Versioned::get_stage() !== 'Stage') {
             //do nothing
         } else {
             //page is being deleted permanently so create archived version
@@ -783,7 +783,7 @@ class SecondHandProduct extends Product implements PermissionProvider
         DB::query('Update \"Product\" SET AllowPurchase = 0 WHERE \"Product\".\"ID\" = '.$this->ID);
         DB::query('Update \"Product_Live\" SET AllowPurchase = 0 WHERE \"Product_Live\".\"ID\" = '.$this->ID);
         $this->writeToStage('Stage');
-        $this->doPublish();
+        $this->publishRecursive();
     }
 
     public function exportFields()
