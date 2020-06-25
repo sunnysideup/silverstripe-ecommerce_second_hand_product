@@ -25,7 +25,11 @@
         "sunnysideup/google_address_field": "*",
         "silverstripe/recipe-cms": "^4.4"
     },
-    "extra": [],
+    "extra": {
+        "expose": [
+            "client/images"
+        ]
+    },
     "autoload": {
         "psr-4": {
             "Sunnysideup\\EcommerceSecondHandProduct\\": "src/"
