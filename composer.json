@@ -21,7 +21,6 @@
         }
     ],
     "require": {
-        "silverstripe/framework": "~3.6",
         "sunnysideup/ecommerce": "*",
         "sunnysideup/google_address_field": "*",
         "silverstripe/cms": "~3.6"
