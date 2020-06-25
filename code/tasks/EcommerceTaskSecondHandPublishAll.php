@@ -18,3 +18,4 @@ class EcommerceTaskSecondHandPublishAll extends BuildTask
         DB::alteration_message(' ================= Completed =================  ');
     }
 }
+

@@ -89,3 +89,4 @@ class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepIn
         return _t('OrderStep.REMOVESECONDHANDPRODUCT_DESCRIPTION', 'Remove second hand products once the sale has been confirmed.');
     }
 }
+

@@ -17,3 +17,4 @@ class GridFieldEditOriginalPageConfigSecondHandPage extends GridFieldConfig_Reco
             ->addComponent(new GridFieldAddNewButtonOriginalPageSecondHandProduct());
     }
 }
+

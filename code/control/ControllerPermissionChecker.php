@@ -27,3 +27,4 @@ class ControllerPermissionChecker extends Controller
         return Permission::check('ADMIN');
     }
 }
+

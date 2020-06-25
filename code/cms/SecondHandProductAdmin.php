@@ -145,3 +145,4 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
         }
     }
 }
+

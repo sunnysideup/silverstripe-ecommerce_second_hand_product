@@ -53,3 +53,4 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
         return $singleton->BestRootParentPage();
     }
 }
+

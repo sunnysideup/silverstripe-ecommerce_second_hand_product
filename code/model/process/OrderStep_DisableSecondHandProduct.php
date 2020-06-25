@@ -85,3 +85,4 @@ class OrderStep_DisableSecondHandProduct extends OrderStep implements OrderStepI
         return _t('OrderStep.DISABLESECONDHANDPRODUCT_DESCRIPTION', 'Disallow second hand products from being sold more than once.');
     }
 }
+

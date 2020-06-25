@@ -173,3 +173,4 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
         return $result;
     }
 }
+

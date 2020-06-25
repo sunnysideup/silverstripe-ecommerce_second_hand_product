@@ -30,3 +30,4 @@ class SecondHandEcommerceConfigExtension extends DataExtension
         return $fields;
     }
 }
+

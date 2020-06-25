@@ -237,3 +237,4 @@ class SecondHandArchive extends DataObject
         return $fields;
     }
 }
+

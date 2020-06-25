@@ -85,3 +85,4 @@ class SecondHandProductValue extends SS_Report
         return $field;
     }
 }
+

@@ -70,3 +70,4 @@ class UpdateSecondHandProduct extends Controller
         return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
     }
 }
+
