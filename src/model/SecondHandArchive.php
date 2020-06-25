@@ -108,7 +108,7 @@ class SecondHandArchive extends DataObject
      * stadard SS method
      * @return Boolean
      */
-    public function canCreate($member = null)
+    public function canCreate($member = null, $context = [])
     {
         return false;
     }
@@ -118,7 +118,7 @@ class SecondHandArchive extends DataObject
      * stadard SS method
      * @return Boolean
      */
-    public function canEdit($member = null)
+    public function canEdit($member = null, $context = [])
     {
         return false;
     }
@@ -127,7 +127,7 @@ class SecondHandArchive extends DataObject
      * stadard SS method
      * @return Boolean
      */
-    public function canView($member = null)
+    public function canView($member = null, $context = [])
     {
         return Permission::check(
             EcommerceConfig::get('SecondHandProduct', 'second_hand_admin_permission_code')
@@ -138,7 +138,7 @@ class SecondHandArchive extends DataObject
      * stadard SS method
      * @return Boolean
      */
-    public function canDelete($member = null)
+    public function canDelete($member = null, $context = [])
     {
         return false;
     }
@@ -226,7 +226,7 @@ class SecondHandArchive extends DataObject
         $fields->addFieldsToTab(
             'Root.Main',
             [
-                ReadOnlyField::create('Created', 'Created')
+                ReadonlyField::create('Created', 'Created')
             ]
         );
         $fields->addFieldsToTab(

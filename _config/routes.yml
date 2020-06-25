@@ -1,14 +1,14 @@
 ---
 Name: ecommerce_second_hand_product_routes
 Before:
-  - 'mysite/*'
+  - 'app/*'
 After:
   - 'framework/*'
   - 'cms/*'
   - 'ecommerce/*'
 ---
 
-Director:
+SilverStripe\Control\Director:
   rules:
     'secondhandproductlist//$Action/$ID/$OtherID': 'ExportSecondHandProducts'
     'updatesecondhandproduct//$Action/$ID/$OtherID': 'UpdateSecondHandProduct'

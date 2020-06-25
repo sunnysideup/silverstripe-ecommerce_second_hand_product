@@ -1,7 +1,7 @@
 ---
 Name: ecommerce_second_hand_product
 Before:
-  - 'mysite/*'
+  - 'app/*'
 After:
   - 'framework/*'
   - 'cms/*'
@@ -30,7 +30,7 @@ EcommerceRole:
 Only:
   moduleexists: 'grouped-cms-menu'
 ---
-LeftAndMain:
+SilverStripe\Admin\LeftAndMain:
   menu_groups:
     Shop:
       - SecondHandProductAdmin

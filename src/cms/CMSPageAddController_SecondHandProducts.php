@@ -24,7 +24,7 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
      */
     public function AddForm()
     {
-        $pageTypes = array();
+        $pageTypes = [];
         foreach ($this->PageTypes() as $type) {
             $html = sprintf(
                 '<span class="page-icon class-%s"></span><strong class="title">%s</strong><span class="description">%s</span>',
@@ -61,6 +61,15 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
                 )
             )
         );
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: ->dontEscape (case sensitive)
+  * NEW: ->dontEscape (COMPLEX)
+  * EXP: dontEscape is not longer in use for form fields, please use HTMLReadonlyField (or similar) instead.
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
         $typeField->dontEscape = true;
 
         // TODO Re-enable search once it allows for HTML title display,
@@ -102,6 +111,15 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
 
     public function doAdd($data, $form)
     {
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: $className (case sensitive)
+  * NEW: $className (COMPLEX)
+  * EXP: Check if the class name can still be used as such
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
         $className = isset($data['PageType']) ? $data['PageType'] : "Page";
         $parentID = isset($data['ParentID']) ? (int)$data['ParentID'] : 0;
 
@@ -124,6 +142,15 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
             $parentID = 0;
         }
 
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: $className (case sensitive)
+  * NEW: $className (COMPLEX)
+  * EXP: Check if the class name can still be used as such
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
         if (!singleton($className)->canCreate(
             Member::currentUser(),
             array('Parent' => $parentObj)
@@ -132,6 +159,15 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
             return Security::permissionFailure($this);
         }
 
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: $className (case sensitive)
+  * NEW: $className (COMPLEX)
+  * EXP: Check if the class name can still be used as such
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
         $record = $this->getNewItem("new-$className-$parentID".$suffix, false);
         $this->extend('updateDoAdd', $record, $form);
 
@@ -142,11 +178,29 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
             return $this->getResponseNegotiator()->respond($this->getRequest());
         }
 
-        Session::set(
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: Session:: (case sensitive)
+  * NEW: Controller::curr()->getRequest()->getSession()-> (COMPLEX)
+  * EXP: If THIS is a controller than you can write: $this->getRequest(). You can also try to access the HTTPRequest directly. 
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+        Controller::curr()->getRequest()->getSession()->set(
             "FormInfo.Form_EditForm.formError.message",
             _t('CMSMain.PageAdded', 'Successfully created page')
         );
-        Session::set("FormInfo.Form_EditForm.formError.type", 'good');
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: Session:: (case sensitive)
+  * NEW: Controller::curr()->getRequest()->getSession()-> (COMPLEX)
+  * EXP: If THIS is a controller than you can write: $this->getRequest(). You can also try to access the HTTPRequest directly. 
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+        Controller::curr()->getRequest()->getSession()->set("FormInfo.Form_EditForm.formError.type", 'good');
 
         return $this->redirect($record->CMSEditLink());
     }
@@ -163,7 +217,16 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
     {
         $pageTypes = parent::PageTypes();
         $result = new ArrayList();
-        $productClass = Object::getCustomClass('SecondHandProduct');
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD:  Object:: (case sensitive)
+  * NEW:  SilverStripe\\Core\\Injector\\Injector::inst()-> (COMPLEX)
+  * EXP: Check if this is the right implementation, this is highly speculative.
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+        $productClass = SilverStripe\Core\Injector\Injector::inst()->getCustomClass('SecondHandProduct');
         $acceptedClasses = ClassInfo::subclassesFor($productClass);
         foreach ($pageTypes as $type) {
             if (in_array($type->ClassName, $acceptedClasses)) {

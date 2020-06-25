@@ -69,7 +69,16 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
                 $currentMember = Member::currentUser();
                 $secondHandProduct->ArchivedByID = $currentMember->ID;
                 $internalItemID = $secondHandProduct->InternalItemID;
-                if (is_a($secondHandProduct, Object::getCustomClass('SiteTree'))) {
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD:  Object:: (case sensitive)
+  * NEW:  SilverStripe\\Core\\Injector\\Injector::inst()-> (COMPLEX)
+  * EXP: Check if this is the right implementation, this is highly speculative.
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+                if (is_a($secondHandProduct, SilverStripe\Core\Injector\Injector::inst()->getCustomClass('SiteTree'))) {
                     $secondHandProduct->write();
                     $secondHandProduct->doPublish();
                     $secondHandProduct->deleteFromStage('Live');

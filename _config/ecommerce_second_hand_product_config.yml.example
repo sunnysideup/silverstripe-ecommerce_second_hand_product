@@ -1,13 +1,13 @@
 
 OrderStep:
   order_steps_to_include:
-    step1: OrderStep_Created
-    step2: OrderStep_Submitted
+    step1: OrderStepCreated
+    step2: OrderStepSubmitted
     step3: OrderStep_DisableSecondHandProduct
-    step4: OrderStep_SentInvoice
-    step5: OrderStep_Paid
+    step4: OrderStepSentInvoice
+    step5: OrderStepPaid
     step6: OrderStep_RemoveSecondHandProduct
-    step7: OrderStep_Archived
+    step7: OrderStepArchived
 
 ExportSecondHandProducts:
   #must end in .json

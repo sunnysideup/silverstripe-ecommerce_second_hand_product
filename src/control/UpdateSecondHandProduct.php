@@ -15,7 +15,7 @@ class UpdateSecondHandProduct extends Controller
      * - code => ip address
      * @var string
      */
-    private static $secret_codes = array();
+    private static $secret_codes = [];
 
     public function init()
     {
@@ -50,7 +50,16 @@ class UpdateSecondHandProduct extends Controller
             if (!$secondHandProduct) {
                 $secondHandProduct = Versioned::get_one_by_stage('SecondHandProduct', 'Stage', ['InternalItemID' => $internalItemID]);
             }
-            if (is_a($secondHandProduct, Object::getCustomClass('SiteTree'))) {
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD:  Object:: (case sensitive)
+  * NEW:  SilverStripe\\Core\\Injector\\Injector::inst()-> (COMPLEX)
+  * EXP: Check if this is the right implementation, this is highly speculative.
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+            if (is_a($secondHandProduct, SilverStripe\Core\Injector\Injector::inst()->getCustomClass('SiteTree'))) {
                 $archived = $secondHandProduct->deleteFromStage('Live');
                 $archived = $secondHandProduct->deleteFromStage('Stage');
             } elseif (! is_null($secondHandProduct)) {

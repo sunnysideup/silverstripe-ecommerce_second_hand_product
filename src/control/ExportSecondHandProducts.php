@@ -31,7 +31,7 @@ class ExportSecondHandProducts extends Controller
      * d
      * @var array
      */
-    private static $relationships_to_include_with_groups = array();
+    private static $relationships_to_include_with_groups = [];
 
 
     /**
@@ -70,7 +70,7 @@ class ExportSecondHandProducts extends Controller
      * - code => ip address
      * @var string
      */
-    private static $secret_codes = array();
+    private static $secret_codes = [];
 
     /**
      *
@@ -93,7 +93,7 @@ class ExportSecondHandProducts extends Controller
             $withImageData = true;
             $imageData = $this->getImageArray(true);
         }
-        $array = array();
+        $array = [];
         $products = SecondHandProduct::get()->filter(array('AllowPurchase' => 1));
         $count = 0;
         $doNotCopy = $this->Config()->get('do_not_copy');
@@ -131,7 +131,7 @@ class ExportSecondHandProducts extends Controller
 
     public function groups()
     {
-        $array = array();
+        $array = [];
         $groups = SecondHandProductGroup::get();
         $count = 0;
         $doNotCopy = $this->Config()->get('do_not_copy');
@@ -211,9 +211,9 @@ class ExportSecondHandProducts extends Controller
      */
     protected function addRelations($currentObject, $relations)
     {
-        $dataToBeAdded = array();
+        $dataToBeAdded = [];
         foreach ($relations as $myField => $relFields) {
-            $innerDataToBeAdded = array();
+            $innerDataToBeAdded = [];
             $relData = $currentObject->$myField();
             if ($relData instanceof SS_List) {
                 $count = 0;
@@ -239,12 +239,12 @@ class ExportSecondHandProducts extends Controller
     protected function getImageArray($imageSizesOnly = false)
     {
         $err = 0;
-        $array = array();
+        $array = [];
         $folderName = Config::inst()->get('ExportSecondHandProducts', 'folder_for_second_hand_images');
         $folder = Folder::find_or_make($folderName);
         $secondHandProducts = SecondHandProduct::get()->filter(array('AllowPurchase' => 1))->exclude(array('ImageID' => 0));
         foreach ($secondHandProducts as $secondHandProduct) {
-            $arrayInner = array();
+            $arrayInner = [];
             if ($secondHandProduct->ImageID) {
                 $image = $secondHandProduct->Image(); //see Product::has_one()
                 if ($image && $image->exists()) {
@@ -275,7 +275,7 @@ class ExportSecondHandProducts extends Controller
                     $image->Name = $name;
                     $image->FileName = $fileName;
                     $image->Title = $title;
-                    $image->ClassName = 'Product_Image';
+                    $image->ClassName = 'ProductImage';
                     $image->write();
                     $newAbsoluteLocation = Director::baseFolder().'/'.$image->FileName;
                     if (! file_exists($newAbsoluteLocation)) {

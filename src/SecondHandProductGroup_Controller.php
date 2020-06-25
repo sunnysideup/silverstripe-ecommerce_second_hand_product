@@ -1,6 +1,6 @@
 <?php
 
-class SecondHandProductGroup_Controller extends ProductGroup_Controller
+class SecondHandProductGroupController extends ProductGroupController
 {
     private static $allowed_actions = array(
         'SearchSecondHandProducts',
@@ -17,7 +17,7 @@ class SecondHandProductGroup_Controller extends ProductGroup_Controller
   */
     protected function init()
     {
-        Config::inst()->update(
+        Config::modify()->update(
             'ProductGroup',
             'base_buyable_class',
             'SecondHandProduct'

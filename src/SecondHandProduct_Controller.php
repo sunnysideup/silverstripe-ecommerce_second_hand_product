@@ -1,8 +1,8 @@
 <?php
 
-class SecondHandProduct_Controller extends Product_Controller
+class SecondHandProductController extends ProductController
 {
-    private static $fields_to_remove_from_print = array();
+    private static $fields_to_remove_from_print = [];
 
     private static $allowed_actions = array(
         'printview' => true
@@ -13,7 +13,16 @@ class SecondHandProduct_Controller extends Product_Controller
         if (!Permission::check('CMS_ACCESS_SECOND_HAND_PRODUCTS')) {
             return Security::permissionFailure($this, 'You do not have access to this feature, please login first.');
         }
-        return $this->renderWith('SecondHandProduct_printview');
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: ->RenderWith( (ignore case)
+  * NEW: ->RenderWith( (COMPLEX)
+  * EXP: Check that the template location is still valid!
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+        return $this->RenderWith('SecondHandProduct_printview');
     }
 
     public function ListOfFieldsForPrinting()
@@ -28,7 +37,16 @@ class SecondHandProduct_Controller extends Product_Controller
                 $fieldsWeNeed[$fieldKey] = $labels[$fieldKey];
             }
         }
-        $fields = $this->dataRecord->db();
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: ->db() (case sensitive)
+  * NEW: ->Config()->get('db') (COMPLEX)
+  * EXP: Check implementation
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+        $fields = $this->dataRecord->Config()->get('db');
         foreach ($fieldsWeNeed as $key => $description) {
             if (isset($fields[$key])) {
                 $type = preg_replace('/\(.*\)/', '', $fields[$key]);
