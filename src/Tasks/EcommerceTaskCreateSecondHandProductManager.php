@@ -26,6 +26,10 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask
 
     public function run($request)
     {
+        /* ### @@@@ START REPLACEMENT @@@@ ###
+         * rewrite this to work with SS4 version of PermissionProviderFactory 
+         * 
+         */
         $permissionProviderFactory = Injector::inst()->get(PermissionProviderFactory::class);
         db::alteration_message('========================== <br />creating second hand products sales manager', 'created');
         $email = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email');
@@ -48,6 +52,7 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask
         );
         db::alteration_message('================================<br />creating shop admin group ', 'created');
 
+        
         $permissionProviderFactory->CreateGroup(
             $code = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_code'),
             $name = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_name'),

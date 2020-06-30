@@ -7,6 +7,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
+use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 class UpdateSecondHandProduct extends Controller
@@ -57,16 +58,7 @@ class UpdateSecondHandProduct extends Controller
             if (! $secondHandProduct) {
                 $secondHandProduct = Versioned::get_one_by_stage(SecondHandProduct::class, 'Stage', ['InternalItemID' => $internalItemID]);
             }
-
-            /**
-             * ### @@@@ START REPLACEMENT @@@@ ###
-             * WHY: automated upgrade
-             * OLD:  Object:: (case sensitive)
-             * NEW:  SilverStripe\\Core\\Injector\\Injector::inst()-> (COMPLEX)
-             * EXP: Check if this is the right implementation, this is highly speculative.
-             * ### @@@@ STOP REPLACEMENT @@@@ ###
-             */
-            if (is_a($secondHandProduct, SilverStripe\Core\Injector\Injector::inst()->getCustomClass(SiteTree::class))) {
+            if (is_a($secondHandProduct, EcommerceConfigClassNames::getName(SiteTree::class))) {
                 $archived = $secondHandProduct->deleteFromStage('Live');
                 $archived = $secondHandProduct->deleteFromStage('Stage');
             } elseif ($secondHandProduct !== null) {

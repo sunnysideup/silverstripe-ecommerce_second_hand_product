@@ -1,11 +1,11 @@
 ---
 Name: ecommerce_second_hand_product_routes
 Before:
-  - 'app/*'
-After:
-  - 'framework/*'
-  - 'cms/*'
-  - 'ecommerce/*'
+  - '#app'
+After: 
+  - '#coreconfig'
+  - '#cmsextensions'
+  - '#ecommerce'
 ---
 SilverStripe\Control\Director:
   rules:

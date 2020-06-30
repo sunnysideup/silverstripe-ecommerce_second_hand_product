@@ -56,22 +56,13 @@ class SecondHandProduct extends Product implements PermissionProvider
      * stadard SS declaration
      * @var array
      */
-
-    /**
-     * ### @@@@ START REPLACEMENT @@@@ ###
-     * OLD: private static $db (case sensitive)
-     * NEW:
-    private static $db (COMPLEX)
-     * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
-     * ### @@@@ STOP REPLACEMENT @@@@ ###
-     */
     private static $table_name = 'SecondHandProduct';
 
     private static $db = [
         'SoldPrice' => 'Currency',
         'PurchasePrice' => 'Currency',
-        'ProductQuality' => 'ENUM("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
-        'IncludesBoxOrCase' => "ENUM('No, Box, Case, Both','No')",
+        'ProductQuality' => 'Enum("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
+        'IncludesBoxOrCase' => "Enum('No, Box, Case, Both','No')",
         'SellingOnBehalf' => 'Boolean',
         'OriginalManual' => 'Boolean',
         'DateItemWasBought' => 'Date',
@@ -86,7 +77,7 @@ class SecondHandProduct extends Product implements PermissionProvider
         'SellersPostalCode' => 'Varchar(50)',
         'SellersRegionCode' => 'Varchar(100)',
         'SellersCountry' => 'Varchar(50)',
-        'SellersIDType' => 'ENUM(",Drivers Licence, Firearms Licence, Passport","")',
+        'SellersIDType' => 'Enum(",Drivers Licence, Firearms Licence, Passport","")',
         'SellersIDNumber' => 'Varchar(50)',
         'SellersDateOfBirth' => 'Date',
         'SellersIDExpiryDate' => 'Date',
@@ -119,15 +110,6 @@ class SecondHandProduct extends Product implements PermissionProvider
      * Standard SS variable.
      */
     private static $summary_fields = [
-
-        /**
-         * ### @@@@ START REPLACEMENT @@@@ ###
-         * WHY: automated upgrade
-         * OLD:  => 'Image' (case sensitive)
-         * NEW:  => 'Image' (COMPLEX)
-         * EXP: you may want to add ownership (owns)
-         * ### @@@@ STOP REPLACEMENT @@@@ ###
-         */
         'Image.CMSThumbnail' => 'Image',
         'Title' => 'Title',
         'InternalItemID' => 'Code',
@@ -357,36 +339,9 @@ class SecondHandProduct extends Product implements PermissionProvider
                 ReadonlyField::create('CanBeSold', 'For Sale', DBField::create_field(DBBoolean::class, $this->canPurchase())->Nice()),
                 ReadonlyField::create('CreatedNice', 'First Entered', $this->getCreatedNice()),
                 TextField::create('InternalItemID', 'Product Code'),
-
-                /**
-                 * ### @@@@ START REPLACEMENT @@@@ ###
-                 * WHY: automated upgrade
-                 * OLD: NumericField::create (case sensitive)
-                 * NEW: NumericField::create (COMPLEX)
-                 * EXP: check the number of decimals required and add as ->setScale(2)
-                 * ### @@@@ STOP REPLACEMENT @@@@ ###
-                 */
-                $purchasePriceField = NumericField::create('PurchasePrice', 'Purchase Price'),
-
-                /**
-                 * ### @@@@ START REPLACEMENT @@@@ ###
-                 * WHY: automated upgrade
-                 * OLD: NumericField::create (case sensitive)
-                 * NEW: NumericField::create (COMPLEX)
-                 * EXP: check the number of decimals required and add as ->setScale(2)
-                 * ### @@@@ STOP REPLACEMENT @@@@ ###
-                 */
-                $salePriceField = NumericField::create('Price', 'Sale Price'),
-
-                /**
-                 * ### @@@@ START REPLACEMENT @@@@ ###
-                 * WHY: automated upgrade
-                 * OLD: NumericField::create (case sensitive)
-                 * NEW: NumericField::create (COMPLEX)
-                 * EXP: check the number of decimals required and add as ->setScale(2)
-                 * ### @@@@ STOP REPLACEMENT @@@@ ###
-                 */
-                $soldPriceField = NumericField::create('SoldPrice', 'Sold Price'),
+                $purchasePriceField = NumericField::create('PurchasePrice', 'Purchase Price')->setScale(2),
+                $salePriceField = NumericField::create('Price', 'Sale Price')->setScale(2),
+                $soldPriceField = NumericField::create('SoldPrice', 'Sold Price')->setScale(2),
                 $serialNumberField = TextField::create('SerialNumber', 'Serial Number'),
                 $productQualityField = DropdownField::create(
                     'ProductQuality',
@@ -491,14 +446,6 @@ class SecondHandProduct extends Product implements PermissionProvider
                     $geocodingField = new GoogleAddressField(
                         'SellersAddressGeocodingField',
                         _t('OrderAddress.FIND_ADDRESS', 'Find address'),
-                        /**
-                         * ### @@@@ START REPLACEMENT @@@@ ###
-                         * WHY: automated upgrade
-                         * OLD: Session:: (case sensitive)
-                         * NEW: Controller::curr()->getRequest()->getSession()-> (COMPLEX)
-                         * EXP: If THIS is a controller than you can write: $this->getRequest(). You can also try to access the HTTPRequest directly.
-                         * ### @@@@ STOP REPLACEMENT @@@@ ###
-                         */
                         Controller::curr()->getRequest()->getSession()->get('SellersAddressGeocodingFieldValue')
                     )
                 );
@@ -594,25 +541,9 @@ class SecondHandProduct extends Product implements PermissionProvider
     {
         return Controller::join_links(
             singleton(SecondHandProductAdmin::class)->Link(),
-            /**
-             * ### @@@@ START REPLACEMENT @@@@ ###
-             * WHY: automated upgrade
-             * OLD: $this->ClassName (case sensitive)
-             * NEW: $this->ClassName (COMPLEX)
-             * EXP: Check if the class name can still be used as such
-             * ### @@@@ STOP REPLACEMENT @@@@ ###
-             */
             $this->ClassName,
             'EditForm',
             'field',
-            /**
-             * ### @@@@ START REPLACEMENT @@@@ ###
-             * WHY: automated upgrade
-             * OLD: $this->ClassName (case sensitive)
-             * NEW: $this->ClassName (COMPLEX)
-             * EXP: Check if the class name can still be used as such
-             * ### @@@@ STOP REPLACEMENT @@@@ ###
-             */
             $this->ClassName,
             'item',
             $this->ID,
@@ -716,31 +647,35 @@ class SecondHandProduct extends Product implements PermissionProvider
     public function requireDefaultRecords()
     {
         parent::requireDefaultRecords();
-        $permissionProviderFactory = Injector::inst()->get(PermissionProviderFactory::class);
-        $member = $permissionProviderFactory->CreateDefaultMember(
-            EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email'),
-            EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_firstname'),
-            EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_surname'),
-            EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_password')
-        );
-        $permissionProviderFactory->CreateGroup(
-            $code = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_code'),
-            $name = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_name'),
-            $parentGroup = null,
-            $permissionCode = EcommerceConfig::get(
-                SecondHandProduct::class,
-                'second_hand_admin_permission_code'
-            ),
-            $roleTitle = EcommerceConfig::get(
-                SecondHandProduct::class,
-                'second_hand_admin_permission_title'
-            ),
-            $permissionArray = [
-                'SITETREE_VIEW_ALL',
-                'CMS_ACCESS_SecondHandProductAdmin',
-            ],
-            $member
-        );
+        /* ### @@@@ START REPLACEMENT @@@@ ###
+         * rewrite this to work with SS4 version of PermissionProviderFactory 
+         * 
+         */
+        // $permissionProviderFactory = Injector::inst()->get(PermissionProviderFactory::class);
+        // $member = $permissionProviderFactory->CreateDefaultMember(
+        //     EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email'),
+        //     EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_firstname'),
+        //     EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_surname'),
+        //     EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_password')
+        // );
+        // $permissionProviderFactory->CreateGroup(
+        //     $code = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_code'),
+        //     $name = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_name'),
+        //     $parentGroup = null,
+        //     $permissionCode = EcommerceConfig::get(
+        //         SecondHandProduct::class,
+        //         'second_hand_admin_permission_code'
+        //     ),
+        //     $roleTitle = EcommerceConfig::get(
+        //         SecondHandProduct::class,
+        //         'second_hand_admin_permission_title'
+        //     ),
+        //     $permissionArray = [
+        //         'SITETREE_VIEW_ALL',
+        //         'CMS_ACCESS_SecondHandProductAdmin',
+        //     ],
+        //     $member
+        // );
     }
 
     public function onAferSubmit($order)

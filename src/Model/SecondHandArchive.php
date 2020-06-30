@@ -13,14 +13,6 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 class SecondHandArchive extends DataObject
 {
-    /**
-     * ### @@@@ START REPLACEMENT @@@@ ###
-     * OLD: private static $db (case sensitive)
-     * NEW:
-    private static $db (COMPLEX)
-     * EXP: Check that is class indeed extends DataObject and that it is not a data-extension!
-     * ### @@@@ STOP REPLACEMENT @@@@ ###
-     */
     private static $table_name = 'SecondHandArchive';
 
     private static $db = [
@@ -29,12 +21,12 @@ class SecondHandArchive extends DataObject
         'SerialNumber' => 'Varchar(50)',
         'DateItemWasBought' => 'Date',
         'DateItemWasSold' => 'Date',
-        'ProductQuality' => 'ENUM("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
+        'ProductQuality' => 'Enum("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
         'SoldOnBehalf' => 'Boolean',
         'PurchasePrice' => 'Currency',
         'Price' => 'Currency',
         'SoldPrice' => 'Currency',
-        'IncludesBoxOrCase' => 'ENUM("No, Box, Case, Both","No")',
+        'IncludesBoxOrCase' => 'Enum("No, Box, Case, Both","No")',
         'OriginalManual' => 'Boolean',
         'PageID' => 'Int',
         'Description' => 'Varchar(255)',
@@ -47,7 +39,7 @@ class SecondHandArchive extends DataObject
         'SellersPostalCode' => 'Varchar(50)',
         'SellersRegionCode' => 'Varchar(100)',
         'SellersCountry' => 'Varchar(50)',
-        'SellersIDType' => 'ENUM(",Drivers Licence, Firearms Licence, Passport","")',
+        'SellersIDType' => 'Enum(",Drivers Licence, Firearms Licence, Passport","")',
         'SellersIDNumber' => 'Varchar(50)',
         'SellersDateOfBirth' => 'Date',
         'SellersIDExpiryDate' => 'Date',
