@@ -50,7 +50,7 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
      * standard SS variable
      * @var string
      */
-    private static $menu_icon = 'ecommerce/images/icons/product-file.gif';
+    private static $menu_icon = 'vendor/sunnysideup/ecommerce/client/images/icons/product-file.gif';
 
     public function getEditForm($id = null, $fields = null)
     {
