@@ -4,6 +4,7 @@ namespace Sunnysideup\EcommerceSecondHandProduct\Model\Process;
 
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Security\Member;
+use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
 use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
@@ -61,7 +62,7 @@ class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepIn
             if ($buyable instanceof SecondHandProduct) {
                 $currentMember = Member::currentUser();
                 $buyable->ArchivedByID = $order->MemberID;
-                if (is_a($buyable, Object::getCustomClass(SiteTree::class))) {
+                if (is_a($buyable, EcommerceConfigClassNames::getName(SiteTree::class))) {
                     $buyable->write();
                     $buyable->publishRecursive();
                     $buyable->deleteFromStage('Live');
