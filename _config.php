@@ -4,4 +4,4 @@ use Sunnysideup\EcommerceSecondHandProduct\Cms\CMSPageAddController_SecondHandPr
 use SilverStripe\Admin\CMSMenu;
 
 
-CMSMenu::remove_menu_item(CMSPageAddController_SecondHandProducts::class);
+CMSMenu::remove_menu_class(CMSPageAddController_SecondHandProducts::class);

@@ -22,15 +22,6 @@ class SecondHandProduct_Controller extends ProductController
         if (! Permission::check('CMS_ACCESS_SECOND_HAND_PRODUCTS')) {
             return Security::permissionFailure($this, 'You do not have access to this feature, please login first.');
         }
-
-        /**
-         * ### @@@@ START REPLACEMENT @@@@ ###
-         * WHY: automated upgrade
-         * OLD: ->RenderWith( (ignore case)
-         * NEW: ->RenderWith( (COMPLEX)
-         * EXP: Check that the template location is still valid!
-         * ### @@@@ STOP REPLACEMENT @@@@ ###
-         */
         return $this->RenderWith('SecondHandProduct_printview');
     }
 
@@ -46,15 +37,6 @@ class SecondHandProduct_Controller extends ProductController
                 $fieldsWeNeed[$fieldKey] = $labels[$fieldKey];
             }
         }
-
-        /**
-         * ### @@@@ START REPLACEMENT @@@@ ###
-         * WHY: automated upgrade
-         * OLD: ->db() (case sensitive)
-         * NEW: ->Config()->get('db') (COMPLEX)
-         * EXP: Check implementation
-         * ### @@@@ STOP REPLACEMENT @@@@ ###
-         */
         $fields = $this->dataRecord->Config()->get('db');
         foreach ($fieldsWeNeed as $key => $description) {
             if (isset($fields[$key])) {

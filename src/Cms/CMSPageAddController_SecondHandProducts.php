@@ -17,6 +17,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
@@ -67,7 +68,17 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
         $numericLabelTmpl = '<span class="step-label"><span class="flyout">%d</span><span class="arrow"></span><span class="title">%s</span></span>';
 
         $fields = new FieldList(
-            new LiteralField('PageModeHeader', sprintf($numericLabelTmpl, 1, _t('CMSMain.ChoosePageParentMode', 'Choose where to create this page'))),
+            LiteralField::create(
+                'PageModeHeader', 
+                DBField::create_field(
+                    'HTMLText',
+                    sprintf(
+                        $numericLabelTmpl,
+                        1,
+                        _t('CMSMain.ChoosePageParentMode', 'Choose where to create this page')
+                    )
+                )
+            ),
             $parentField = DropdownField::create(
                 'ParentID',
                 'Category',
@@ -75,7 +86,14 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
             ),
             $typeField = new OptionsetField(
                 'PageType',
-                sprintf($numericLabelTmpl, 2, _t('CMSMain.ChoosePageType', 'Choose page type')),
+                DBField::create_field(
+                    'HTMLText',
+                    sprintf(
+                        $numericLabelTmpl,
+                        2,
+                        _t('CMSMain.ChoosePageType', 'Choose page type')
+                    )
+                ),
                 $pageTypes
             ),
             new LiteralField(
@@ -89,16 +107,6 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
                 )
             )
         );
-
-        /**
-         * ### @@@@ START REPLACEMENT @@@@ ###
-         * WHY: automated upgrade
-         * OLD: ->dontEscape (case sensitive)
-         * NEW: ->dontEscape (COMPLEX)
-         * EXP: dontEscape is not longer in use for form fields, please use HTMLReadonlyField (or similar) instead.
-         * ### @@@@ STOP REPLACEMENT @@@@ ###
-         */
-        $typeField->dontEscape = true;
 
         // TODO Re-enable search once it allows for HTML title display,
         // see http://open.silverstripe.org/ticket/7455
@@ -123,7 +131,7 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
 
         $this->extend('updatePageOptions', $fields);
 
-        $form = CMSForm::create(
+        $form = Form::create(
             $this,
             'AddForm',
             $fields,
@@ -131,8 +139,6 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
         )->setHTMLID('Form_AddForm');
         $form->setAttribute('data-hints', $this->SiteTreeHints());
         $form->setAttribute('data-childfilter', $this->Link('childfilter'));
-
-        $form->setResponseNegotiator($this->getResponseNegotiator());
 
         return $form;
     }
@@ -175,7 +181,10 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
         try {
             $record->write();
         } catch (ValidationException $ex) {
-            $form->sessionMessage($ex->getResult()->message(), 'bad');
+            foreach ($ex->getResult()->getMessages() as $messageKey => $messageArray) {
+                $form->sessionMessage($messageArray['message'], $messageArray['messageType']);
+            }
+            
             return $this->getResponseNegotiator()->respond($this->getRequest());
         }
         $this->getRequest()->getSession()->set(

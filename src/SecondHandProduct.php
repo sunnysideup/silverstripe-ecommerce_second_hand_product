@@ -26,6 +26,7 @@ use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Versioned\Versioned;
+use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
 use Sunnysideup\Ecommerce\Pages\Product;
@@ -138,11 +139,11 @@ class SecondHandProduct extends Product implements PermissionProvider
     private static $searchable_fields = [
         'FullName' => [
             'title' => 'Keyword',
-            'field' => 'TextField',
+            'field' => TextField::class,
         ],
         'Price' => [
             'title' => 'Price',
-            'field' => 'NumericField',
+            'field' => NumericField::class,
         ],
         'InternalItemID' => [
             'title' => 'Internal Item ID',
@@ -316,9 +317,27 @@ class SecondHandProduct extends Product implements PermissionProvider
         $fields->addFieldsToTab(
             'Root.Main',
             [
-                $allowPurchaseField = CheckboxField::create('AllowPurchase', '<strong>Allow product to be purchased</strong>'),
-                $sellinOnBehalf = CheckboxField::create('SellingOnBehalf', '<strong>Selling on behalf</strong>'),
-                $featuredProductField = CheckboxField::create('FeaturedProduct', _t('Product.FEATURED', '<strong>Featured Product</strong>')),
+                $allowPurchaseField = CheckboxField::create(
+                    'AllowPurchase', 
+                    DBField::create_field(
+                        'HTMLText',
+                        '<strong>Allow product to be purchased</strong>'
+                    )
+                ),
+                $sellinOnBehalf = CheckboxField::create(
+                    'SellingOnBehalf',
+                    DBField::create_field(
+                        'HTMLText',
+                        '<strong>Selling on behalf</strong>'
+                    )
+                ),
+                $featuredProductField = CheckboxField::create(
+                    'FeaturedProduct',
+                    DBField::create_field(
+                        'HTMLText',
+                        _t('Product.FEATURED', '<strong>Featured Product</strong>')
+                    )
+                ),
                 TextField::create('Title', 'Product Title'),
             ]
         );
@@ -357,7 +376,7 @@ class SecondHandProduct extends Product implements PermissionProvider
                 $contentField = TextField::create('ShortDescription', 'Description'),
                 $boughtDate = DateField::create('DateItemWasBought', 'Date this item was bought'),
                 $soldDate = DateField::create('DateItemWasSold', 'Date this item was sold'),
-                $mainImageField = UploadField::create(Image::class, 'Main Product Image'),
+                $mainImageField = UploadField::create('Image', 'Main Product Image'),
                 $additionalImagesField = UploadField::create('AdditionalImages', 'More Images'),
                 $metaFieldDesc = TextareaField::create('MetaDescription', 'Meta Description'),
             ]
@@ -376,7 +395,10 @@ class SecondHandProduct extends Product implements PermissionProvider
         $boxOrCaseField->setRightTitle('Does this product come with a box, case or both?');
         $contentField->setRightTitle('Optional text only description, the maximum length of this description is 255 characters.');
         $contentField->setMaxLength(255);
-        $qualityFieldDescription = 'A <strong>Condition Rating Page</strong> has yet to be setup';
+        $qualityFieldDescription = DBField::create_field(
+            'HTMLText',
+            'A <strong>Condition Rating Page</strong> has yet to be setup'
+        );
         $obj = $this->EcomConfig()->SecondHandExplanationPage();
         if ($obj->exists()) {
             $qualityFieldDescription = 'An explanation of the ratings scale can be found by clicking this <a href="' . $obj->Link() . '">link</a>';
@@ -384,16 +406,22 @@ class SecondHandProduct extends Product implements PermissionProvider
         $productQualityField->setRightTitle($qualityFieldDescription);
         $boughtDate->setRightTitle('Date Format (dd-mm-YYYY). Example: 3rd of May 1992 should be entered as 03-05-1992');
         $mainImageField->setRightTitle(
-            '<strong>Upload the main image for the product here.</strong><br>
-            Recommended size: 810px wide x 418px high - but you can choose any width up to 810px, height must
-            ALWAYS BE 418px. Should be provided to FTP data upload as productcode.jpg - e.g. 1003040.jpg.
-            Images should be compressed up to 50%.'
+            DBField::create_field(
+                'HTMLText',
+                '<strong>Upload the main image for the product here.</strong><br>
+                Recommended size: 810px wide x 418px high - but you can choose any width up to 810px, height must
+                ALWAYS BE 418px. Should be provided to FTP data upload as productcode.jpg - e.g. 1003040.jpg.
+                Images should be compressed up to 50%.'
+            )
         );
         $additionalImagesField->setRightTitle(
-            '<strong>Upload additional images here, you can upload as many as you want.</strong><br>
-            Recommended size: 810px wide x 418px high - but you can choose any width up to 810px, height must
-            ALWAYS BE 418px. Should be provided to FTP data upload as productcode.jpg - e.g. 1003040.jpg.
-            Images should be compressed up to 50%.'
+            DBField::create_field(
+                'HTMLText',
+                '<strong>Upload additional images here, you can upload as many as you want.</strong><br>
+                Recommended size: 810px wide x 418px high - but you can choose any width up to 810px, height must
+                ALWAYS BE 418px. Should be provided to FTP data upload as productcode.jpg - e.g. 1003040.jpg.
+                Images should be compressed up to 50%.'
+            )
         );
         //replace InternalItemID field with a read only field
         $fields->replaceField(
@@ -502,30 +530,31 @@ class SecondHandProduct extends Product implements PermissionProvider
         // If the product has been sold all fields should be disabled
         // Only the shop administrator is allowed to undo this.
         if ($this->HasBeenSold()) {
+            $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandProduct::class);
             $fields->insertAfter(
                 'AllowPurchase',
                 EcommerceCMSButtonField::create(
                     'ArchiveButton',
-                    '/admin/secondhandproducts/SecondHandProduct/archive/?productid=' . $this->ID,
+                    '/admin/secondhandproducts/' . $classURLSegment . '/archive/?productid=' . $this->ID,
                     _t('SecondHandProduct.ARCHIVE_BUTTON', 'Archive Product')
                 )
             );
             $fields = $fields->makeReadonly();
             $fields->replaceField($categoriesTable->Name, $categoriesTable);
             $categoriesTable->setConfig(GridFieldConfig_RecordViewer::create());
-            $fields->replaceField(
-                'EnquiresList',
-                GridField::create(
-                    'EnquiresList',
-                    'Enquiries List',
-                    $this->PageEnquiries(),
-                    GridFieldConfig_RecordViewer::create()
-                )
-            );
         }
 
         if ($this->canEdit()) {
-            $fields->replaceField('AllowPurchase', CheckboxField::create('AllowPurchase', '<strong>Allow product to be purchased</strong>'));
+            $fields->replaceField(
+                'AllowPurchase', 
+                CheckboxField::create(
+                    'AllowPurchase',
+                    DBField::create_field(
+                        'HTMLText',
+                        '<strong>Allow product to be purchased</strong>'
+                    )
+                )
+            );
             $fields->replaceField('DateItemWasSold', DateField::create('DateItemWasSold', 'Date this item was sold'));
         }
 
@@ -539,12 +568,13 @@ class SecondHandProduct extends Product implements PermissionProvider
 
     public function CMSEditLink()
     {
+        $sanitisedClassName = ClassHelpers::sanitise_class_name($this->ClassName);
         return Controller::join_links(
             singleton(SecondHandProductAdmin::class)->Link(),
-            $this->ClassName,
+            $sanitisedClassName,
             'EditForm',
             'field',
-            $this->ClassName,
+            $sanitisedClassName,
             'item',
             $this->ID,
             'edit'

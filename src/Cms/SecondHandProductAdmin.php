@@ -11,13 +11,13 @@ use SilverStripe\Forms\GridField\GridFieldExportButton;
 use SilverStripe\Security\Member;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\View\Requirements;
+use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Cms\ModelAdminEcommerceBaseClass;
 use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
 use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs\GridFieldEditOriginalPageConfigSecondHandPage;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
-
 /**
  * @description: for the management of Product and Product Groups only
  *
@@ -104,7 +104,8 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
                             ['title' => $archivedProduct->Title]
                         ))
                     );
-                    $cmsEditLink = '/admin/secondhandproducts/SecondHandArchive/EditForm/field/SecondHandArchive/item/' . $archivedProduct->ID . '/edit';
+                    $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandArchive::class);
+                    $cmsEditLink = '/admin/secondhandproducts/' . $classURLSegment . '/EditForm/field/' . $classURLSegment . '/item/' . $archivedProduct->ID . '/edit';
                     return Controller::curr()->redirect($cmsEditLink);
                 }
             }
