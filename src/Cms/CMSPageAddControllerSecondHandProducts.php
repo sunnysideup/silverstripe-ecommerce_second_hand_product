@@ -2,18 +2,8 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
 
-use CMSForm;
-
-
-
-
-
-
-
-
 use SilverStripe\CMS\Controllers\CMSPageAddController;
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Control\Controller;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
@@ -31,7 +21,7 @@ use Sunnysideup\Ecommerce\Pages\ProductGroup;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 
-class CMSPageAddController_SecondHandProducts extends CMSPageAddController
+class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
 {
     private static $url_segment = 'addsecondhandproduct';
 
@@ -69,7 +59,7 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
 
         $fields = new FieldList(
             LiteralField::create(
-                'PageModeHeader', 
+                'PageModeHeader',
                 DBField::create_field(
                     'HTMLText',
                     sprintf(
@@ -166,7 +156,7 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
         if (! $parentObj || ! $parentObj->ID) {
             $parentID = 0;
         }
-        
+
         if (! singleton($className)->canCreate(
             Member::currentUser(),
             ['Parent' => $parentObj]
@@ -174,7 +164,7 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
         ) {
             return Security::permissionFailure($this);
         }
-        
+
         $record = $this->getNewItem("new-${className}-${parentID}" . $suffix, false);
         $this->extend('updateDoAdd', $record, $form);
 
@@ -184,7 +174,7 @@ class CMSPageAddController_SecondHandProducts extends CMSPageAddController
             foreach ($ex->getResult()->getMessages() as $messageKey => $messageArray) {
                 $form->sessionMessage($messageArray['message'], $messageArray['messageType']);
             }
-            
+
             return $this->getResponseNegotiator()->respond($this->getRequest());
         }
         $this->getRequest()->getSession()->set(

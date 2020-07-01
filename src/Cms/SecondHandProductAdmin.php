@@ -18,6 +18,7 @@ use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs\GridFieldEdit
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
+
 /**
  * @description: for the management of Product and Product Groups only
  *
@@ -84,7 +85,7 @@ class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
                 $currentMember = Member::currentUser();
                 $secondHandProduct->ArchivedByID = $currentMember->ID;
                 $internalItemID = $secondHandProduct->InternalItemID;
-                if (is_a($secondHandProduct,EcommerceConfigClassNames::getName(SiteTree::class))) {
+                if (is_a($secondHandProduct, EcommerceConfigClassNames::getName(SiteTree::class))) {
                     $secondHandProduct->write();
                     $secondHandProduct->publishRecursive();
                     $secondHandProduct->deleteFromStage('Live');

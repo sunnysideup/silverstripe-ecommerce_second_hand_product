@@ -10,14 +10,14 @@ use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
-class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepInterface
+class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInterface
 {
     /**
      * The OrderStatusLog that is relevant to the particular step.
      *
      * @var string
      */
-    protected $relevantLogEntryClassName = 'OrderStatusLog_RemoveSecondHandProduct';
+    protected $relevantLogEntryClassName = OrderStepRemoveSecondHandProduct::class;
 
     private static $defaults = [
         'CustomerCanEdit' => 0,
@@ -60,7 +60,6 @@ class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepIn
     {
         foreach ($order->Buyables() as $buyable) {
             if ($buyable instanceof SecondHandProduct) {
-                $currentMember = Member::currentUser();
                 $buyable->ArchivedByID = $order->MemberID;
                 if (is_a($buyable, EcommerceConfigClassNames::getName(SiteTree::class))) {
                     $buyable->write();

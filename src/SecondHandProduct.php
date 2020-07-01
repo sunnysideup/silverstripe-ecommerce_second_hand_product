@@ -3,14 +3,11 @@
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
 use SilverStripe\AssetAdmin\Forms\UploadField;
-use SilverStripe\Assets\Image;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\DropdownField;
-use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\NumericField;
@@ -318,7 +315,7 @@ class SecondHandProduct extends Product implements PermissionProvider
             'Root.Main',
             [
                 $allowPurchaseField = CheckboxField::create(
-                    'AllowPurchase', 
+                    'AllowPurchase',
                     DBField::create_field(
                         'HTMLText',
                         '<strong>Allow product to be purchased</strong>'
@@ -510,7 +507,6 @@ class SecondHandProduct extends Product implements PermissionProvider
         );
         if ($this->BasedOnID) {
             $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
-            $labels = $this->FieldLabels();
             foreach ($list as $listField) {
                 $fields->replaceField(
                     $listField,
@@ -546,7 +542,7 @@ class SecondHandProduct extends Product implements PermissionProvider
 
         if ($this->canEdit()) {
             $fields->replaceField(
-                'AllowPurchase', 
+                'AllowPurchase',
                 CheckboxField::create(
                     'AllowPurchase',
                     DBField::create_field(
@@ -631,8 +627,6 @@ class SecondHandProduct extends Product implements PermissionProvider
                 }
             }
         }
-        $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
-
         //set the IternatlItemID if it doesn't already exist
         if (! $this->InternalItemID) {
             //todo - this may need improvement

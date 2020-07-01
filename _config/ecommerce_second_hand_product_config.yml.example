@@ -3,10 +3,10 @@ OrderStep:
   order_steps_to_include:
     step1: OrderStepCreated
     step2: OrderStepSubmitted
-    step3: OrderStep_DisableSecondHandProduct
+    step3: OrderStepDisableSecondHandProduct
     step4: OrderStepSentInvoice
     step5: OrderStepPaid
-    step6: OrderStep_RemoveSecondHandProduct
+    step6: OrderStepRemoveSecondHandProduct
     step7: OrderStepArchived
 
 ExportSecondHandProducts:

@@ -2,7 +2,6 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
-use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;

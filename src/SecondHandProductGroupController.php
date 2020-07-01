@@ -12,7 +12,7 @@ use SilverStripe\Forms\TextField;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 use Sunnysideup\Ecommerce\Pages\ProductGroupController;
 
-class SecondHandProductGroup_Controller extends ProductGroupController
+class SecondHandProductGroupController extends ProductGroupController
 {
     private static $allowed_actions = [
         'SearchSecondHandProducts',
@@ -45,7 +45,6 @@ class SecondHandProductGroup_Controller extends ProductGroupController
 
     public function search($request)
     {
-        $term = Convert::raw2sql($request->param('searchterm'));
         //uncompleted
     }
 

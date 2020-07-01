@@ -6,7 +6,7 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\View\ArrayData;
 use Sunnysideup\Ecommerce\Forms\Gridfield\GridFieldAddNewButtonOriginalPage;
-use Sunnysideup\EcommerceSecondHandProduct\Cms\CMSPageAddController_SecondHandProducts;
+use Sunnysideup\EcommerceSecondHandProduct\Cms\CMSPageAddControllerSecondHandProducts;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 
 /**
@@ -41,7 +41,7 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
         }
 
         $data = new ArrayData([
-            'NewLink' => '/admin/' . Config::inst()->get(CMSPageAddController_SecondHandProducts::class, 'url_segment') . '/' . $getSegment,
+            'NewLink' => '/admin/' . Config::inst()->get(CMSPageAddControllerSecondHandProducts::class, 'url_segment') . '/' . $getSegment,
             'ButtonName' => $this->buttonName,
         ]);
 

@@ -9,14 +9,14 @@ use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
-class OrderStep_DisableSecondHandProduct extends OrderStep implements OrderStepInterface
+class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepInterface
 {
     /**
      * The OrderStatusLog that is relevant to the particular step.
      *
      * @var string
      */
-    protected $relevantLogEntryClassName = 'OrderStatusLog_DisableSecondHandProduct';
+    protected $relevantLogEntryClassName = OrderStepDisableSecondHandProduct::class;
 
     private static $defaults = [
         'CustomerCanEdit' => 0,
