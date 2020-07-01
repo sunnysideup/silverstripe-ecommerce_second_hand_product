@@ -677,35 +677,22 @@ class SecondHandProduct extends Product implements PermissionProvider
     public function requireDefaultRecords()
     {
         parent::requireDefaultRecords();
-        /* ### @@@@ START REPLACEMENT @@@@ ###
-         * rewrite this to work with SS4 version of PermissionProviderFactory 
-         * 
-         */
-        // $permissionProviderFactory = Injector::inst()->get(PermissionProviderFactory::class);
-        // $member = $permissionProviderFactory->CreateDefaultMember(
-        //     EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email'),
-        //     EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_firstname'),
-        //     EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_surname'),
-        //     EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_password')
-        // );
-        // $permissionProviderFactory->CreateGroup(
-        //     $code = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_code'),
-        //     $name = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_name'),
-        //     $parentGroup = null,
-        //     $permissionCode = EcommerceConfig::get(
-        //         SecondHandProduct::class,
-        //         'second_hand_admin_permission_code'
-        //     ),
-        //     $roleTitle = EcommerceConfig::get(
-        //         SecondHandProduct::class,
-        //         'second_hand_admin_permission_title'
-        //     ),
-        //     $permissionArray = [
-        //         'SITETREE_VIEW_ALL',
-        //         'CMS_ACCESS_SecondHandProductAdmin',
-        //     ],
-        //     $member
-        // );
+        return PermissionProviderFactory::inst()
+            ->setEmail(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email'))
+            ->setFirstName(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_firstname'))
+            ->setSurname(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_surname'))
+            ->setPassword(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_password'))
+            ->setName(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_name'))
+            ->setCode(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_code'))
+            ->setPermissionCode(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'))
+            ->setRoleTitle(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_title'))
+            ->setPermissionArray(
+                [
+                    'SITETREE_VIEW_ALL',
+                    'CMS_ACCESS_SecondHandProductAdmin',
+                ]
+            )
+            ->CreateGroupAndMember();
     }
 
     public function onAferSubmit($order)
