@@ -53,7 +53,7 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
     /**
      * finds the most likely root parent for the shop.
      *
-     * @return SiteTree | NULL
+     * @return \SilverStripe\CMS\Model\SiteTree | NULL
      */
     public function BestRootParentPage()
     {

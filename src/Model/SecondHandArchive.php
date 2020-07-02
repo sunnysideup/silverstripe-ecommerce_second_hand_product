@@ -201,7 +201,7 @@ class SecondHandArchive extends DataObject
 
     /**
      * stadard SS method
-     * @return FieldList
+     * @return \SilverStripe\Forms\FieldList
      */
     public function getCMSFields()
     {
