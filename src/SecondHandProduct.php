@@ -292,7 +292,7 @@ class SecondHandProduct extends Product implements PermissionProvider
 
     /**
      * stadard SS method
-     * @return FieldList
+     * @return \SilverStripe\Forms\FieldList
      */
     public function getCMSFields()
     {

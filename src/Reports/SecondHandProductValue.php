@@ -53,7 +53,7 @@ class SecondHandProductValue extends Report
     /**
      * working out the items.
      *
-     * @return DataList
+     * @return \SilverStripe\ORM\DataList
      */
     public function sourceRecords($params = null)
     {
