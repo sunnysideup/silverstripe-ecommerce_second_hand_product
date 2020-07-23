@@ -45,8 +45,9 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
             'ButtonName' => $this->buttonName,
         ]);
 
+        $templates = SSViewer::get_templates_by_class($this, '', GridFieldAddNewButton::class);
         return [
-            $this->targetFragment => $data->RenderWith('SilverStripe/Forms/GridField/GridFieldAddNewbutton'),
+            $this->targetFragment => $data->renderWith($templates),
         ];
     }
 
