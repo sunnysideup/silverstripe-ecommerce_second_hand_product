@@ -2,9 +2,8 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Reports;
 
-use Currency;
-
 use SilverStripe\Forms\GridField\GridFieldExportButton;
+use SilverStripe\ORM\FieldType\DBCurrency;
 use SilverStripe\Reports\Report;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
@@ -23,7 +22,7 @@ class SecondHandProductValue extends Report
     {
         $values = $this->sourceRecords()->column('PurchasePrice');
         $sum = array_sum($values);
-        $object = Currency::create('Sum');
+        $object = DBCurrency::create('Sum');
         $object->setValue($sum);
         $name = _t(
             'EcommerceSideReport.SECOND_HAND_REPORT_TOTAL_STOCK_VALUE',
