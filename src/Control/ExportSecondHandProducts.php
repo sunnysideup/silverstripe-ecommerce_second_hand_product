@@ -3,13 +3,13 @@
 namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
 use SilverStripe\Assets\Folder;
+use SilverStripe\Assets\Image;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\SS_List;
-use Sunnysideup\Ecommerce\Filesystem\ProductImage;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
@@ -285,7 +285,7 @@ class ExportSecondHandProducts extends Controller
                     $image->Name = $name;
                     $image->FileName = $fileName;
                     $image->Title = $title;
-                    $image->ClassName = ProductImage::class;
+                    $image->ClassName = Image::class;
                     $image->write();
                     $newAbsoluteLocation = Director::baseFolder() . '/' . $image->FileName;
                     if (! file_exists($newAbsoluteLocation)) {
