@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
 
+use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\CMS\Controllers\CMSMain;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
@@ -12,6 +13,7 @@ use SilverStripe\Security\Member;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\View\Requirements;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
+use Sunnysideup\Ecommerce\Cms\EcommerceModelAdminTrait;
 use Sunnysideup\Ecommerce\Cms\ModelAdminEcommerceBaseClass;
 use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
 use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs\GridFieldEditOriginalPageConfigSecondHandPage;
@@ -27,8 +29,10 @@ use Sunnysideup\GoogleAddressField\GoogleAddressField;
  * @sub-package: cms
  **/
 
-class SecondHandProductAdmin extends ModelAdminEcommerceBaseClass
+class SecondHandProductAdmin extends ModelAdmin
 {
+    use EcommerceModelAdminTrait;
+
     private static $menu_priority = 3.2;
 
     private static $url_segment = 'secondhandproducts';
