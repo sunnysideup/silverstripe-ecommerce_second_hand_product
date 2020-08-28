@@ -20,7 +20,7 @@ class SecondHandProductGroup extends ProductGroup
         SecondHandProduct::class,
     ];
 
-    private static $icon = 'ecommerce_second_hand_product/images/treeicons/SecondHandProductGroup';
+    private static $icon = 'sunnysideup/ecommerce_second_hand_product: client/images/treeicons/SecondHandProductGroup-file.gif';
 
     /**
      * Standard SS variable.

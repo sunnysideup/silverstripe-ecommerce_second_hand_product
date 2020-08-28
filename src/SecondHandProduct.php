@@ -187,7 +187,7 @@ class SecondHandProduct extends Product implements PermissionProvider
      * standard SS declaration
      * @var string
      */
-    private static $icon = 'ecommerce_second_hand_product/images/treeicons/SecondHandProduct';
+    private static $icon = 'sunnysideup/ecommerce_second_hand_product: client/images/treeicons/SecondHandProduct-file.gif';
 
     /**
      * Standard SS variable.
