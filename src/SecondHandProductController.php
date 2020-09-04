@@ -30,7 +30,7 @@ class SecondHandProductController extends ProductController
         $al = ArrayList::create();
         $fieldsWeNeed = $this->dataRecord->stat('db');
         $labels = $this->FieldLabels();
-        foreach ($fieldsWeNeed as $fieldKey => $useless) {
+        foreach (array_keys($fieldsWeNeed) as $fieldKey) {
             if (in_array($fieldKey, self::$fields_to_remove_from_print, true)) {
                 unset($fieldsWeNeed[$fieldKey]);
             } else {

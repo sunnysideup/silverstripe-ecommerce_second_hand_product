@@ -171,7 +171,7 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
         try {
             $record->write();
         } catch (ValidationException $ex) {
-            foreach ($ex->getResult()->getMessages() as $messageKey => $messageArray) {
+            foreach ($ex->getResult()->getMessages() as $messageArray) {
                 $form->sessionMessage($messageArray['message'], $messageArray['messageType']);
             }
 

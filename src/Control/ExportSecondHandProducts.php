@@ -248,7 +248,6 @@ class ExportSecondHandProducts extends Controller
 
     protected function getImageArray($imageSizesOnly = false)
     {
-        $err = 0;
         $array = [];
         $folderName = Config::inst()->get(ExportSecondHandProducts::class, 'folder_for_second_hand_images');
         $folder = Folder::find_or_make($folderName);
@@ -268,7 +267,7 @@ class ExportSecondHandProducts extends Controller
                 }
             }
             $count = 0;
-            foreach ($arrayInner as $imageID => $image) {
+            foreach ($arrayInner as $image) {
                 $fileName = $image->FileName;
                 $oldFileLocationAbsolute = Director::baseFolder() . '/' . $image->FileName;
                 if (file_exists($oldFileLocationAbsolute)) {
@@ -288,9 +287,7 @@ class ExportSecondHandProducts extends Controller
                     $image->ClassName = Image::class;
                     $image->write();
                     $newAbsoluteLocation = Director::baseFolder() . '/' . $image->FileName;
-                    if (! file_exists($newAbsoluteLocation)) {
-                        $err++;
-                    } else {
+                    if (file_exists($newAbsoluteLocation)) {
                         if ($imageSizesOnly) {
                             if (! isset($array[$secondHandProduct->InternalItemID])) {
                                 $array[$secondHandProduct->InternalItemID] = 0;
@@ -303,8 +300,6 @@ class ExportSecondHandProducts extends Controller
                             $array[$secondHandProduct->InternalItemID][] = $name;
                         }
                     }
-                } else {
-                    $err++;
                 }
                 $count++;
             }
