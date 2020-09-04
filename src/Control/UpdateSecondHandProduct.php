@@ -69,7 +69,7 @@ class UpdateSecondHandProduct extends Controller
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function MyPermissionCheck()
     {

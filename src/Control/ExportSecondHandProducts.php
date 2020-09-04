@@ -182,7 +182,7 @@ class ExportSecondHandProducts extends Controller
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function MyPermissionCheck()
     {

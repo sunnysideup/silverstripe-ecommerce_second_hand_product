@@ -229,7 +229,7 @@ class SecondHandProduct extends Product implements PermissionProvider
 
     /**
      * standard SS method
-     * @return boolean
+     * @return bool
      */
     public function canCreate($member = null, $context = [])
     {
@@ -242,7 +242,7 @@ class SecondHandProduct extends Product implements PermissionProvider
 
     /**
      * standard SS method
-     * @return boolean
+     * @return bool
      */
     public function canPublish($member = null)
     {
@@ -255,7 +255,7 @@ class SecondHandProduct extends Product implements PermissionProvider
 
     /**
      * standard SS method
-     * @return boolean
+     * @return bool
      */
     public function canEdit($member = null, $context = [])
     {
@@ -268,7 +268,7 @@ class SecondHandProduct extends Product implements PermissionProvider
 
     /**
      * standard SS method
-     * @return boolean
+     * @return bool
      */
     public function canDelete($member = null, $context = [])
     {

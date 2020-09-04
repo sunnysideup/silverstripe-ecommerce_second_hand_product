@@ -103,7 +103,7 @@ class SecondHandProductGroup extends ProductGroup
 
     /**
      * Level is within SiteTree hierarchy
-     * @return boolean
+     * @return bool
      */
     protected function hasOtherSecondHandProductGroupsOnThisLevel()
     {
