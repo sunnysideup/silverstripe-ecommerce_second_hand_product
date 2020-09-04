@@ -3,7 +3,6 @@
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
 use SilverStripe\Core\Config\Config;
-use SilverStripe\Core\Convert;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;

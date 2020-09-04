@@ -14,7 +14,6 @@ use SilverStripe\Versioned\Versioned;
 use SilverStripe\View\Requirements;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Cms\EcommerceModelAdminTrait;
-use Sunnysideup\Ecommerce\Cms\ModelAdminEcommerceBaseClass;
 use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
 use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs\GridFieldEditOriginalPageConfigSecondHandPage;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
