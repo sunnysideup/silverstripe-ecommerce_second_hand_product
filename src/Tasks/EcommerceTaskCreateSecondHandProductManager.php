@@ -42,7 +42,7 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask
             ->setEmail($email)
             ->setFirstName($firstName)
             ->setSurname($surname)
-            ->setName(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_name'))
+            ->setGroupName(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_name'))
             ->setCode(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_code'))
             ->setPermissionCode(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'))
             ->setRoleTitle(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_title'))
