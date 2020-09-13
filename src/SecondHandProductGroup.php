@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\ORM\DataObject;
@@ -54,10 +55,10 @@ class SecondHandProductGroup extends ProductGroup
         $fields = parent::getCMSFields();
         $fields->addFieldToTab(
             'Root.SecondHand',
-            CheckboxField::create(
-                'RootParent',
+            ReadonlyField::create(
+                'RootParentNice',
                 _t('SecondHandProductGroup.LANDING_PAGE', 'Landing Page')
-            )
+            )->setValue($this->dbObject('RootParent')->Nice())
         );
         return $fields;
     }
