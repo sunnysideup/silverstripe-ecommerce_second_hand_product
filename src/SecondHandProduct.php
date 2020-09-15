@@ -26,6 +26,7 @@ use SilverStripe\Versioned\Versioned;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
+use Sunnysideup\Ecommerce\Model\Config\EcommerceDBConfig;
 use Sunnysideup\Ecommerce\Pages\Product;
 use Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
@@ -396,7 +397,7 @@ class SecondHandProduct extends Product implements PermissionProvider
             'HTMLText',
             'A <strong>Condition Rating Page</strong> has yet to be setup'
         );
-        $obj = EcommerceConfig::inst()->SecondHandExplanationPage();
+        $obj = EcommerceDBConfig::current_ecommerce_db_config()->SecondHandExplanationPage();
         if ($obj->exists()) {
             $qualityFieldDescription = 'An explanation of the ratings scale can be found by clicking this <a href="' . $obj->Link() . '">link</a>';
         }
