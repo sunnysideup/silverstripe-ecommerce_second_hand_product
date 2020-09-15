@@ -80,7 +80,7 @@ class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInt
      *
      * @param Order $order
      *
-     * @return OrderStep | Null	(next step OrderStep)
+     * @return OrderStep|null	(next step OrderStep)
      **/
     public function nextStep(Order $order)
     {

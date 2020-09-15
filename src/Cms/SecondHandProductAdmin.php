@@ -9,7 +9,7 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldExportButton;
-use SilverStripe\Security\Member;
+use SilverStripe\Security\Security;
 use SilverStripe\Versioned\Versioned;
 use SilverStripe\View\Requirements;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
@@ -85,7 +85,7 @@ class SecondHandProductAdmin extends ModelAdmin
             $id = intval($_GET['productid']);
             if ($id) {
                 $secondHandProduct = SecondHandProduct::get()->byID($id);
-                $currentMember = Member::currentUser();
+                $currentMember = Security::getCurrentUser();
                 $secondHandProduct->ArchivedByID = $currentMember->ID;
                 $internalItemID = $secondHandProduct->InternalItemID;
                 if (is_a($secondHandProduct, EcommerceConfigClassNames::getName(SiteTree::class))) {

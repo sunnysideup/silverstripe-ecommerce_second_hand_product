@@ -14,7 +14,6 @@ use SilverStripe\Forms\OptionsetField;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\ValidationException;
-use SilverStripe\Security\Member;
 use SilverStripe\Security\Security;
 use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
@@ -158,7 +157,7 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
         }
 
         if (! singleton($className)->canCreate(
-            Member::currentUser(),
+            Security::getCurrentUser(),
             ['Parent' => $parentObj]
         )
         ) {

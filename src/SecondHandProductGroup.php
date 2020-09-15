@@ -2,9 +2,8 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
-use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 

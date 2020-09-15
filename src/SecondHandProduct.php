@@ -396,7 +396,7 @@ class SecondHandProduct extends Product implements PermissionProvider
             'HTMLText',
             'A <strong>Condition Rating Page</strong> has yet to be setup'
         );
-        $obj = $this->EcomConfig()->SecondHandExplanationPage();
+        $obj = EcommerceConfig::inst()->SecondHandExplanationPage();
         if ($obj->exists()) {
             $qualityFieldDescription = 'An explanation of the ratings scale can be found by clicking this <a href="' . $obj->Link() . '">link</a>';
         }

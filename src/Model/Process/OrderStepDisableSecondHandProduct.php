@@ -76,7 +76,7 @@ class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepIn
      *
      * @param Order $order
      *
-     * @return OrderStep | Null	(next step OrderStep)
+     * @return OrderStep|null	(next step OrderStep)
      **/
     public function nextStep(Order $order)
     {

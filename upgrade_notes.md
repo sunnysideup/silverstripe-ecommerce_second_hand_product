@@ -416,7 +416,7 @@ modified:	src/Model/Process/OrderStep_RemoveSecondHandProduct.php
  class OrderStep_RemoveSecondHandProduct extends OrderStep implements OrderStepInterface
 @@ -61,7 +68,7 @@
              if ($buyable instanceof SecondHandProduct) {
-                 $currentMember = Member::currentUser();
+                 $currentMember = Security::currentUser();
                  $buyable->ArchivedByID = $order->MemberID;
 -                if (is_a($buyable, Object::getCustomClass('SiteTree'))) {
 +                if (is_a($buyable, Object::getCustomClass(SiteTree::class))) {
