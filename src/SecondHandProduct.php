@@ -385,13 +385,13 @@ class SecondHandProduct extends Product implements PermissionProvider
         $featuredProductField->setDescription('If this box is ticked then this product will appear in the "Featured Products" box on the home page');
         $allowPurchaseField->setDescription('This box must be ticked to allow a customer to purchase it');
         $sellinOnBehalf->setDescription('This box must be ticked if this product is being sold on behalf');
-        $purchasePriceField->setRightTitle('Price paid for the product');
-        $salePriceField->setRightTitle('Selling price');
-        $soldPriceField->setRightTitle('The price that the product actually sold for');
-        $serialNumberField->setRightTitle('Enter the serial number of the product here');
+        $purchasePriceField->setDescription('Price paid for the product');
+        $salePriceField->setDescription('Selling price');
+        $soldPriceField->setDescription('The price that the product actually sold for');
+        $serialNumberField->setDescription('Enter the serial number of the product here');
         $originalManualField->setDescription('Tick this box if the product includes the original manual, otherwise leave it empty');
-        $boxOrCaseField->setRightTitle('Does this product come with a box, case or both?');
-        $contentField->setRightTitle('Optional text only description, the maximum length of this description is 255 characters.');
+        $boxOrCaseField->setDescription('Does this product come with a box, case or both?');
+        $contentField->setDescription('Optional text only description, the maximum length of this description is 255 characters.');
         $contentField->setMaxLength(255);
         $qualityFieldDescription = DBField::create_field(
             'HTMLText',
@@ -401,9 +401,9 @@ class SecondHandProduct extends Product implements PermissionProvider
         if ($obj->exists()) {
             $qualityFieldDescription = 'An explanation of the ratings scale can be found by clicking this <a href="' . $obj->Link() . '">link</a>';
         }
-        $productQualityField->setRightTitle($qualityFieldDescription);
-        $boughtDate->setRightTitle('Date Format (dd-mm-YYYY). Example: 3rd of May 1992 should be entered as 03-05-1992');
-        $mainImageField->setRightTitle(
+        $productQualityField->setDescription($qualityFieldDescription);
+        $boughtDate->setDescription('Date Format (dd-mm-YYYY). Example: 3rd of May 1992 should be entered as 03-05-1992');
+        $mainImageField->setDescription(
             DBField::create_field(
                 'HTMLText',
                 '<strong>Upload the main image for the product here.</strong><br>
@@ -412,7 +412,7 @@ class SecondHandProduct extends Product implements PermissionProvider
                 Images should be compressed up to 50%.'
             )
         );
-        $additionalImagesField->setRightTitle(
+        $additionalImagesField->setDescription(
             DBField::create_field(
                 'HTMLText',
                 '<strong>Upload additional images here, you can upload as many as you want.</strong><br>
