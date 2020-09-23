@@ -26,7 +26,6 @@ use SilverStripe\Versioned\Versioned;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
-use Sunnysideup\Ecommerce\Model\Config\EcommerceDBConfig;
 use Sunnysideup\Ecommerce\Pages\Product;
 use Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
@@ -606,7 +605,7 @@ class SecondHandProduct extends Product implements PermissionProvider
         return parent::canPurchase($member, $checkPrice);
     }
 
-    public function HasBeenSold()
+    public function HasBeenSold() : bool
     {
         if (parent::HasBeenSold()) {
             return true;
