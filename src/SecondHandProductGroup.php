@@ -121,7 +121,7 @@ class SecondHandProductGroup extends ProductGroup
      *
      * @return string
      */
-    protected function getBuyableClassName()
+    public function getBuyableClassName() : string
     {
         return SecondHandProduct::class;
     }
