@@ -102,16 +102,6 @@ class SecondHandProductGroup extends ProductGroup
     }
 
     /**
-     * Returns the class we are working with.
-     *
-     * @return string
-     */
-    public function getBuyableClassName(): string
-    {
-        return SecondHandProduct::class;
-    }
-
-    /**
      * Level is within SiteTree hierarchy
      * @return bool
      */
@@ -124,5 +114,19 @@ class SecondHandProductGroup extends ProductGroup
             ->filter(['ParentID' => $this->ParentID])
             ->exclude(['ID' => $this->ID])
             ->count() > 0 ? true : false;
+    }
+
+    /**
+     * Returns the class we are working with.
+     *
+     * @return string
+     */
+<<<<<<< HEAD
+    public function getBuyableClassName() : string
+=======
+    protected function getBuyableClassName(): string
+>>>>>>> 0e39eb7da3d81004f73d6fe0397fc16878d7b130
+    {
+        return SecondHandProduct::class;
     }
 }
