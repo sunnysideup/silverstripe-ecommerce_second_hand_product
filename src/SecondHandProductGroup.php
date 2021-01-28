@@ -125,4 +125,6 @@ class SecondHandProductGroup extends ProductGroup
             ->exclude(['ID' => $this->ID])
             ->count() > 0 ? true : false;
     }
+
+
 }
