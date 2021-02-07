@@ -44,6 +44,13 @@ class SecondHandProduct extends Product implements PermissionProvider
     private static $embargo_number_of_days = 0;
 
     /**
+     * halt purchase for ... number of days
+     * from the day of creation.
+     * @var int
+     */
+    private static $max_number_of_days_for_sale = 999;
+
+    /**
      * Restrict GoogleAddressField to a specific Country
      * E.g. for New Zealand, $country_code =  'NZ'
      * @var string
@@ -582,6 +589,51 @@ class SecondHandProduct extends Product implements PermissionProvider
         $fields = parent::getSettingsFields();
         $fields->removeByName('ParentID');
         return $fields;
+    }
+
+    /**
+     * @return string
+     */
+    protected static function getStage()
+    {
+        $stage = '';
+        if (Versioned::get_stage() === 'Live') {
+            $stage = '_Live';
+        }
+        return $stage;
+    }
+    /**
+     *
+     * @var string
+     */
+    protected $treshold_sql_cache = '';
+
+    public static function get_treshold_sql() : string
+    {
+        if (self::$treshold_sql_cache === '') {
+            $stage = self::getStage();
+            $daysMin = intval(Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days'));
+            $minThreshold = date(
+                'Y-m-d H:i:s',
+                strtotime('-' . $daysMin . ' days', DBDatetime::now()->getTimestamp())
+            );
+            $daysMax = intval(Config::inst()->get(SecondHandProduct::class, 'max_number_of_days_for_sale'));
+            $maxThreshold = date(
+                'Y-m-d H:i:s',
+                strtotime('-' . $daysMax . ' days', DBDatetime::now()->getTimestamp())
+            );
+            self::$treshold_sql_cache = '
+                (
+                    "SiteTree' . $stage . '"."Created" < \'' . $threshold . '\' OR
+                    (
+                        SecondHandProduct' . $stage . '.DateItemWasBought IS NOT NULL AND
+                        SecondHandProduct' . $stage . '.DateItemWasBought > \'' . $minThreshold . '\' AND
+                        SecondHandProduct' . $stage . '.DateItemWasBought < \'' . $maxThreshold . '\'
+                    )
+                )
+            ';
+        }
+        return self::$treshold_sql_cache;
     }
 
     public function canPurchase(Member $member = null, $checkPrice = true)
