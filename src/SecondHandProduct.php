@@ -594,7 +594,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     /**
      * @return string
      */
-    protected static function getStage()
+    protected static function get_stage()
     {
         $stage = '';
         if (Versioned::get_stage() === 'Live') {
@@ -611,7 +611,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     public static function get_treshold_sql() : string
     {
         if (self::$treshold_sql_cache === '') {
-            $stage = self::getStage();
+            $stage = self::get_stage();
             $daysMin = intval(Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days'));
             $minThreshold = date(
                 'Y-m-d H:i:s',

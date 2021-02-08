@@ -7,14 +7,16 @@ use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
+
 class SecondHandProductGroup extends ProductGroup
 {
-    protected $main_second_hand_page_cache = null;
+    protected static $main_second_hand_page_cache = null;
 
     public static function main_second_hand_page()
     {
         if (! isset(self::$main_second_hand_page_cache)) {
-            self::$main_second_hand_page_cache = SecondHandHolderPage::get()->first();
+            self::$main_second_hand_page_cache = SecondHandProductGroup::get()->first()->TopParentGroup();
             if (! self::$main_second_hand_page_cache) {
                 self::$main_second_hand_page_cache = Injector::inst()->get(SecondHandProductGroup::class)->BestRootParentPage();
             }
