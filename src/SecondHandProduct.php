@@ -34,6 +34,11 @@ use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 
 class SecondHandProduct extends Product implements PermissionProvider
 {
+    /**
+     * @var string
+     */
+    protected $treshold_sql_cache = '';
+
     private static $can_be_root = false;
 
     /**
@@ -591,24 +596,7 @@ class SecondHandProduct extends Product implements PermissionProvider
         return $fields;
     }
 
-    /**
-     * @return string
-     */
-    protected static function get_stage()
-    {
-        $stage = '';
-        if (Versioned::get_stage() === 'Live') {
-            $stage = '_Live';
-        }
-        return $stage;
-    }
-    /**
-     *
-     * @var string
-     */
-    protected $treshold_sql_cache = '';
-
-    public static function get_treshold_sql() : string
+    public static function get_treshold_sql(): string
     {
         if (self::$treshold_sql_cache === '') {
             $stage = self::get_stage();
@@ -772,5 +760,17 @@ class SecondHandProduct extends Product implements PermissionProvider
             $date = $this->Created;
         }
         return $date . ' = ' . DBField::create_field(DBDate::class, $date)->Ago();
+    }
+
+    /**
+     * @return string
+     */
+    protected static function get_stage()
+    {
+        $stage = '';
+        if (Versioned::get_stage() === 'Live') {
+            $stage = '_Live';
+        }
+        return $stage;
     }
 }

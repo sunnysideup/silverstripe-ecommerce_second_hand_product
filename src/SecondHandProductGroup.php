@@ -7,28 +7,11 @@ use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
-
 class SecondHandProductGroup extends ProductGroup
 {
     protected static $main_second_hand_page_cache = null;
 
-    public static function main_second_hand_page()
-    {
-        if (! isset(self::$main_second_hand_page_cache)) {
-            self::$main_second_hand_page_cache = SecondHandProductGroup::get()->first()->TopParentGroup();
-            if (! self::$main_second_hand_page_cache) {
-                self::$main_second_hand_page_cache = Injector::inst()->get(SecondHandProductGroup::class)->BestRootParentPage();
-            }
-        }
-        return self::$main_second_hand_page_cache;
-    }
-
-    public static function main_second_hand_page_id() : int
-    {
-        $page = self::main_second_hand_page();
-        return $page ? $page->ID : 0;
-    }
+    protected static $list_of_filters = [];
 
     private static $table_name = 'SecondHandProductGroup';
 
@@ -59,6 +42,23 @@ class SecondHandProductGroup extends ProductGroup
      * @var string
      */
     private static $description = 'A product category page specifically for second had products';
+
+    public static function main_second_hand_page()
+    {
+        if (! isset(self::$main_second_hand_page_cache)) {
+            self::$main_second_hand_page_cache = SecondHandProductGroup::get()->first()->TopParentGroup();
+            if (! self::$main_second_hand_page_cache) {
+                self::$main_second_hand_page_cache = Injector::inst()->get(SecondHandProductGroup::class)->BestRootParentPage();
+            }
+        }
+        return self::$main_second_hand_page_cache;
+    }
+
+    public static function main_second_hand_page_id(): int
+    {
+        $page = self::main_second_hand_page();
+        return $page ? $page->ID : 0;
+    }
 
     public function i18n_singular_name()
     {
@@ -133,23 +133,6 @@ class SecondHandProductGroup extends ProductGroup
     }
 
     /**
-     * Level is within SiteTree hierarchy
-     * @return bool
-     */
-    protected function hasOtherSecondHandProductGroupsOnThisLevel()
-    {
-        if (! $this->ParentID) {
-            $this->ParentID = 0;
-        }
-        return SecondHandProductGroup::get()
-            ->filter(['ParentID' => $this->ParentID])
-            ->exclude(['ID' => $this->ID])
-            ->count() > 0 ? true : false;
-    }
-
-    protected static $list_of_filters = [];
-
-    /**
      * @return GroupedList|null
      */
     public function ListOfFilters()
@@ -157,7 +140,7 @@ class SecondHandProductGroup extends ProductGroup
         if (! isset(self::$list_of_filters[$this->ID])) {
             self::$list_of_filters[$this->ID] = null;
             $mainSecondHandPageID = self::main_second_hand_page_id();
-            if ($this->ID === $mainSecondHandPageID)  {
+            if ($this->ID === $mainSecondHandPageID) {
                 $stage = $this->getStage();
                 self::$list_of_filters = [];
                 $productIDs = $this->getProductsThatCanBePurchasedArray();
@@ -271,4 +254,18 @@ class SecondHandProductGroup extends ProductGroup
         return self::$_page_cache['SecondHandProductAlsoShowProductsIDs'][$this->ID];
     }
 
+    /**
+     * Level is within SiteTree hierarchy
+     * @return bool
+     */
+    protected function hasOtherSecondHandProductGroupsOnThisLevel()
+    {
+        if (! $this->ParentID) {
+            $this->ParentID = 0;
+        }
+        return SecondHandProductGroup::get()
+            ->filter(['ParentID' => $this->ParentID])
+            ->exclude(['ID' => $this->ID])
+            ->count() > 0 ? true : false;
+    }
 }
