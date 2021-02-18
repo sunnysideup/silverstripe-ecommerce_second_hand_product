@@ -229,7 +229,7 @@ class SecondHandProductGroup extends ProductGroup
                 $idArray[$row['ProductID']] = $row['ProductID'];
             }
             if ($this instanceof SecondHandProductGroup) {
-                $children = $this->ChildGroups(99)->column('ID');
+                $children = $this->ChildCategoriesBasedOnProducts(99)->column('ID');
                 $children += [$this->ID => $this->ID];
                 $sql = '
                     SELECT Product' . $stage . '.ID
