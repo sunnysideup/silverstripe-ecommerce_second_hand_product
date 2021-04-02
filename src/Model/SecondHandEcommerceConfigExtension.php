@@ -18,7 +18,6 @@ class SecondHandEcommerceConfigExtension extends DataExtension
 
     /**
      * Update Fields
-     * @return FieldList
      */
     public function updateCMSFields(FieldList $fields)
     {
@@ -30,6 +29,5 @@ class SecondHandEcommerceConfigExtension extends DataExtension
                 SiteTree::class
             )
         );
-        return $fields;
     }
 }

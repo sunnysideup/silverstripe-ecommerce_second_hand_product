@@ -746,10 +746,10 @@ class SecondHandProduct extends Product implements PermissionProvider
 
     public function populateDefaults()
     {
-        parent::populateDefaults();
         if (! $this->DateItemWasBought) {
             $this->DateItemWasBought = DBDatetime::now()->Rfc2822();
         }
+        return parent::populateDefaults();
     }
 
     public function getCreatedNice()
