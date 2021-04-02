@@ -25,14 +25,6 @@ class UpdateSecondHandProduct extends Controller
      */
     private static $secret_codes = [];
 
-    public function init()
-    {
-        parent::init();
-        if (! $this->MyPermissionCheck()) {
-            die('you do not have access');
-        }
-    }
-
     public function unpublish($request)
     {
         $unpublished = false;
@@ -76,5 +68,13 @@ class UpdateSecondHandProduct extends Controller
         $codesWithIPs = $this->Config()->get('secret_codes');
         $code = $this->request->param('ID');
         return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
+    }
+
+    protected function init()
+    {
+        parent::init();
+        if (! $this->MyPermissionCheck()) {
+            die('you do not have access');
+        }
     }
 }

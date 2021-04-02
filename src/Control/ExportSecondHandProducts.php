@@ -89,14 +89,6 @@ class ExportSecondHandProducts extends Controller
      */
     private static $url_segment_of_parent_field_name = 'ParentURLSegmentForImportExport';
 
-    public function init()
-    {
-        parent::init();
-        if (! $this->MyPermissionCheck()) {
-            die('you do not have access');
-        }
-    }
-
     public function products()
     {
         $withImageData = false;
@@ -116,28 +108,24 @@ class ExportSecondHandProducts extends Controller
             foreach ($products as $product) {
                 $productData = $product->toMap();
                 $archivedVersion = SecondHandArchive::get()->filter(['InternalItemID' => $product->InternalItemID])->first();
-                $productData['HasBeenArchived'] = $archivedVersion ? true : false;
+                $productData['HasBeenArchived'] = (bool) $archivedVersion;
                 $array[$count] = $productData;
                 foreach ($doNotCopy as $field) {
                     unset($array[$count][$field]);
                 }
                 if ($parent = $product->Parent()) {
-                    if ($parent->ID === $rootSecondHandPage->ID) {
-                        $array[$count][$parentURLSegmentField] = false;
-                    } else {
-                        $array[$count][$parentURLSegmentField] = $parent->URLSegment;
-                    }
+                    $array[$count][$parentURLSegmentField] = $parent->ID === $rootSecondHandPage->ID ? false : $parent->URLSegment;
                 }
                 $array[$count] += $this->addRelations($product, $relations);
                 if ($withImageData && isset($imageData[$product->InternalItemID])) {
                     $array[$count]['ImagesFileSize'] = $imageData[$product->InternalItemID];
                 }
                 //next one
-                $count++;
+                ++$count;
             }
         }
 
-        return $this->returnJSONorFile($array, '');
+        return $this->returnJSONorFile($array);
     }
 
     public function groups()
@@ -158,16 +146,12 @@ class ExportSecondHandProducts extends Controller
                         unset($array[$count][$field]);
                     }
                     if ($parent = $group->Parent()) {
-                        if ($parent->ID === $rootSecondHandPage->ID) {
-                            $array[$count][$parentURLSegmentField] = false;
-                        } else {
-                            $array[$count][$parentURLSegmentField] = $parent->URLSegment;
-                        }
+                        $array[$count][$parentURLSegmentField] = $parent->ID === $rootSecondHandPage->ID ? false : $parent->URLSegment;
                     }
                     $array[$count] += $this->addRelations($group, $relations);
 
                     //next one
-                    $count++;
+                    ++$count;
                 }
             }
         }
@@ -177,7 +161,7 @@ class ExportSecondHandProducts extends Controller
 
     public function images()
     {
-        $array = $this->getImageArray(false);
+        $array = $this->getImageArray();
         return $this->returnJSONorFile($array, 'images');
     }
 
@@ -191,6 +175,14 @@ class ExportSecondHandProducts extends Controller
         return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
     }
 
+    protected function init()
+    {
+        parent::init();
+        if (! $this->MyPermissionCheck()) {
+            die('you do not have access');
+        }
+    }
+
     protected function returnJSONorFile($array, $filenameAppendix = '')
     {
         if (Director::isDev()) {
@@ -198,7 +190,7 @@ class ExportSecondHandProducts extends Controller
         } else {
             $json = json_encode($array);
             $json = str_replace(["\t", "\r", "\n"], [' ', ' ', ' '], $json);
-            $json = preg_replace('/\s\s+/', ' ', $json);
+            $json = preg_replace('#\s\s+#', ' ', $json);
         }
         $fileName = $this->Config()->get('location_to_save_contents');
         if ($fileName) {
@@ -231,7 +223,7 @@ class ExportSecondHandProducts extends Controller
                     foreach ($relFields as $relField) {
                         $innerDataToBeAdded[$count][$relField] = $relItem->{$relField};
                     }
-                    $count++;
+                    ++$count;
                 }
             } elseif ($relData instanceof DataObject) {
                 foreach ($relFields as $relField) {
@@ -272,11 +264,7 @@ class ExportSecondHandProducts extends Controller
                 $oldFileLocationAbsolute = Director::baseFolder() . '/' . $image->FileName;
                 if (file_exists($oldFileLocationAbsolute)) {
                     $extension = pathinfo($image->FileName, PATHINFO_EXTENSION);
-                    if (! $extension) {
-                        $extension = 'jpg';
-                    } else {
-                        $extension = strtolower($extension);
-                    }
+                    $extension = $extension ? strtolower($extension) : 'jpg';
                     $name = $secondHandProduct->InternalItemID . '_' . $count . '.' . $extension;
                     $fileName = $folder->FileName . $name;
                     $title = $secondHandProduct->Title . ' #' . ($count + 1);
@@ -301,7 +289,7 @@ class ExportSecondHandProducts extends Controller
                         }
                     }
                 }
-                $count++;
+                ++$count;
             }
         }
 

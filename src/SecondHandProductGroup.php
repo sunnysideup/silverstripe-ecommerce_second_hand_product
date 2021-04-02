@@ -124,8 +124,6 @@ class SecondHandProductGroup extends ProductGroup
 
     /**
      * Returns the class we are working with.
-     *
-     * @return string
      */
     public function getBuyableClassName(): string
     {

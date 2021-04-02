@@ -82,7 +82,7 @@ class SecondHandProductAdmin extends ModelAdmin
     public function archive($request)
     {
         if (isset($_GET['productid'])) {
-            $id = intval($_GET['productid']);
+            $id = (int) $_GET['productid'];
             if ($id) {
                 $secondHandProduct = SecondHandProduct::get()->byID($id);
                 $currentMember = Security::getCurrentUser();
@@ -120,7 +120,7 @@ class SecondHandProductAdmin extends ModelAdmin
     public function restore($request)
     {
         if (isset($_GET['productid'])) {
-            $id = intval($_GET['productid']);
+            $id = (int) $_GET['productid'];
             if ($id) {
                 $restoredPage = Versioned::get_latest_version(SiteTree::class, $id);
                 $parentID = $restoredPage->ParentID;
@@ -128,7 +128,7 @@ class SecondHandProductAdmin extends ModelAdmin
                     var_dump($parentID);
                     $this->ensureParentHasVersion($parentID);
                     if (! $restoredPage) {
-                        return new HTTPResponse("SiteTree #${id} not found", 400);
+                        return new HTTPResponse("SiteTree #{$id} not found", 400);
                     }
                     $restoredPage = $restoredPage->doRestoreToStage();
                     //$restoredPage->doPublish();
@@ -143,7 +143,7 @@ class SecondHandProductAdmin extends ModelAdmin
                     $cmsEditLink = '/admin/secondhandproducts/SecondHandProduct/EditForm/field/SecondHandProduct/item/' . $id . '/edit';
                     return Controller::curr()->redirect($cmsEditLink);
                 }
-                return new HTTPResponse("Parent Page #${parentID} is missing", 400);
+                return new HTTPResponse("Parent Page #{$parentID} is missing", 400);
             }
         }
         return new HTTPResponse('ERROR!', 400);

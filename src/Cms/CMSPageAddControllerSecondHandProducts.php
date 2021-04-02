@@ -164,13 +164,13 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
             return Security::permissionFailure($this);
         }
 
-        $record = $this->getNewItem("new-${className}-${parentID}" . $suffix, false);
+        $record = $this->getNewItem("new-{$className}-{$parentID}" . $suffix, false);
         $this->extend('updateDoAdd', $record, $form);
 
         try {
             $record->write();
-        } catch (ValidationException $ex) {
-            foreach ($ex->getResult()->getMessages() as $messageArray) {
+        } catch (ValidationException $validationException) {
+            foreach ($validationException->getResult()->getMessages() as $messageArray) {
                 $form->sessionMessage($messageArray['message'], $messageArray['messageType']);
             }
 

@@ -102,15 +102,11 @@ class SecondHandArchive extends DataObject
 
     public static function create_from_page($page)
     {
-        if ($page->InternalItemID) {
-            $filter = [
-                'InternalItemID' => $page->InternalItemID,
-            ];
-        } else {
-            $filter = [
-                'PageID' => $page->ID,
-            ];
-        }
+        $filter = $page->InternalItemID ? [
+            'InternalItemID' => $page->InternalItemID,
+        ] : [
+            'PageID' => $page->ID,
+        ];
         $obj = SecondHandArchive::get()->filter($filter)->first();
         if (! $obj) {
             $obj = SecondHandArchive::create($filter);
