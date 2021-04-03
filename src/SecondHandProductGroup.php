@@ -13,12 +13,13 @@ class SecondHandProductGroup extends ProductGroup
     protected static $main_second_hand_page_cache = null;
 
     /**
-     *
      * @var string
      */
     protected static $groups_to_show_first = ProductGroup::class;
 
     protected static $list_of_filters = [];
+
+    protected static $_page_cache = [];
 
     private static $table_name = 'SecondHandProductGroup';
 
@@ -200,8 +201,6 @@ class SecondHandProductGroup extends ProductGroup
         }
         return self::$list_of_filters[$this->ID];
     }
-
-    protected static $_page_cache = [];
 
     /**
      * returns a list of Product IDs for Second Hand Products
