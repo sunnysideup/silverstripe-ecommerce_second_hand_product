@@ -180,7 +180,7 @@ class SecondHandArchive extends DataObject
      * stadard SS method
      * @return bool
      */
-    public function canDelete($member = null, $context = [])
+    public function canDelete($member = null)
     {
         return false;
     }

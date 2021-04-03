@@ -282,7 +282,7 @@ class SecondHandProduct extends Product implements PermissionProvider
      * standard SS method
      * @return bool
      */
-    public function canDelete($member = null, $context = [])
+    public function canDelete($member = null)
     {
         return Permission::check(
             EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
