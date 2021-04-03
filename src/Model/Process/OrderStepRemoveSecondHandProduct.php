@@ -28,7 +28,7 @@ class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInt
         'ShowAsInProcessOrder' => 1,
     ];
 
-    public function HideFromEveryone() : bool
+    public function HideFromEveryone(): bool
     {
         return true;
     }
