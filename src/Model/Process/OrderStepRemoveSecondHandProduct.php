@@ -40,11 +40,11 @@ class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInt
      *
      * @see Order::doNextStatus
      *
-     * @param Order $order object
+     * @param Order $order
      *
      * @return bool - true if the current step is ready to be run...
      **/
-    public function initStep(Order $order)
+    public function initStep(Order $order) : bool
     {
         return true;
     }
@@ -52,11 +52,11 @@ class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInt
     /**
      * Add a member to the order - in case he / she is not a shop admin.
      *
-     * @param Order $order object
+     * @param Order $order
      *
      * @return bool - true if run correctly.
      **/
-    public function doStep(Order $order)
+    public function doStep(Order $order) : bool
     {
         foreach ($order->Buyables() as $buyable) {
             if ($buyable instanceof SecondHandProduct) {
