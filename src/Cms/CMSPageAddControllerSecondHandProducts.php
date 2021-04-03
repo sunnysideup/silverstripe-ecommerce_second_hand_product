@@ -205,6 +205,7 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
                 $result->push($type);
             }
         }
+
         return $result;
     }
 }

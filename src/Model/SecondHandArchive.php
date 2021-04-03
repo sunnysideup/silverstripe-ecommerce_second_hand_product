@@ -144,11 +144,16 @@ class SecondHandArchive extends DataObject
         $obj->SellersIDPhotocopy = $page->SellersIDPhotocopy;
 
         $obj->write();
+
         return $obj;
     }
 
     /**
-     * stadard SS method
+     * stadard SS method.
+     *
+     * @param null|mixed $member
+     * @param mixed      $context
+     *
      * @return bool
      */
     public function canCreate($member = null, $context = [])
@@ -157,7 +162,11 @@ class SecondHandArchive extends DataObject
     }
 
     /**
-     * stadard SS method
+     * stadard SS method.
+     *
+     * @param null|mixed $member
+     * @param mixed      $context
+     *
      * @return bool
      */
     public function canEdit($member = null, $context = [])
@@ -166,7 +175,11 @@ class SecondHandArchive extends DataObject
     }
 
     /**
-     * stadard SS method
+     * stadard SS method.
+     *
+     * @param null|mixed $member
+     * @param mixed      $context
+     *
      * @return bool
      */
     public function canView($member = null, $context = [])
@@ -177,7 +190,10 @@ class SecondHandArchive extends DataObject
     }
 
     /**
-     * stadard SS method
+     * stadard SS method.
+     *
+     * @param null|mixed $member
+     *
      * @return bool
      */
     public function canDelete($member = null)
@@ -196,7 +212,8 @@ class SecondHandArchive extends DataObject
     }
 
     /**
-     * stadard SS method
+     * stadard SS method.
+     *
      * @return \SilverStripe\Forms\FieldList
      */
     public function getCMSFields()
@@ -239,6 +256,7 @@ class SecondHandArchive extends DataObject
                 $fields->dataFieldByName('SellersIDPhotocopy'),
             ]
         );
+
         return $fields;
     }
 }

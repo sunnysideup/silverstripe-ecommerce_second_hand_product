@@ -28,6 +28,7 @@ class SecondHandProductValue extends Report
             'EcommerceSideReport.SECOND_HAND_REPORT_TOTAL_STOCK_VALUE',
             'Second Hand Products, total stock value'
         );
+
         return $name . ': ' . $object->Nice();
     }
 
@@ -51,6 +52,8 @@ class SecondHandProductValue extends Report
 
     /**
      * working out the items.
+     *
+     * @param null|mixed $params
      *
      * @return \SilverStripe\ORM\DataList
      */

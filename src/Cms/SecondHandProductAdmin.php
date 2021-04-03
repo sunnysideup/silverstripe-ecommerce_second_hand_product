@@ -26,8 +26,7 @@ use Sunnysideup\GoogleAddressField\GoogleAddressField;
  * @authors: Nicolaas [at] Sunny Side Up .co.nz
  * @package: ecommerce
  * @sub-package: cms
- **/
-
+ */
 class SecondHandProductAdmin extends ModelAdmin
 {
     use EcommerceModelAdminTrait;
@@ -51,7 +50,8 @@ class SecondHandProductAdmin extends ModelAdmin
     ];
 
     /**
-     * standard SS variable
+     * standard SS variable.
+     *
      * @var string
      */
     private static $menu_icon = 'vendor/sunnysideup/ecommerce/client/images/icons/product-file.gif';
@@ -71,6 +71,7 @@ class SecondHandProductAdmin extends ModelAdmin
                 }
             }
         }
+
         return $form;
     }
 
@@ -110,10 +111,12 @@ class SecondHandProductAdmin extends ModelAdmin
                     );
                     $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandArchive::class);
                     $cmsEditLink = '/admin/secondhandproducts/' . $classURLSegment . '/EditForm/field/' . $classURLSegment . '/item/' . $archivedProduct->ID . '/edit';
+
                     return Controller::curr()->redirect($cmsEditLink);
                 }
             }
         }
+
         return new HTTPResponse('ERROR!', 400);
     }
 
@@ -141,16 +144,21 @@ class SecondHandProductAdmin extends ModelAdmin
                         ))
                     );
                     $cmsEditLink = '/admin/secondhandproducts/SecondHandProduct/EditForm/field/SecondHandProduct/item/' . $id . '/edit';
+
                     return Controller::curr()->redirect($cmsEditLink);
                 }
+
                 return new HTTPResponse("Parent Page #{$parentID} is missing", 400);
             }
         }
+
         return new HTTPResponse('ERROR!', 400);
     }
 
     /**
-     * little hack to fix parent if it is not versioned into versions table
+     * little hack to fix parent if it is not versioned into versions table.
+     *
+     * @param mixed $parentID
      */
     public function ensureParentHasVersion($parentID)
     {

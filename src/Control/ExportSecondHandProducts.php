@@ -37,17 +37,18 @@ class ExportSecondHandProducts extends Controller
     ];
 
     /**
-     * in the following format:
+     * in the following format:.
      *
      * AnyRelationA => (ForeignDBField1, ForeignDBField2, etc...)
      * AnyRelationB => (ForeignDBField1, ForeignDBField2, etc...)
      * d
+     *
      * @var array
      */
     private static $relationships_to_include_with_groups = [];
 
     /**
-     * in the following format:
+     * in the following format:.
      *
      * AnyRelationA => (ForeignDBField1, ForeignDBField2, etc...)
      * AnyRelationB => (ForeignDBField1, ForeignDBField2, etc...)
@@ -65,13 +66,15 @@ class ExportSecondHandProducts extends Controller
     ];
 
     /**
-     * where will the data be saved (if any)
+     * where will the data be saved (if any).
+     *
      * @var string
      */
     private static $location_to_save_contents = '';
 
     /**
-     * where will the data be saved (if any)
+     * where will the data be saved (if any).
+     *
      * @var string
      */
     private static $folder_for_second_hand_images = 'second-hand-images';
@@ -79,7 +82,8 @@ class ExportSecondHandProducts extends Controller
     /**
      * make the page less easy to access
      * (but still accessible)
-     * - code => ip address
+     * - code => ip address.
+     *
      * @var string
      */
     private static $secret_codes = [];
@@ -162,6 +166,7 @@ class ExportSecondHandProducts extends Controller
     public function images()
     {
         $array = $this->getImageArray();
+
         return $this->returnJSONorFile($array, 'images');
     }
 
@@ -172,6 +177,7 @@ class ExportSecondHandProducts extends Controller
     {
         $codesWithIPs = $this->Config()->get('secret_codes');
         $code = $this->request->param('ID');
+
         return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
     }
 
@@ -202,12 +208,13 @@ class ExportSecondHandProducts extends Controller
             die('COMPLETED');
         }
         $this->response->addHeader('Content-Type', 'application/json');
+
         return $json;
     }
 
     /**
      * @param DataObject $currentObject the object we are exporting
-     * @param array $relations  the array of fields to be added
+     * @param array      $relations     the array of fields to be added
      *
      * @return array
      */

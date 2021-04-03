@@ -40,7 +40,7 @@ class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepIn
      * @see Order::doNextStatus
      *
      * @return bool - true if the current step is ready to be run...
-     **/
+     */
     public function initStep(Order $order): bool
     {
         return true;
@@ -49,8 +49,8 @@ class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepIn
     /**
      * Add a member to the order - in case he / she is not a shop admin.
      *
-     * @return bool - true if run correctly.
-     **/
+     * @return bool - true if run correctly
+     */
     public function doStep(Order $order): bool
     {
         foreach ($order->Buyables() as $buyable) {
@@ -64,6 +64,7 @@ class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepIn
                 }
             }
         }
+
         return true;
     }
 

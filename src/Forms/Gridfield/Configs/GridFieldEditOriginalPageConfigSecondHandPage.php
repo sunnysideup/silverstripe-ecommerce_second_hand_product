@@ -23,6 +23,7 @@ class GridFieldEditOriginalPageConfigSecondHandPage extends GridFieldConfig_Reco
             ->removeComponentsByType(GridFieldDeleteAction::class)
             ->removeComponentsByType(GridFieldAddNewButton::class)
             ->removeComponentsByType(GridFieldAddNewButtonOriginalPage::class)
-            ->addComponent(new GridFieldAddNewButtonOriginalPageSecondHandProduct());
+            ->addComponent(new GridFieldAddNewButtonOriginalPageSecondHandProduct())
+        ;
     }
 }

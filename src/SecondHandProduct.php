@@ -44,6 +44,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     /**
      * halt purchase for ... number of days
      * from the day of creation.
+     *
      * @var int
      */
     private static $embargo_number_of_days = 0;
@@ -51,19 +52,22 @@ class SecondHandProduct extends Product implements PermissionProvider
     /**
      * halt purchase for ... number of days
      * from the day of creation.
+     *
      * @var int
      */
     private static $max_number_of_days_for_sale = 999;
 
     /**
      * Restrict GoogleAddressField to a specific Country
-     * E.g. for New Zealand, $country_code =  'NZ'
+     * E.g. for New Zealand, $country_code =  'NZ'.
+     *
      * @var string
      */
     private static $country_code = null;
 
     /**
-     * stadard SS declaration
+     * stadard SS declaration.
+     *
      * @var array
      */
     private static $table_name = 'SecondHandProduct';
@@ -196,7 +200,8 @@ class SecondHandProduct extends Product implements PermissionProvider
     private static $second_hand_admin_user_password = '';
 
     /**
-     * standard SS declaration
+     * standard SS declaration.
+     *
      * @var string
      */
     private static $icon = 'sunnysideup/ecommerce_second_hand_product: client/images/treeicons/SecondHandProduct-file.gif';
@@ -212,7 +217,8 @@ class SecondHandProduct extends Product implements PermissionProvider
     private static $plural_name = 'SecondHand Products';
 
     /**
-     * standard SS declaration
+     * standard SS declaration.
+     *
      * @var string
      */
     private static $description = 'This page displays a single secondhand product that can only be sold once';
@@ -226,6 +232,7 @@ class SecondHandProduct extends Product implements PermissionProvider
                 $array[] = $this->{$field};
             }
         }
+
         return implode('; ', $array);
     }
 
@@ -240,7 +247,11 @@ class SecondHandProduct extends Product implements PermissionProvider
     }
 
     /**
-     * standard SS method
+     * standard SS method.
+     *
+     * @param null|mixed $member
+     * @param mixed      $context
+     *
      * @return bool
      */
     public function canCreate($member = null, $context = [])
@@ -253,7 +264,10 @@ class SecondHandProduct extends Product implements PermissionProvider
     }
 
     /**
-     * standard SS method
+     * standard SS method.
+     *
+     * @param null|mixed $member
+     *
      * @return bool
      */
     public function canPublish($member = null)
@@ -266,7 +280,11 @@ class SecondHandProduct extends Product implements PermissionProvider
     }
 
     /**
-     * standard SS method
+     * standard SS method.
+     *
+     * @param null|mixed $member
+     * @param mixed      $context
+     *
      * @return bool
      */
     public function canEdit($member = null, $context = [])
@@ -279,7 +297,10 @@ class SecondHandProduct extends Product implements PermissionProvider
     }
 
     /**
-     * standard SS method
+     * standard SS method.
+     *
+     * @param null|mixed $member
+     *
      * @return bool
      */
     public function canDelete($member = null)
@@ -293,7 +314,7 @@ class SecondHandProduct extends Product implements PermissionProvider
 
     public function onBeforeDelete()
     {
-        if (Versioned::get_stage() !== 'Stage') {
+        if ('Stage' !== Versioned::get_stage()) {
             //do nothing
         } else {
             //page is being deleted permanently so create archived version
@@ -303,7 +324,8 @@ class SecondHandProduct extends Product implements PermissionProvider
     }
 
     /**
-     * stadard SS method
+     * stadard SS method.
+     *
      * @return \SilverStripe\Forms\FieldList
      */
     public function getCMSFields()
@@ -577,6 +599,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     public function CMSEditLink()
     {
         $sanitisedClassName = ClassHelpers::sanitise_class_name($this->ClassName);
+
         return Controller::join_links(
             singleton(SecondHandProductAdmin::class)->Link(),
             $sanitisedClassName,
@@ -593,12 +616,13 @@ class SecondHandProduct extends Product implements PermissionProvider
     {
         $fields = parent::getSettingsFields();
         $fields->removeByName('ParentID');
+
         return $fields;
     }
 
     public static function get_treshold_sql(): string
     {
-        if (self::$treshold_sql_cache === '') {
+        if ('' === self::$treshold_sql_cache) {
             $stage = self::get_stage();
             $daysMin = intval(Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days'));
             $minThreshold = date(
@@ -621,6 +645,7 @@ class SecondHandProduct extends Product implements PermissionProvider
                 )
             ';
         }
+
         return self::$treshold_sql_cache;
     }
 
@@ -642,6 +667,7 @@ class SecondHandProduct extends Product implements PermissionProvider
                 return false;
             }
         }
+
         return parent::canPurchase($member, $checkPrice);
     }
 
@@ -653,6 +679,7 @@ class SecondHandProduct extends Product implements PermissionProvider
         if ($this->DateItemWasSold) {
             return true;
         }
+
         return false;
     }
 
@@ -705,12 +732,14 @@ class SecondHandProduct extends Product implements PermissionProvider
             'help' => EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_help'),
             'sort' => 250,
         ];
+
         return $perms;
     }
 
     public function requireDefaultRecords()
     {
         parent::requireDefaultRecords();
+
         return PermissionProviderFactory::inst()
             ->setEmail(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email'))
             ->setFirstName(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_firstname'))
@@ -726,7 +755,8 @@ class SecondHandProduct extends Product implements PermissionProvider
                     'CMS_ACCESS_SecondHandProductAdmin',
                 ]
             )
-            ->CreateGroupAndMember();
+            ->CreateGroupAndMember()
+        ;
     }
 
     public function onAferSubmit($order)
@@ -741,6 +771,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     {
         $fields = $this->summaryFields();
         unset($fields['Image.CMSThumbnail']);
+
         return $fields;
     }
 
@@ -749,6 +780,7 @@ class SecondHandProduct extends Product implements PermissionProvider
         if (! $this->DateItemWasBought) {
             $this->DateItemWasBought = DBDatetime::now()->Rfc2822();
         }
+
         return parent::populateDefaults();
     }
 
@@ -759,6 +791,7 @@ class SecondHandProduct extends Product implements PermissionProvider
         } else {
             $date = $this->Created;
         }
+
         return $date . ' = ' . DBField::create_field(DBDate::class, $date)->Ago();
     }
 
@@ -768,9 +801,10 @@ class SecondHandProduct extends Product implements PermissionProvider
     protected static function get_stage()
     {
         $stage = '';
-        if (Versioned::get_stage() === 'Live') {
+        if ('Live' === Versioned::get_stage()) {
             $stage = '_Live';
         }
+
         return $stage;
     }
 }

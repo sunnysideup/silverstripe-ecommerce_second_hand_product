@@ -59,12 +59,14 @@ class SecondHandProductGroup extends ProductGroup
                 self::$main_second_hand_page_cache = Injector::inst()->get(SecondHandProductGroup::class)->BestRootParentPage();
             }
         }
+
         return self::$main_second_hand_page_cache;
     }
 
     public static function main_second_hand_page_id(): int
     {
         $page = self::main_second_hand_page();
+
         return $page ? $page->ID : 0;
     }
 
@@ -88,6 +90,7 @@ class SecondHandProductGroup extends ProductGroup
                 _t('SecondHandProductGroup.LANDING_PAGE', 'Landing Page')
             )->setValue($this->dbObject('RootParent')->Nice())
         );
+
         return $fields;
     }
 
@@ -127,6 +130,7 @@ class SecondHandProductGroup extends ProductGroup
         if ($obj) {
             return $obj;
         }
+
         return SecondHandProductGroup::get()->first();
     }
 
@@ -139,7 +143,7 @@ class SecondHandProductGroup extends ProductGroup
     }
 
     /**
-     * @return GroupedList|null
+     * @return null|GroupedList
      */
     public function ListOfFilters()
     {
@@ -179,7 +183,8 @@ class SecondHandProductGroup extends ProductGroup
                 }
 
                 $firstList = ProductGroup::get()
-                    ->filter(['ID' => $idArray]);
+                    ->filter(['ID' => $idArray])
+                ;
                 $uselessParents = [];
                 foreach ($firstList as $item) {
                     if (isset($idArray[$item->ParentID]) || isset($uselessParents[$item->ParentID])) {
@@ -195,16 +200,19 @@ class SecondHandProductGroup extends ProductGroup
                 $list = ProductGroup::get()
                     ->filter(['ID' => $idArray])
                     ->exclude(['ID' => self::main_second_hand_page_id()])
-                    ->sort('IF("ClassName" = \'' . addslashes($this->Config()->groups_to_show_first) . '\', 1, 0) ASC, Title ASC');
+                    ->sort('IF("ClassName" = \'' . addslashes($this->Config()->groups_to_show_first) . '\', 1, 0) ASC, Title ASC')
+                ;
                 self::$list_of_filters[$this->ID] = GroupedList::create($list);
             }
         }
+
         return self::$list_of_filters[$this->ID];
     }
 
     /**
      * returns a list of Product IDs for Second Hand Products
-     * linked to this Second Hand Product Group
+     * linked to this Second Hand Product Group.
+     *
      * @return string
      */
     public function SecondHandProductAlsoShowProductsIDs()
@@ -255,11 +263,13 @@ class SecondHandProductGroup extends ProductGroup
             }
             self::$_page_cache['SecondHandProductAlsoShowProductsIDs'][$this->ID] = implode(',', $idArray);
         }
+
         return self::$_page_cache['SecondHandProductAlsoShowProductsIDs'][$this->ID];
     }
 
     /**
-     * Level is within SiteTree hierarchy
+     * Level is within SiteTree hierarchy.
+     *
      * @return bool
      */
     protected function hasOtherSecondHandProductGroupsOnThisLevel()
@@ -267,6 +277,7 @@ class SecondHandProductGroup extends ProductGroup
         if (! $this->ParentID) {
             $this->ParentID = 0;
         }
+
         return SecondHandProductGroup::get()
             ->filter(['ParentID' => $this->ParentID])
             ->exclude(['ID' => $this->ID])

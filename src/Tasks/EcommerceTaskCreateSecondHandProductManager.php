@@ -15,7 +15,7 @@ use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
  * @package: ecommerce
  * @sub-package: tasks
  * @inspiration: Silverstripe Ltd, Jeremy
- **/
+ */
 class EcommerceTaskCreateSecondHandProductManager extends BuildTask
 {
     protected $title = 'Create e-commerce Second Hand Product Manager';
@@ -52,6 +52,7 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask
                     'CMS_ACCESS_SecondHandProductAdmin',
                 ]
             )
-            ->CreateGroupAndMember();
+            ->CreateGroupAndMember()
+        ;
     }
 }

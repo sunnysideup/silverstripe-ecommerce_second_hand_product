@@ -9,9 +9,14 @@ use Sunnysideup\Ecommerce\Model\Address\EcommerceCountry;
 class ControllerPermissionChecker extends Controller
 {
     /**
-     * checks that the url is contains the secret code and is coming from the correct IP address (if not set to wildcard)
+     * checks that the url is contains the secret code and is coming from the correct IP address (if not set to wildcard).
+     *
      * @var array
      * @var array - ID parameter in URL
+     *
+     * @param mixed $codesWithIPs
+     * @param mixed $code
+     *
      * @return bool
      */
     public static function permissionCheck($codesWithIPs, $code)
@@ -22,12 +27,13 @@ class ControllerPermissionChecker extends Controller
             if ($code) {
                 $testIP = isset($codesWithIPs[$code]) ? $codesWithIPs[$code] : false;
                 if ($testIP) {
-                    if ($testIP === $ip || $testIP === '*') {
+                    if ($testIP === $ip || '*' === $testIP) {
                         return true;
                     }
                 }
             }
         }
+
         return Permission::check('ADMIN');
     }
 }

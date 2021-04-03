@@ -8,7 +8,7 @@ use SilverStripe\Forms\TreeDropdownField;
 use SilverStripe\ORM\DataExtension;
 
 /**
- * <a href="$EcomConfig.SecondHandExplanationPage.Link">$EcomConfig.SecondHandExplanationPage.Title</a>
+ * <a href="$EcomConfig.SecondHandExplanationPage.Link">$EcomConfig.SecondHandExplanationPage.Title</a>.
  */
 class SecondHandEcommerceConfigExtension extends DataExtension
 {
@@ -17,7 +17,7 @@ class SecondHandEcommerceConfigExtension extends DataExtension
     ];
 
     /**
-     * Update Fields
+     * Update Fields.
      */
     public function updateCMSFields(FieldList $fields)
     {

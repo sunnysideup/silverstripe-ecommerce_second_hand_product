@@ -48,6 +48,7 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
         ]);
 
         $templates = SSViewer::get_templates_by_class($this, '', GridFieldAddNewButton::class);
+
         return [
             $this->targetFragment => $data->renderWith($templates),
         ];
@@ -56,7 +57,7 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
     /**
      * finds the most likely root parent for the shop.
      *
-     * @return \SilverStripe\CMS\Model\SiteTree|null
+     * @return null|\SilverStripe\CMS\Model\SiteTree
      */
     public function BestRootParentPage()
     {

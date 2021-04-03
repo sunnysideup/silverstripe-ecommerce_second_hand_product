@@ -20,7 +20,8 @@ class UpdateSecondHandProduct extends Controller
     /**
      * make the page less easy to access
      * (but still accessible)
-     * - code => ip address
+     * - code => ip address.
+     *
      * @var string
      */
     private static $secret_codes = [];
@@ -36,6 +37,7 @@ class UpdateSecondHandProduct extends Controller
                 $unpublished = $secondHandProduct->deleteFromStage('Live');
             }
         }
+
         return json_encode($unpublished);
     }
 
@@ -53,10 +55,11 @@ class UpdateSecondHandProduct extends Controller
             if (is_a($secondHandProduct, EcommerceConfigClassNames::getName(SiteTree::class))) {
                 $archived = $secondHandProduct->deleteFromStage('Live');
                 $archived = $secondHandProduct->deleteFromStage('Stage');
-            } elseif ($secondHandProduct !== null) {
+            } elseif (null !== $secondHandProduct) {
                 $archived = $secondHandProduct->delete();
             }
         }
+
         return json_encode($archived);
     }
 
@@ -67,6 +70,7 @@ class UpdateSecondHandProduct extends Controller
     {
         $codesWithIPs = $this->Config()->get('secret_codes');
         $code = $this->request->param('ID');
+
         return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
     }
 

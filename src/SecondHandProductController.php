@@ -22,6 +22,7 @@ class SecondHandProductController extends ProductController
         if (! Permission::check('CMS_ACCESS_SECOND_HAND_PRODUCTS')) {
             return Security::permissionFailure($this, 'You do not have access to this feature, please login first.');
         }
+
         return $this->RenderWith('SecondHandProduct_printview');
     }
 
@@ -59,6 +60,7 @@ class SecondHandProductController extends ProductController
                 )
             );
         }
+
         return $al;
     }
 }
