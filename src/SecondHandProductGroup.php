@@ -5,11 +5,18 @@ namespace Sunnysideup\EcommerceSecondHandProduct;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\GroupedList;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 
 class SecondHandProductGroup extends ProductGroup
 {
     protected static $main_second_hand_page_cache = null;
+
+    /**
+     *
+     * @var string
+     */
+    protected static $groups_to_show_first = ProductGroup::class;
 
     protected static $list_of_filters = [];
 
@@ -187,14 +194,14 @@ class SecondHandProductGroup extends ProductGroup
                 $list = ProductGroup::get()
                     ->filter(['ID' => $idArray])
                     ->exclude(['ID' => self::main_second_hand_page_id()])
-                    ->sort('IF("ClassName" = \'' . BrandPage::class . '\', 1, 0) ASC, Title ASC');
-                self::$list_of_filters[$this->ID] = GroupedList::create(
-                    $list
-                );
+                    ->sort('IF("ClassName" = \'' . add_slashes($this->Config()->groups_to_show_first) . '\', 1, 0) ASC, Title ASC');
+                self::$list_of_filters[$this->ID] = GroupedList::create($list);
             }
         }
         return self::$list_of_filters[$this->ID];
     }
+
+    protected static $_page_cache = [];
 
     /**
      * returns a list of Product IDs for Second Hand Products
@@ -227,7 +234,7 @@ class SecondHandProductGroup extends ProductGroup
                 $idArray[$row['ProductID']] = $row['ProductID'];
             }
             if ($this instanceof SecondHandProductGroup) {
-                $children = $this->ChildCategoriesBasedOnProducts(99)->column('ID');
+                $children = $this->ChildCategoriesBasedOnProducts()->column('ID');
                 $children += [$this->ID => $this->ID];
                 $sql = '
                     SELECT Product' . $stage . '.ID

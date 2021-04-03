@@ -37,7 +37,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     /**
      * @var string
      */
-    protected $treshold_sql_cache = '';
+    protected static $treshold_sql_cache = '';
 
     private static $can_be_root = false;
 
@@ -612,7 +612,7 @@ class SecondHandProduct extends Product implements PermissionProvider
             );
             self::$treshold_sql_cache = '
                 (
-                    "SiteTree' . $stage . '"."Created" < \'' . $threshold . '\' OR
+                    "SiteTree' . $stage . '"."Created" < \'' . $maxThreshold . '\' OR
                     (
                         SecondHandProduct' . $stage . '.DateItemWasBought IS NOT NULL AND
                         SecondHandProduct' . $stage . '.DateItemWasBought > \'' . $minThreshold . '\' AND
