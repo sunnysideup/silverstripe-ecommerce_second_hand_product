@@ -194,7 +194,7 @@ class SecondHandProductGroup extends ProductGroup
                 $list = ProductGroup::get()
                     ->filter(['ID' => $idArray])
                     ->exclude(['ID' => self::main_second_hand_page_id()])
-                    ->sort('IF("ClassName" = \'' . add_slashes($this->Config()->groups_to_show_first) . '\', 1, 0) ASC, Title ASC');
+                    ->sort('IF("ClassName" = \'' . addslashes($this->Config()->groups_to_show_first) . '\', 1, 0) ASC, Title ASC');
                 self::$list_of_filters[$this->ID] = GroupedList::create($list);
             }
         }
