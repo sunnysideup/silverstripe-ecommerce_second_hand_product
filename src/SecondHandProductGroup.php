@@ -19,7 +19,7 @@ class SecondHandProductGroup extends ProductGroup
 
     protected static $list_of_filters = [];
 
-    protected static $_page_cache = [];
+    protected static $_page_cache_ids = [];
 
     private static $table_name = 'SecondHandProductGroup';
 
@@ -217,9 +217,9 @@ class SecondHandProductGroup extends ProductGroup
      */
     public function SecondHandProductAlsoShowProductsIDs()
     {
-        if (! isset(self::$_page_cache['SecondHandProductAlsoShowProductsIDs'][$this->ID])) {
+        if (! isset(self::$_page_cache_ids['SecondHandProductAlsoShowProductsIDs'][$this->ID])) {
             $stage = $this->getStage();
-            self::$_page_cache['SecondHandProductAlsoShowProductsIDs'] = [];
+            self::$_page_cache_ids['SecondHandProductAlsoShowProductsIDs'] = [];
             $tresholdSQL = SecondHandProduct::get_treshold_sql();
             $sql = '
                 SELECT ProductID
@@ -261,10 +261,10 @@ class SecondHandProductGroup extends ProductGroup
                     $idArray[$row['ID']] = $row['ID'];
                 }
             }
-            self::$_page_cache['SecondHandProductAlsoShowProductsIDs'][$this->ID] = implode(',', $idArray);
+            self::$_page_cache_ids['SecondHandProductAlsoShowProductsIDs'][$this->ID] = implode(',', $idArray);
         }
 
-        return self::$_page_cache['SecondHandProductAlsoShowProductsIDs'][$this->ID];
+        return self::$_page_cache_ids['SecondHandProductAlsoShowProductsIDs'][$this->ID];
     }
 
     /**
