@@ -241,7 +241,7 @@ class SecondHandProductGroup extends ProductGroup
                 $idArray[$row['ProductID']] = $row['ProductID'];
             }
             if ($this instanceof SecondHandProductGroup) {
-                $children = $this->ChildCategoriesBasedOnProducts()->column('ID');
+                $children = $this->ChildCategoriesBasedOnProducts()->columnUnique();
                 $children += [$this->ID => $this->ID];
                 $sql = '
                     SELECT Product' . $stage . '.ID
@@ -256,7 +256,7 @@ class SecondHandProductGroup extends ProductGroup
                         ' . $tresholdSQL . ';';
 
                 $rows = DB::query($sql);
-                // $myProductArray = $this->ProductsShowable($tresholdSQL)->column('ID');
+                // $myProductArray = $this->ProductsShowable($tresholdSQL)->columnUnique();
                 foreach ($rows as $row) {
                     $idArray[$row['ID']] = $row['ID'];
                 }
