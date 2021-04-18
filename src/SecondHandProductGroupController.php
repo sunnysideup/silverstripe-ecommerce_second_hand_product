@@ -47,11 +47,6 @@ class SecondHandProductGroupController extends ProductGroupController
         //uncompleted
     }
 
-    public function HasSearchFilterAndSort()
-    {
-        return true;
-    }
-
     protected function init()
     {
         Config::modify()->update(
