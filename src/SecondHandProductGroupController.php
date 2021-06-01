@@ -8,6 +8,7 @@ use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\RequiredFields;
 use SilverStripe\Forms\TextField;
+use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 use Sunnysideup\Ecommerce\Pages\ProductGroupController;
 
@@ -56,5 +57,20 @@ class SecondHandProductGroupController extends ProductGroupController
         );
         parent::init();
         $this->showFullList = true;
+    }
+
+    /**
+     * Do we show all products on one page?
+     *
+     * @return bool
+     */
+    public function IsShowFullList() : bool
+    {
+        return true;
+    }
+
+    protected function MaxNumberOfProductsPerPageAbsolute(): int
+    {
+        return EcommerceConfig::get(SecondHandProductGroup::class, 'maximum_number_of_products_to_list') + 1;
     }
 }

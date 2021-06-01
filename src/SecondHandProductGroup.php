@@ -3,19 +3,21 @@
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
 use SilverStripe\ORM\GroupedList;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 
 class SecondHandProductGroup extends ProductGroup
 {
-    protected static $main_second_hand_page_cache = null;
-
     /**
      * @var string
      */
     protected static $groups_to_show_first = ProductGroup::class;
+
+    protected static $main_second_hand_page_cache = null;
 
     protected static $list_of_filters = [];
 
@@ -50,6 +52,8 @@ class SecondHandProductGroup extends ProductGroup
      * @var string
      */
     private static $description = 'A product category page specifically for second had products';
+
+    private static $maximum_number_of_products_to_list = 999;
 
     public static function main_second_hand_page()
     {
@@ -169,7 +173,7 @@ class SecondHandProductGroup extends ProductGroup
                     WHERE
                         "ProductID" IN (' . implode(',', $productIDs) . ') AND
                         "AllowPurchase" = 1 AND
-                        ' . $this->getThresholdSQL() . '
+                        ' . SecondHandProduct::get_treshold_sql() . '
                     GROUP BY ProductGroupID;
                 ';
                 $rows = DB::query($sql);
