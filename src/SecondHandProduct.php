@@ -595,6 +595,7 @@ class SecondHandProduct extends Product implements PermissionProvider
                 ReadonlyField::create('HasBeenSoldNice', 'Has been sold', ($this->HasBeenSold() ? 'YES' : 'NO')),
             ]
         );
+
         return $fields;
     }
 
@@ -671,14 +672,14 @@ class SecondHandProduct extends Product implements PermissionProvider
         return parent::canPurchase($member, $checkPrice);
     }
 
-    public function isListed() : bool
+    public function isListed(): bool
     {
         return SecondHandProduct::get()
             ->where(self::get_treshold_sql())
             ->byId($this->ID) ? true : false;
     }
 
-    public function isUnderEmbargo() : bool
+    public function isUnderEmbargo(): bool
     {
         $embargoDays = Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
         if (intval($embargoDays) > 0) {
@@ -693,9 +694,11 @@ class SecondHandProduct extends Product implements PermissionProvider
                 return true;
             }
         }
+
         return false;
     }
-    public function didNotSell() : bool
+
+    public function didNotSell(): bool
     {
         $embargoDays = Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
         if (intval($embargoDays) > 0) {
@@ -710,6 +713,7 @@ class SecondHandProduct extends Product implements PermissionProvider
                 return true;
             }
         }
+
         return false;
     }
 
