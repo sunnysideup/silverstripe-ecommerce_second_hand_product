@@ -138,6 +138,14 @@ class SecondHandProductGroup extends ProductGroup
         return SecondHandProductGroup::get()->first();
     }
 
+    protected function hasOtherSecondHandProductGroupsOnThisLevel() : bool
+    {
+        return SecondHandProductGroup::get()
+            ->filter(['ParentID' => $this->ParentID ?: 0])
+            ->exclude(['ID' => $this->ID])
+            ->count() > 0;
+    }
+
     /**
      * Returns the class we are working with.
      */
