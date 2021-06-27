@@ -148,6 +148,6 @@ class SecondHandProductGroup extends ProductGroup
         return SecondHandProductGroup::get()
             ->filter(['ParentID' => $this->ParentID ?: 0])
             ->exclude(['ID' => $this->ID])
-            ->count() > 0;
+            ->exists();
     }
 }

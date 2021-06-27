@@ -373,7 +373,7 @@ class SecondHandProduct extends Product implements PermissionProvider
             ]
         );
         $secondhandProductCategories = SecondHandProductGroup::get();
-        if ($secondhandProductCategories->count()) {
+        if ($secondhandProductCategories->exists()) {
             $fields->addFieldToTab(
                 'Root.Main',
                 $categoryField = DropdownField::create(
