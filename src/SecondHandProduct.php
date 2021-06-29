@@ -374,7 +374,7 @@ class SecondHandProduct extends Product implements PermissionProvider
             ]
         );
         $secondhandProductCategories = SecondHandProductGroup::get();
-        if ($secondhandProductCategories->count()) {
+        if ($secondhandProductCategories->exists()) {
             $fields->addFieldToTab(
                 'Root.Main',
                 $categoryField = DropdownField::create(
@@ -588,6 +588,14 @@ class SecondHandProduct extends Product implements PermissionProvider
             );
             $fields->replaceField('DateItemWasSold', DateField::create('DateItemWasSold', 'Date this item was sold'));
         }
+        $fields->addFieldsToTab(
+            'Root.Status',
+            [
+                ReadonlyField::create('isListedNice', 'Is listed', ($this->isListed() ? 'YES' : 'NO')),
+                ReadonlyField::create('isUnderEmbargoNice', 'Is under embargo', ($this->isUnderEmbargo() ? 'YES' : 'NO')),
+                ReadonlyField::create('HasBeenSoldNice', 'Has been sold', ($this->HasBeenSold() ? 'YES' : 'NO')),
+            ]
+        );
 
         return $fields;
     }
@@ -655,6 +663,25 @@ class SecondHandProduct extends Product implements PermissionProvider
         if ($this->HasBeenSold()) {
             return false;
         }
+        if ($this->isUnderEmbargo()) {
+            return false;
+        }
+        if (! $this->isListed()) {
+            return false;
+        }
+
+        return parent::canPurchase($member, $checkPrice);
+    }
+
+    public function isListed(): bool
+    {
+        return SecondHandProduct::get()
+            ->where(self::get_treshold_sql())
+            ->byId($this->ID) ? true : false;
+    }
+
+    public function isUnderEmbargo(): bool
+    {
         $embargoDays = Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
         if (intval($embargoDays) > 0) {
             if ($this->DateItemWasBought) {
@@ -665,11 +692,30 @@ class SecondHandProduct extends Product implements PermissionProvider
             $createdDate = strtotime($date);
             $daysOld = (time() - $createdDate) / (60 * 60 * 24);
             if ($daysOld <= $embargoDays) {
-                return false;
+                return true;
             }
         }
 
-        return parent::canPurchase($member, $checkPrice);
+        return false;
+    }
+
+    public function didNotSell(): bool
+    {
+        $embargoDays = Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
+        if (intval($embargoDays) > 0) {
+            if ($this->DateItemWasBought) {
+                $date = $this->DateItemWasBought;
+            } else {
+                $date = $this->Created;
+            }
+            $createdDate = strtotime($date);
+            $daysOld = (time() - $createdDate) / (60 * 60 * 24);
+            if ($daysOld <= $embargoDays) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function HasBeenSold(): bool

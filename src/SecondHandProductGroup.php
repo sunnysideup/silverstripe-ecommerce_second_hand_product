@@ -3,11 +3,8 @@
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\DB;
-use SilverStripe\ORM\GroupedList;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 
 class SecondHandProductGroup extends ProductGroup
@@ -146,4 +143,11 @@ class SecondHandProductGroup extends ProductGroup
         return SecondHandProduct::class;
     }
 
+    protected function hasOtherSecondHandProductGroupsOnThisLevel(): bool
+    {
+        return SecondHandProductGroup::get()
+            ->filter(['ParentID' => $this->ParentID ?: 0])
+            ->exclude(['ID' => $this->ID])
+            ->exists();
+    }
 }
