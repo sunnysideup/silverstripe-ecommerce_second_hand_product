@@ -3,6 +3,7 @@
 namespace Sunnysideup\EcommerceSecondHandProduct\Model;
 
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
@@ -89,9 +90,17 @@ class SecondHandArchive extends DataObject
 
     private static $searchable_fields = [
         'Title' => 'PartialMatchFilter',
-        'Price' => 'ExactMatchFilter',
+        'Price' => [
+            'title' => 'Sale Price',
+            'field' => NumericField::class,
+            'filter' => 'ExactMatchFilter',
+        ],
         'InternalItemID' => 'PartialMatchFilter',
-        'PurchasePrice' => 'ExactMatchFilter',
+        'PurchasePrice' => [
+            'title' => 'Purchase Price',
+            'field' => NumericField::class,
+            'filter' => 'ExactMatchFilter',
+        ],
         'ProductQuality' => 'ExactMatchFilter',
         'IncludesBoxOrCase' => 'ExactMatchFilter',
         'OriginalManual' => 'ExactMatchFilter',

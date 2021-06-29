@@ -124,13 +124,20 @@ class SecondHandProduct extends Product implements PermissionProvider
      * Standard SS variable.
      */
     private static $summary_fields = [
-        'Image.CMSThumbnail' => 'Image',
-        'Title' => 'Title',
-        'InternalItemID' => 'Code',
-        'Price' => 'Price',
-        'AllowPurchaseNice' => 'For Sale',
-        'CreatedNice' => 'Entered',
+
     ];
+
+    public function SummaryFields()
+    {
+        return [
+            'Image.CMSThumbnail' => 'Image',
+            'Title' => 'Title',
+            'InternalItemID' => 'Code',
+            'Price' => 'Price',
+            'AllowPurchaseNice' => 'For Sale',
+            'CreatedNice' => 'Entered',
+        ];
+    }
 
     private static $seller_summary_detail_fields = [
         'SellersName',
@@ -175,7 +182,11 @@ class SecondHandProduct extends Product implements PermissionProvider
             'filter' => 'PartialMatchFilter',
         ],
         'AllowPurchase',
-        'PurchasePrice' => 'ExactMatchFilter',
+        'PurchasePrice' => [
+            'title' => 'Purchase Price',
+            'field' => NumericField::class,
+            'filter' => 'ExactMatchFilter',
+        ],
         'SerialNumber' => 'PartialMatchFilter',
     ];
 
