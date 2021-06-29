@@ -338,12 +338,13 @@ class SecondHandProduct extends Product implements PermissionProvider
         $fields->removeByName('Details');
         $fields->removeByName('Images');
         $fields->removeFieldFromTab('Root', 'Title');
-        $fields->removeFieldFromTab('Root', 'URLSegment');
         $fields->removeFieldFromTab('Root', 'MenuTitle');
         $fields->removeFieldFromTab('Root', 'ShortDescription');
         $fields->removeFieldFromTab('Root', 'Content');
         $fields->removeFieldFromTab('Root', 'Metadata');
         $fields->removeFieldFromTab('Root', 'AddToCartLink');
+
+        $fields->dataFieldByName('URLSegment')->setReadonly(true);
 
         $fields->addFieldsToTab(
             'Root.Main',
