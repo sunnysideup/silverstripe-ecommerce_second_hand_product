@@ -63,7 +63,7 @@ class SecondHandProduct extends Product implements PermissionProvider
      *
      * @var string
      */
-    private static $country_code = null;
+    private static $country_code;
 
     /**
      * stadard SS declaration.
@@ -124,20 +124,7 @@ class SecondHandProduct extends Product implements PermissionProvider
      * Standard SS variable.
      */
     private static $summary_fields = [
-
     ];
-
-    public function SummaryFields()
-    {
-        return [
-            'Image.CMSThumbnail' => 'Image',
-            'Title' => 'Title',
-            'InternalItemID' => 'Code',
-            'Price' => 'Price',
-            'AllowPurchaseNice' => 'For Sale',
-            'CreatedNice' => 'Entered',
-        ];
-    }
 
     private static $seller_summary_detail_fields = [
         'SellersName',
@@ -233,6 +220,18 @@ class SecondHandProduct extends Product implements PermissionProvider
      * @var string
      */
     private static $description = 'This page displays a single secondhand product that can only be sold once';
+
+    public function SummaryFields()
+    {
+        return [
+            'Image.CMSThumbnail' => 'Image',
+            'Title' => 'Title',
+            'InternalItemID' => 'Code',
+            'Price' => 'Price',
+            'AllowPurchaseNice' => 'For Sale',
+            'CreatedNice' => 'Entered',
+        ];
+    }
 
     public function getSellerSummary()
     {

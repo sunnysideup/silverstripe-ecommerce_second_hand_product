@@ -14,7 +14,7 @@ class SecondHandProductGroup extends ProductGroup
      */
     protected static $groups_to_show_first = ProductGroup::class;
 
-    protected static $main_second_hand_page_cache = null;
+    protected static $main_second_hand_page_cache;
 
     protected static $list_of_filters = [];
 
@@ -148,6 +148,7 @@ class SecondHandProductGroup extends ProductGroup
         return SecondHandProductGroup::get()
             ->filter(['ParentID' => $this->ParentID ?: 0])
             ->exclude(['ID' => $this->ID])
-            ->exists();
+            ->exists()
+        ;
     }
 }
