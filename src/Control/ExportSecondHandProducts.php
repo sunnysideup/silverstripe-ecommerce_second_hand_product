@@ -117,7 +117,7 @@ class ExportSecondHandProducts extends Controller
                 foreach ($doNotCopy as $field) {
                     unset($array[$count][$field]);
                 }
-                if ($parent = $product->Parent()) {
+                if ($parent = $product->ParentGroup()) {
                     $array[$count][$parentURLSegmentField] = $parent->ID === $rootSecondHandPage->ID ? false : $parent->URLSegment;
                 }
                 $array[$count] += $this->addRelations($product, $relations);
