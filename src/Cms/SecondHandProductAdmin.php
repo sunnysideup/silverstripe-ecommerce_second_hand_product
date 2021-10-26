@@ -63,7 +63,8 @@ class SecondHandProductAdmin extends ModelAdmin
         }
         $form = parent::getEditForm();
         if (singleton($this->modelClass) instanceof SiteTree) {
-            if ($gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass))) {
+            $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass));
+            if ($gridField) {
                 if ($gridField instanceof GridField) {
                     $gridField->setConfig(GridFieldEditOriginalPageConfigSecondHandPage::create());
                     $gridField->getConfig()->addComponent($exportButton = new GridFieldExportButton('buttons-before-left'));

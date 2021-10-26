@@ -105,7 +105,8 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
 
         // CMSMain->currentPageID() automatically sets the homepage,
         // which we need to counteract in the default selection (which should default to root, ID=0)
-        if ($parentID = $this->getRequest()->getVar('ParentID')) {
+        $parentID = $this->getRequest()->getVar('ParentID');
+        if ($parentID) {
             $parentField->setValue((int) $parentID);
         }
 

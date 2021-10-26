@@ -38,7 +38,8 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
         }
 
         $getSegment = '';
-        if ($page = $this->BestRootParentPage()) {
+        $page = $this->BestRootParentPage();
+        if ($page) {
             $getSegment = '?ParentID=' . $page->ID;
         }
 

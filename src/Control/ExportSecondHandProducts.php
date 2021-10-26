@@ -117,7 +117,8 @@ class ExportSecondHandProducts extends Controller
                 foreach ($doNotCopy as $field) {
                     unset($array[$count][$field]);
                 }
-                if ($parent = $product->ParentGroup()) {
+                $parent = $product->ParentGroup();
+                if ($parent) {
                     $array[$count][$parentURLSegmentField] = $parent->ID === $rootSecondHandPage->ID ? false : $parent->URLSegment;
                 }
                 $array[$count] += $this->addRelations($product, $relations);
@@ -149,7 +150,8 @@ class ExportSecondHandProducts extends Controller
                     foreach ($doNotCopy as $field) {
                         unset($array[$count][$field]);
                     }
-                    if ($parent = $group->Parent()) {
+                    $parent = $group->Parent();
+                    if ($parent) {
                         $array[$count][$parentURLSegmentField] = $parent->ID === $rootSecondHandPage->ID ? false : $parent->URLSegment;
                     }
                     $array[$count] += $this->addRelations($group, $relations);
