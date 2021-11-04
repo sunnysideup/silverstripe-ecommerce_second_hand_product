@@ -853,20 +853,6 @@ class SecondHandProduct extends Product implements PermissionProvider
     }
 
     /**
-     * @return string
-     */
-    protected static function get_stage()
-    {
-        $stage = '';
-        if ('Live' === Versioned::get_stage()) {
-            $stage = '_Live';
-        }
-
-        return $stage;
-    }
-
-
-    /**
      * By default we search for products that are allowed to be purchased only
      * standard SS method.
      *
@@ -882,4 +868,16 @@ class SecondHandProduct extends Product implements PermissionProvider
         return $fields;
     }
 
+    /**
+     * @return string
+     */
+    protected static function get_stage()
+    {
+        $stage = '';
+        if ('Live' === Versioned::get_stage()) {
+            $stage = '_Live';
+        }
+
+        return $stage;
+    }
 }
