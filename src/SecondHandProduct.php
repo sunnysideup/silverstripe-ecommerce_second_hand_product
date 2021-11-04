@@ -864,4 +864,22 @@ class SecondHandProduct extends Product implements PermissionProvider
 
         return $stage;
     }
+
+
+    /**
+     * By default we search for products that are allowed to be purchased only
+     * standard SS method.
+     *
+     * @param null|mixed $_params
+     *
+     * @return \SilverStripe\Forms\FieldList
+     */
+    public function scaffoldSearchFields($_params = null)
+    {
+        $fields = parent::scaffoldSearchFields($_params);
+        $fields->fieldByName('AllowPurchase')->setValue('');
+
+        return $fields;
+    }
+
 }
