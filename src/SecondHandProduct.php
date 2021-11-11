@@ -104,7 +104,7 @@ class SecondHandProduct extends Product implements PermissionProvider
     ];
 
     private static $default_sort = [
-        'Created' => 'DESC',
+        'ID' => 'DESC',
     ];
 
     private static $defaults = [
