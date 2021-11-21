@@ -683,6 +683,11 @@ class SecondHandProduct extends Product implements PermissionProvider
         return parent::canPurchase($member, $checkPrice);
     }
 
+    public function IsSecondHandProduct() : bool
+    {
+        return true;
+    }
+
     public function isListed(): bool
     {
         return SecondHandProduct::get()
