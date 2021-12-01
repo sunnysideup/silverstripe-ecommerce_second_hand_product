@@ -148,7 +148,7 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
         }
 
         if (is_numeric($parentID) && $parentID > 0) {
-            $parentObj = ProductGroup::get()->byID($parentID);
+            $parentObj = ProductGroup::get_by_id($parentID);
         } else {
             $parentObj = null;
         }

@@ -103,7 +103,7 @@ class SecondHandProductGroup extends ProductGroup
         parent::onBeforeWrite();
         $this->RootParent = false;
         if ($this->ParentID) {
-            $parent = SiteTree::get()->byID($this->ParentID);
+            $parent = SiteTree::get_by_id($this->ParentID);
             if ($parent) {
                 if ($parent instanceof SecondHandProductGroup) {
                     $this->RootParent = false;

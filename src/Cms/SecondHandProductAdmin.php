@@ -86,7 +86,7 @@ class SecondHandProductAdmin extends ModelAdmin
         if (isset($_GET['productid'])) {
             $id = (int) $_GET['productid'];
             if ($id) {
-                $secondHandProduct = SecondHandProduct::get()->byID($id);
+                $secondHandProduct = SecondHandProduct::get_by_id($id);
                 $currentMember = Security::getCurrentUser();
                 $secondHandProduct->ArchivedByID = $currentMember->ID;
                 $internalItemID = $secondHandProduct->InternalItemID;
@@ -165,7 +165,7 @@ class SecondHandProductAdmin extends ModelAdmin
     {
         $parentPage = Versioned::get_latest_version(SiteTree::class, $parentID);
         if (! $parentPage) {
-            $parentPage = SiteTree::get()->byID($parentID);
+            $parentPage = SiteTree::get_by_id($parentID);
             if ($parentPage) {
                 $parentPage->writeToStage('Stage');
                 $parentPage->publish('Stage', 'Live', true);
