@@ -7,6 +7,7 @@ use SilverStripe\ORM\DB;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
+use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 
 /**
  * create the e-commerce specific Member Groups.
@@ -16,7 +17,7 @@ use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
  * @sub-package: tasks
  * @inspiration: Silverstripe Ltd, Jeremy
  */
-class EcommerceTaskCreateSecondHandProductManager extends BuildTask
+class EcommerceTaskCreateSecondHandProductManager extends BuildTask implements PermissionProviderFactoryProvider
 {
     protected $title = 'Create e-commerce Second Hand Product Manager';
 

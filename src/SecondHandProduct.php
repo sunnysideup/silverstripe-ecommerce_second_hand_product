@@ -31,8 +31,9 @@ use Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
 use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
+use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 
-class SecondHandProduct extends Product implements PermissionProvider
+class SecondHandProduct extends Product implements PermissionProvider, PermissionProviderFactoryProvider
 {
     /**
      * @var string
