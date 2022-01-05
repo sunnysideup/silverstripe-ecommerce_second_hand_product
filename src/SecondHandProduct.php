@@ -799,10 +799,8 @@ class SecondHandProduct extends Product implements PermissionProvider, Permissio
         return $perms;
     }
 
-    public function requireDefaultRecords()
+    public static function permission_provider_factory_runner()
     {
-        parent::requireDefaultRecords();
-
         return PermissionProviderFactory::inst()
             ->setEmail(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email'))
             ->setFirstName(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_firstname'))
@@ -820,6 +818,12 @@ class SecondHandProduct extends Product implements PermissionProvider, Permissio
             )
             ->CreateGroupAndMember()
         ;
+
+    }
+    public function requireDefaultRecords()
+    {
+        parent::requireDefaultRecords();
+        self::permission_provider_factory_runner();
     }
 
     public function onAferSubmit($order)

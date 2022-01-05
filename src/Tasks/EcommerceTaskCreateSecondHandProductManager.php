@@ -25,6 +25,13 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask implements P
 
     public function run($request)
     {
+
+
+        self::permission_provider_factory_runner();
+    }
+
+    public static function permission_provider_factory_runner()
+    {
         $email = EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email');
         if (! $email) {
             $email = 'secondhandproducts@' . $_SERVER['HTTP_HOST'];
@@ -53,7 +60,6 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask implements P
                     'CMS_ACCESS_SecondHandProductAdmin',
                 ]
             )
-            ->CreateGroupAndMember()
-        ;
+            ->CreateGroupAndMember();
     }
 }
