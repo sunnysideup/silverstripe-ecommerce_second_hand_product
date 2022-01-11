@@ -25,8 +25,6 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask implements P
 
     public function run($request)
     {
-
-
         self::permission_provider_factory_runner();
     }
 
@@ -60,6 +58,7 @@ class EcommerceTaskCreateSecondHandProductManager extends BuildTask implements P
                     'CMS_ACCESS_SecondHandProductAdmin',
                 ]
             )
-            ->CreateGroupAndMember();
+            ->CreateGroupAndMember()
+        ;
     }
 }

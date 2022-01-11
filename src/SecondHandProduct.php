@@ -818,8 +818,8 @@ class SecondHandProduct extends Product implements PermissionProvider, Permissio
             )
             ->CreateGroupAndMember()
         ;
-
     }
+
     public function requireDefaultRecords()
     {
         parent::requireDefaultRecords();
