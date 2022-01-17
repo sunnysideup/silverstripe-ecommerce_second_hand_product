@@ -826,14 +826,6 @@ class SecondHandProduct extends Product implements PermissionProvider, Permissio
         self::permission_provider_factory_runner();
     }
 
-    public function onAferSubmit($order)
-    {
-        DB::query('Update \"Product\" SET AllowPurchase = 0 WHERE \"Product\".\"ID\" = ' . $this->ID);
-        DB::query('Update \"Product_Live\" SET AllowPurchase = 0 WHERE \"Product_Live\".\"ID\" = ' . $this->ID);
-        $this->writeToStage('Stage');
-        $this->publishRecursive();
-    }
-
     public function exportFields()
     {
         $fields = $this->summaryFields();
