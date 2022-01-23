@@ -789,18 +789,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $this->InternalItemID;
     }
 
-    public function providePermissions()
-    {
-        $perms[EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code')] = [
-            'name' => EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_title'),
-            'category' => 'E-commerce',
-            'help' => EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_help'),
-            'sort' => 250,
-        ];
-
-        return $perms;
-    }
-
     public static function permission_provider_factory_runner() : Group
     {
         return PermissionProviderFactory::inst()
@@ -814,12 +802,16 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             ->setCode(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_code'))
             ->setPermissionCode(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'))
             ->setRoleTitle(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_title'))
+
             ->setPermissionArray(
                 [
                     'SITETREE_VIEW_ALL',
                     'CMS_ACCESS_SecondHandProductAdmin',
                 ]
             )
+
+            ->setSort(250)
+            ->setDescription(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_help'))
 
             ->CreateGroupAndMember()
         ;
