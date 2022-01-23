@@ -18,6 +18,7 @@ use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
@@ -28,11 +29,13 @@ use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
 use Sunnysideup\Ecommerce\Pages\Product;
 use Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
+
+use Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
 use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 
-class SecondHandProduct extends Product implements PermissionProvider, PermissionProviderFactoryProvider
+class SecondHandProduct extends Product implements PermissionProviderFactoryProvider
 {
     /**
      * @var string
@@ -798,9 +801,11 @@ class SecondHandProduct extends Product implements PermissionProvider, Permissio
         return $perms;
     }
 
-    public static function permission_provider_factory_runner()
+    public static function permission_provider_factory_runner() : Group
     {
         return PermissionProviderFactory::inst()
+            ->setParentGroup(EcommerceRole::get_category())
+
             ->setEmail(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email'))
             ->setFirstName(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_firstname'))
             ->setSurname(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_surname'))
@@ -815,14 +820,9 @@ class SecondHandProduct extends Product implements PermissionProvider, Permissio
                     'CMS_ACCESS_SecondHandProductAdmin',
                 ]
             )
+
             ->CreateGroupAndMember()
         ;
-    }
-
-    public function requireDefaultRecords()
-    {
-        parent::requireDefaultRecords();
-        self::permission_provider_factory_runner();
     }
 
     public function exportFields()
