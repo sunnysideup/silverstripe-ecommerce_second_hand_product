@@ -21,16 +21,14 @@ use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
-use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
+use Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole;
 use Sunnysideup\Ecommerce\Pages\Product;
 use Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
-
-use Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
 use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
@@ -789,7 +787,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $this->InternalItemID;
     }
 
-    public static function permission_provider_factory_runner() : Group
+    public static function permission_provider_factory_runner(): Group
     {
         return PermissionProviderFactory::inst()
             ->setParentGroup(EcommerceRole::get_category())
