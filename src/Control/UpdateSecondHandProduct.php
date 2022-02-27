@@ -10,6 +10,8 @@ use SilverStripe\Versioned\Versioned;
 use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
+use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
+
 class UpdateSecondHandProduct extends Controller
 {
     private static $allowed_actions = [
@@ -45,19 +47,9 @@ class UpdateSecondHandProduct extends Controller
     {
         $archived = false;
         $otherID = $request->param('OtherID');
-        if (isset($otherID)) {
-            $archived = null;
-            $internalItemID = Convert::raw2sql($otherID);
-            $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
-            if (! $secondHandProduct) {
-                $secondHandProduct = Versioned::get_one_by_stage(SecondHandProduct::class, 'Stage', ['InternalItemID' => $internalItemID]);
-            }
-            if (is_a($secondHandProduct, EcommerceConfigClassNames::getName(SiteTree::class))) {
-                $archived = $secondHandProduct->deleteFromStage('Live');
-                $archived = $secondHandProduct->deleteFromStage('Stage');
-            } elseif (null !== $secondHandProduct) {
-                $archived = $secondHandProduct->delete();
-            }
+        $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
+        if ($secondHandProduct) {
+            $archived = SecondHandProductActions::archive($secondHandProduct->ID);
         }
 
         return json_encode($archived);

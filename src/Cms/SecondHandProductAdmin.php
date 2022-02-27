@@ -18,6 +18,8 @@ use Sunnysideup\Ecommerce\Traits\EcommerceModelAdminTrait;
 use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs\GridFieldEditOriginalPageConfigSecondHandPage;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+
+use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
 
 /**
@@ -86,21 +88,8 @@ class SecondHandProductAdmin extends ModelAdmin
         if (isset($_GET['productid'])) {
             $id = (int) $_GET['productid'];
             if ($id) {
-                $secondHandProduct = SecondHandProduct::get_by_id($id);
-                $currentMember = Security::getCurrentUser();
-                $secondHandProduct->ArchivedByID = $currentMember->ID;
-                $internalItemID = $secondHandProduct->InternalItemID;
-                if (is_a($secondHandProduct, EcommerceConfigClassNames::getName(SiteTree::class))) {
-                    $secondHandProduct->write();
-                    $secondHandProduct->publishRecursive();
-                    $secondHandProduct->deleteFromStage('Live');
-                    $secondHandProduct->deleteFromStage('Stage');
-                } elseif ($secondHandProduct) {
-                    $secondHandProduct->write();
-                    $secondHandProduct->delete();
-                }
+                $archivedProduct = SecondHandProductActions::archive($id);
                 //after deleting the product redirect to the archived page
-                $archivedProduct = SecondHandArchive::get()->filter(['InternalItemID' => $internalItemID])->first();
                 if ($archivedProduct) {
                     $this->getResponse()->addHeader(
                         'X-Status',
@@ -110,8 +99,7 @@ class SecondHandProductAdmin extends ModelAdmin
                             ['title' => $archivedProduct->Title]
                         ))
                     );
-                    $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandArchive::class);
-                    $cmsEditLink = '/admin/secondhandproducts/' . $classURLSegment . '/EditForm/field/' . $classURLSegment . '/item/' . $archivedProduct->ID . '/edit';
+                    $cmsEditLink = $archivedProduct->ModelAdminLink();
 
                     return Controller::curr()->redirect($cmsEditLink);
                 }
@@ -126,16 +114,8 @@ class SecondHandProductAdmin extends ModelAdmin
         if (isset($_GET['productid'])) {
             $id = (int) $_GET['productid'];
             if ($id) {
-                $restoredPage = Versioned::get_latest_version(SiteTree::class, $id);
-                $parentID = $restoredPage->ParentID;
+                $restoredPage = SecondHandProductActions::restore($id);
                 if ($parentID) {
-                    var_dump($parentID);
-                    $this->ensureParentHasVersion($parentID);
-                    if (! $restoredPage) {
-                        return new HTTPResponse("SiteTree #{$id} not found", 400);
-                    }
-                    $restoredPage = $restoredPage->doRestoreToStage();
-                    //$restoredPage->doPublish();
                     $this->getResponse()->addHeader(
                         'X-Status',
                         rawurlencode(_t(
@@ -144,7 +124,7 @@ class SecondHandProductAdmin extends ModelAdmin
                             ['title' => $restoredPage->Title]
                         ))
                     );
-                    $cmsEditLink = '/admin/secondhandproducts/SecondHandProduct/EditForm/field/SecondHandProduct/item/' . $id . '/edit';
+                    $cmsEditLink = $restoredPage->ModelAdminLink();
 
                     return Controller::curr()->redirect($cmsEditLink);
                 }
@@ -156,20 +136,4 @@ class SecondHandProductAdmin extends ModelAdmin
         return new HTTPResponse('ERROR!', 400);
     }
 
-    /**
-     * little hack to fix parent if it is not versioned into versions table.
-     *
-     * @param mixed $parentID
-     */
-    public function ensureParentHasVersion($parentID)
-    {
-        $parentPage = Versioned::get_latest_version(SiteTree::class, $parentID);
-        if (! $parentPage) {
-            $parentPage = SiteTree::get_by_id($parentID);
-            if ($parentPage) {
-                $parentPage->writeToStage('Stage');
-                $parentPage->publish('Stage', 'Live', true);
-            }
-        }
-    }
 }

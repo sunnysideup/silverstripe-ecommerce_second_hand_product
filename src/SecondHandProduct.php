@@ -208,19 +208,19 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     /**
      * Standard SS variable.
      */
-    private static $singular_name = 'SecondHand Product';
+    private static $singular_name = 'Second-Hand Product';
 
     /**
      * Standard SS variable.
      */
-    private static $plural_name = 'SecondHand Products';
+    private static $plural_name = 'Second-Hand Products';
 
     /**
      * standard SS declaration.
      *
      * @var string
      */
-    private static $description = 'This page displays a single secondhand product that can only be sold once';
+    private static $description = 'This page displays a single second-hand product that can only be sold once';
 
     public function SummaryFields()
     {
@@ -565,19 +565,18 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             $fields->removeByName('SellersAddressGeocodingField');
         }
         $fields->addFieldToTab(
-            'Root.Categorisation',
+            'Root.Under',
             $categoriesTable = $this->getProductGroupsTableField()
         );
 
         // If the product has been sold all fields should be disabled
         // Only the shop administrator is allowed to undo this.
         if ($this->HasBeenSold()) {
-            $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandProduct::class);
             $fields->insertAfter(
                 'AllowPurchase',
                 EcommerceCMSButtonField::create(
                     'ArchiveButton',
-                    '/admin/secondhandproducts/' . $classURLSegment . '/archive/?productid=' . $this->ID,
+                    $this->ArchiveLink(),
                     _t('SecondHandProduct.ARCHIVE_BUTTON', 'Archive Product')
                 )
             );
@@ -611,6 +610,25 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $fields;
     }
 
+    public function ArchiveLink() : string
+    {
+        $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandProduct::class);
+        return '/admin/secondhandproducts/' . $classURLSegment . '/archive/?productid=' . $this->ID;
+    }
+
+    public function RestoreLink() : string
+    {
+        $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandProduct::class);
+        return '/admin/secondhandproducts/' . $classURLSegment . '/restore/?productid=' . $this->ID;
+    }
+
+    public function ModelAdminLink() : string
+    {
+        //admin/secondhandproducts/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/EditForm/field/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/item/7760/edit
+        $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandArchive::class);
+        return '/admin/secondhandproducts/' . $classURLSegment . '/EditForm/field/' . $classURLSegment . '/item/' . $this->ID . '/edit';
+    }
+
     public function getPrintLink()
     {
         return $this->link('printview');
@@ -640,6 +658,10 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $fields;
     }
 
+    /**
+     * products that can be sold SQL
+     * @return string
+     */
     public static function get_treshold_sql(): string
     {
         if ('' === self::$treshold_sql_cache) {
@@ -696,42 +718,22 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             ->byId($this->ID) ? true : false;
     }
 
+    /**
+     * this is the same as the
+     * @return bool [description]
+     */
     public function isUnderEmbargo(): bool
     {
-        $embargoDays = Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
-        if (intval($embargoDays) > 0) {
-            if ($this->DateItemWasBought) {
-                $date = $this->DateItemWasBought;
-            } else {
-                $date = $this->Created;
-            }
-            $createdDate = strtotime($date);
-            $daysOld = (time() - $createdDate) / (60 * 60 * 24);
-            if ($daysOld <= $embargoDays) {
-                return true;
-            }
-        }
-
-        return false;
+        return SecondHandProduct::get()
+            ->where(self::get_treshold_sql())
+            ->byId($this->ID) ? true : false;
     }
 
     public function didNotSell(): bool
     {
-        $embargoDays = Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
-        if (intval($embargoDays) > 0) {
-            if ($this->DateItemWasBought) {
-                $date = $this->DateItemWasBought;
-            } else {
-                $date = $this->Created;
-            }
-            $createdDate = strtotime($date);
-            $daysOld = (time() - $createdDate) / (60 * 60 * 24);
-            if ($daysOld <= $embargoDays) {
-                return true;
-            }
-        }
-
-        return false;
+        $shouldBeListedAfterTs = strtotime('-' . $daysMax . ' days', DBDatetime::now()->getTimestamp());
+        $listedTs = strtotime($this->Created);
+        return $listedTs < $shouldBeListedAfterTs;
     }
 
     public function HasBeenSold(): bool
