@@ -14,18 +14,18 @@ use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
-use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
+use Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole;
 use Sunnysideup\Ecommerce\Pages\Product;
 use Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
@@ -33,7 +33,7 @@ use Sunnysideup\GoogleAddressField\GoogleAddressField;
 use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 
-class SecondHandProduct extends Product implements PermissionProvider, PermissionProviderFactoryProvider
+class SecondHandProduct extends Product implements PermissionProviderFactoryProvider
 {
     /**
      * @var string
@@ -771,21 +771,11 @@ class SecondHandProduct extends Product implements PermissionProvider, Permissio
         return $this->InternalItemID;
     }
 
-    public function providePermissions()
-    {
-        $perms[EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code')] = [
-            'name' => EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_title'),
-            'category' => 'E-commerce',
-            'help' => EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_help'),
-            'sort' => 250,
-        ];
-
-        return $perms;
-    }
-
-    public static function permission_provider_factory_runner()
+    public static function permission_provider_factory_runner(): Group
     {
         return PermissionProviderFactory::inst()
+            ->setParentGroup(EcommerceRole::get_category())
+
             ->setEmail(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email'))
             ->setFirstName(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_firstname'))
             ->setSurname(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_surname'))
@@ -794,28 +784,19 @@ class SecondHandProduct extends Product implements PermissionProvider, Permissio
             ->setCode(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_code'))
             ->setPermissionCode(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'))
             ->setRoleTitle(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_title'))
+
             ->setPermissionArray(
                 [
                     'SITETREE_VIEW_ALL',
                     'CMS_ACCESS_SecondHandProductAdmin',
                 ]
             )
+
+            ->setSort(250)
+            ->setDescription(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_help'))
+
             ->CreateGroupAndMember()
         ;
-
-    }
-    public function requireDefaultRecords()
-    {
-        parent::requireDefaultRecords();
-        self::permission_provider_factory_runner();
-    }
-
-    public function onAferSubmit($order)
-    {
-        DB::query('Update \"Product\" SET AllowPurchase = 0 WHERE \"Product\".\"ID\" = ' . $this->ID);
-        DB::query('Update \"Product_Live\" SET AllowPurchase = 0 WHERE \"Product_Live\".\"ID\" = ' . $this->ID);
-        $this->writeToStage('Stage');
-        $this->publishRecursive();
     }
 
     public function exportFields()
