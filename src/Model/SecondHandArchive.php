@@ -10,7 +10,11 @@ use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
+
+use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+
+use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 
 class SecondHandArchive extends DataObject
 {
@@ -218,6 +222,13 @@ class SecondHandArchive extends DataObject
     public function i18n_plural_name()
     {
         return self::$plural_name;
+    }
+
+    public function ModelAdminLink() : string
+    {
+        //admin/secondhandproducts/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/EditForm/field/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/item/7760/edit
+        $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandArchive::class);
+        return '/admin/secondhandproducts/' . $classURLSegment . '/EditForm/field/' . $classURLSegment . '/item/' . $this->ID . '/edit';
     }
 
     /**

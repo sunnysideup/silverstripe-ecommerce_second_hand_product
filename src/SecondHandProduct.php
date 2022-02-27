@@ -572,12 +572,11 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         // If the product has been sold all fields should be disabled
         // Only the shop administrator is allowed to undo this.
         if ($this->HasBeenSold()) {
-            $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandProduct::class);
             $fields->insertAfter(
                 'AllowPurchase',
                 EcommerceCMSButtonField::create(
                     'ArchiveButton',
-                    '/admin/secondhandproducts/' . $classURLSegment . '/archive/?productid=' . $this->ID,
+                    $this->ArchiveLink(),
                     _t('SecondHandProduct.ARCHIVE_BUTTON', 'Archive Product')
                 )
             );
@@ -609,6 +608,25 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         );
 
         return $fields;
+    }
+
+    public function ArchiveLink() : string
+    {
+        $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandProduct::class);
+        return '/admin/secondhandproducts/' . $classURLSegment . '/archive/?productid=' . $this->ID;
+    }
+
+    public function RestoreLink() : string
+    {
+        $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandProduct::class);
+        return '/admin/secondhandproducts/' . $classURLSegment . '/restore/?productid=' . $this->ID;
+    }
+
+    public function ModelAdminLink() : string
+    {
+        //admin/secondhandproducts/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/EditForm/field/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/item/7760/edit
+        $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandArchive::class);
+        return '/admin/secondhandproducts/' . $classURLSegment . '/EditForm/field/' . $classURLSegment . '/item/' . $this->ID . '/edit';
     }
 
     public function getPrintLink()
@@ -713,7 +731,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     public function didNotSell(): bool
     {
-        $shouldBeListedAfterTs = strtotime('-' . $daysMax . ' days', DBDatetime::now()->getTimestamp())
+        $shouldBeListedAfterTs = strtotime('-' . $daysMax . ' days', DBDatetime::now()->getTimestamp());
         $listedTs = strtotime($this->Created);
         return $listedTs < $shouldBeListedAfterTs;
     }
