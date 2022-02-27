@@ -678,12 +678,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             );
             self::$treshold_sql_cache = '
                 (
-                    "SiteTree' . $stage . '"."Created" > \'' . $maxThreshold . '\' OR
-                    (
-                        SecondHandProduct' . $stage . '.DateItemWasBought IS NOT NULL AND
-                        SecondHandProduct' . $stage . '.DateItemWasBought > \'' . $minThreshold . '\' AND
-                        SecondHandProduct' . $stage . '.DateItemWasBought < \'' . $maxThreshold . '\'
-                    )
+                    SecondHandProduct' . $stage . '.DateItemWasBought IS NOT NULL AND
+                    SecondHandProduct' . $stage . '.DateItemWasBought > \'' . $minThreshold . '\' AND
+                    SecondHandProduct' . $stage . '.DateItemWasBought < \'' . $maxThreshold . '\'
                 )
             ';
         }
@@ -722,12 +719,24 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      * this is the same as the
      * @return bool [description]
      */
-    public function isUnderEmbargo(): bool
-    {
-        return SecondHandProduct::get()
-            ->where(self::get_treshold_sql())
-            ->byId($this->ID) ? true : false;
-    }
+     public function isUnderEmbargo(): bool
+     {
+         $embargoDays = Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
+         if (intval($embargoDays) > 0) {
+             if ($this->DateItemWasBought) {
+                 $date = $this->DateItemWasBought;
+             } else {
+                 $date = $this->Created;
+             }
+             $createdDate = strtotime($date);
+             $daysOld = (time() - $createdDate) / (60 * 60 * 24);
+             if ($daysOld <= $embargoDays) {
+                 return true;
+             }
+         }
+
+         return false;
+     }
 
     public function didNotSell(): bool
     {
@@ -777,6 +786,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             }
         }
         parent::onBeforeWrite();
+        if(! $this->DateItemWasBought) {
+            $this->DateItemWasBought = $this->Created;
+        }
     }
 
     public function SecondHandProductQualityPercentage()
