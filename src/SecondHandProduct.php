@@ -601,9 +601,13 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         $fields->addFieldsToTab(
             'Root.Status',
             [
-                ReadonlyField::create('isListedNice', 'Is listed', ($this->isListed() ? 'YES' : 'NO')),
-                ReadonlyField::create('isUnderEmbargoNice', 'Is under embargo', ($this->isUnderEmbargo() ? 'YES' : 'NO')),
+                ReadonlyField::create('IsForSaleRightNow', 'Is listed', ($this->canPurchase() ? 'YES' : 'NO'))
+                    ->setDescription('This is based on the three fields below'),
+                ReadonlyField::create('isListedNice', 'Can be listed', ($this->isListed() ? 'YES IS LISTED ON SITE' : 'NO, NOT LISTED ON SITE')),
+                ReadonlyField::create('isUnderEmbargoNice', 'Is under embargo', ($this->isUnderEmbargo() ? 'YES - STILL WAITING' : 'NO LONGER')),
                 ReadonlyField::create('HasBeenSoldNice', 'Has been sold', ($this->HasBeenSold() ? 'YES' : 'NO')),
+                ReadonlyField::create('DidNotSellNice', 'Did not sell?', ($this->didNotSell() ? 'YES' : 'SO FAR SO GOOD')),
+                // ReadonlyField::create('Sql', 'Sql', $this->get_treshold_sql()),
             ]
         );
 
@@ -678,9 +682,10 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             );
             self::$treshold_sql_cache = '
                 (
+                    "AllowPurchase" = 1 AND
                     SecondHandProduct' . $stage . '.DateItemWasBought IS NOT NULL AND
-                    SecondHandProduct' . $stage . '.DateItemWasBought > \'' . $minThreshold . '\' AND
-                    SecondHandProduct' . $stage . '.DateItemWasBought < \'' . $maxThreshold . '\'
+                    SecondHandProduct' . $stage . '.DateItemWasBought <= \'' . $minThreshold . '\' AND
+                    SecondHandProduct' . $stage . '.DateItemWasBought > \'' . $maxThreshold . '\'
                 )
             ';
         }
@@ -740,6 +745,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     public function didNotSell(): bool
     {
+        $daysMax = intval(Config::inst()->get(SecondHandProduct::class, 'max_number_of_days_for_sale'));
         $shouldBeListedAfterTs = strtotime('-' . $daysMax . ' days', DBDatetime::now()->getTimestamp());
         $listedTs = strtotime($this->Created);
         return $listedTs < $shouldBeListedAfterTs;
