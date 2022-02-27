@@ -34,6 +34,12 @@ class ExportSecondHandProducts extends Controller
         'ID',
         'RecordClassName',
         'parser',
+        'Lat',
+        'Lng',
+        'Lng',
+        'ExcludeFromSearchEngines',
+        'FooterMenuOrder',
+        'RootParent',
     ];
 
     /**
