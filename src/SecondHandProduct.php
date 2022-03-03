@@ -606,7 +606,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 ReadonlyField::create('isListedNice', 'Can be listed', ($this->isListed() ? 'YES IS LISTED ON SITE' : 'NO, NOT LISTED ON SITE')),
                 ReadonlyField::create('isUnderEmbargoNice', 'Is under embargo', ($this->isUnderEmbargo() ? 'YES - STILL WAITING' : 'NO LONGER')),
                 ReadonlyField::create('HasBeenSoldNice', 'Has been sold', ($this->HasBeenSold() ? 'YES' : 'NO')),
-                ReadonlyField::create('DidNotSellNice', 'Did not sell?', ($this->didNotSell() ? 'YES' : 'SO FAR SO GOOD')),
+                ReadonlyField::create('DidNotSellNice', 'Did not sell?', ($this->didNotSell() ? 'YES - NEVER SOLD' : 'SO FAR SO GOOD - NOT PASSED USED BY DATE')),
                 // ReadonlyField::create('Sql', 'Sql', $this->get_treshold_sql()),
             ]
         );
