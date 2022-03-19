@@ -23,17 +23,19 @@ class SecondHandProductActions
     public static function archive(int $id) : ?SecondHandArchive
     {
         $secondHandProduct = SecondHandProduct::get_by_id($id);
-        $currentMember = Security::getCurrentUser();
-        $secondHandProduct->ArchivedByID = $currentMember->ID;
-        $internalItemID = $secondHandProduct->InternalItemID;
-        if (is_a($secondHandProduct, EcommerceConfigClassNames::getName(SiteTree::class))) {
-            $secondHandProduct->write();
-            $secondHandProduct->publishRecursive();
-            $secondHandProduct->deleteFromStage('Live');
-            $secondHandProduct->deleteFromStage('Stage');
-        } elseif ($secondHandProduct) {
-            $secondHandProduct->write();
-            $secondHandProduct->delete();
+        if($secondHandProduct) {
+            $currentMember = Security::getCurrentUser();
+            $secondHandProduct->ArchivedByID = $currentMember->ID;
+            $internalItemID = $secondHandProduct->InternalItemID;
+            if ($secondHandProduct->hasMethod('publishRecursive')) {
+                $secondHandProduct->write();
+                $secondHandProduct->publishRecursive();
+                $secondHandProduct->deleteFromStage(Versioned::DRAFT);
+                $secondHandProduct->deleteFromStage(Versioned::LIVE);
+            } elseif ($secondHandProduct) {
+                $secondHandProduct->write();
+                $secondHandProduct->delete();
+            }
         }
         return SecondHandArchive::get()->filter(['InternalItemID' => $internalItemID])->first();
     }
@@ -43,7 +45,7 @@ class SecondHandProductActions
         $restoredPage = Versioned::get_latest_version(SiteTree::class, $id);
         $parentID = $restoredPage->ParentID;
         if ($parentID) {
-            $this->ensureParentHasVersion($parentID);
+            $restoredPage->ensureParentHasVersion($parentID);
             if (! $restoredPage) {
                 return new HTTPResponse("SiteTree #{$id} not found", 400);
             }
