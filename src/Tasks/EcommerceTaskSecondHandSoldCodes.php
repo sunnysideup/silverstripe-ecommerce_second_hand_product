@@ -19,6 +19,7 @@ class EcommerceTaskSecondHandSoldCodes extends BuildTask
     protected $description = '';
 
     protected $fix = true;
+    protected $forSale = false;
 
     public function run($request)
     {
@@ -36,13 +37,7 @@ class EcommerceTaskSecondHandSoldCodes extends BuildTask
             }
         }
         DB::alteration_message(' ================= For Sale =================  ');
-        $products = SecondHandProduct::get()->exclude(['ID' => $ids]);
-        foreach ($products as $product) {
-            DB::alteration_message($product->InternalItemID. ' | '.$product->Title);
-            if($product->DateItemWasSold) {
-                $this->markAsSold($product);
-            }
-        }
+
     }
     protected function markAsSold($product)
     {
