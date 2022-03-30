@@ -6,6 +6,8 @@ use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
 
 use SilverStripe\Core\Environment;
+
+use SilverStripe\Versioned\Versioned;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 use Sunnysideup\Ecommerce\Model\OrderItem;
@@ -28,9 +30,18 @@ class EcommerceTaskSecondCheckSoldItems extends BuildTask
             foreach($codesArray as $key => $code) {
                 $code = trim($code);
                 if($code) {
-                    $forSale = SecondHandProduct::get()->filter(['InternalItemID' => $code, 'AllowPurchase' => 1])->first();
-                    if($forSale) {
-                        DB::alteration_message('ERROR WITH '.$code . ' | '.$forSale->Title, 'deleted');
+                    $forSaleProduct = SecondHandProduct::get()->filter(['InternalItemID' => $code, 'AllowPurchase' => 1])->first();
+                    if($forSaleProduct) {
+                        if(! empty($_POST['markassold'])) {
+                            $forSaleProduct->AllowPurchase = false;
+                        }
+                        if($forSaleProduct->DateItemWasSold || ! empty($_POST['markassold'])) {
+                            $forSaleProduct->writeToStage(Versioned::DRAFT);
+                            $forSaleProduct->publishRecursive();
+                        }
+                        if($forSaleProduct->AllowPurchase) {
+                            DB::alteration_message('<a href="/'.$forSaleProduct->CMSEditLink().'">ERROR WITH '.$code . ' | '.$forSaleProduct->Title.'</a>', 'deleted');
+                        }
                     }
                 } else {
                     unset($codesArray[$key]);
@@ -44,6 +55,9 @@ class EcommerceTaskSecondCheckSoldItems extends BuildTask
             <form method="post">
                 <h2>Paste Codes Below, separated by new line, tab or comma</h2>
                 <textarea name="codes" rows=30 cols=100></textarea>
+                <br />
+                <br />
+                <input type="checkbox" name="markassold" value="1" /> mark as sold
                 <br />
                 <br />
                 <input type="submit" value="check" />

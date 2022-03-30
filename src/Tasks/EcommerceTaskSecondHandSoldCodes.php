@@ -6,6 +6,8 @@ use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
 
 use SilverStripe\Core\Environment;
+
+use SilverStripe\Versioned\Versioned;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 use Sunnysideup\Ecommerce\Model\OrderItem;
