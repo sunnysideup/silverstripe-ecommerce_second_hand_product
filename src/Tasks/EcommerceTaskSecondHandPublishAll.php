@@ -2,9 +2,10 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
-use Environment;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
+
+use SilverStripe\Core\Environment;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 class EcommerceTaskSecondHandPublishAll extends BuildTask
