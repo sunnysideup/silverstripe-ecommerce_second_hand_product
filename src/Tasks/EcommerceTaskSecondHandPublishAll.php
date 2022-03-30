@@ -6,6 +6,8 @@ use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
 
 use SilverStripe\Core\Environment;
+
+use SilverStripe\Versioned\Versioned;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 class EcommerceTaskSecondHandPublishAll extends BuildTask
@@ -20,8 +22,8 @@ class EcommerceTaskSecondHandPublishAll extends BuildTask
         $products = SecondHandProduct::get();
         foreach ($products as $product) {
             DB::alteration_message('Publish: ' . $product->Title);
-            $product->writeToStage('Stage');
-            $product->publish('Stage', 'Live');
+            $product->writeToStage(Versioned::DRAFT);
+            $product->publishRecursive();
         }
         DB::alteration_message(' ================= Completed =================  ');
     }

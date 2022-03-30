@@ -18,6 +18,8 @@ class EcommerceTaskSecondHandSoldCodes extends BuildTask
 
     protected $description = '';
 
+    protected $fix = true;
+
     public function run($request)
     {
         Environment::increaseTimeLimitTo(600);
@@ -26,12 +28,28 @@ class EcommerceTaskSecondHandSoldCodes extends BuildTask
         $ids = OrderItem::get()->filter(['BuyableClassName' => SecondHandProduct::class])->column('BuyableID');
         $products = SecondHandProduct::get()->filterAny(['AllowPurchase' => 0, 'ID' => $ids]);
         foreach ($products as $product) {
-            DB::alteration_message($product->InternalItemID);
+            if($product->AllowPurchase) {
+                DB::alteration_message('<a href="/'.$product->CMSEditLink().'">ERROR WITH '.$product->InternalItemID . ' | '.$product->Title.'</a>', 'deleted');
+                $this->markAsSold($product);
+            } else {
+                DB::alteration_message($product->InternalItemID);
+            }
         }
         DB::alteration_message(' ================= For Sale =================  ');
         $products = SecondHandProduct::get()->exclude(['ID' => $ids]);
         foreach ($products as $product) {
-            DB::alteration_message($product->InternalItemID);
+            DB::alteration_message($product->InternalItemID. ' | '.$product->Title);
+            if($product->DateItemWasSold) {
+                $this->markAsSold($product);
+            }
+        }
+    }
+    protected function markAsSold($product)
+    {
+        if($this->fix) {
+            $product->AllowPurchase = 0;
+            $product->writeToStage(Versioned::DRAFT);
+            $product->publishRecursive();
         }
     }
 }
