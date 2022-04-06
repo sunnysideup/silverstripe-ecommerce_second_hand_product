@@ -5,6 +5,8 @@ namespace Sunnysideup\EcommerceSecondHandProduct;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
+
+use SilverStripe\Core\Injector\Injector;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 
 class SecondHandProductGroup extends ProductGroup
