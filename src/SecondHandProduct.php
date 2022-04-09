@@ -808,44 +808,61 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         if(! $this->DateItemWasBought) {
             $this->DateItemWasBought = $this->Created;
         }
+        $this->fixImagePosition();
     }
+
+    protected $imagesDone = false;
 
     public function onAfterWrite()
     {
         parent::onAfterWrite();
-        $array = [];
-        $folderName = Config::inst()->get(self::class, 'folder_for_second_hand_images');
-        $folder = Folder::find_or_make($folderName);
-        $arrayInner = [];
-        if ($this->ImageID) {
-            $image = $this->Image(); //see Product::has_one()
-            if ($image && $image->exists()) {
-                $arrayInner[$image->ID] = $image;
+
+    }
+
+    protected function fixImagePosition()
+    {
+        if(! $this->imagesDone) {
+            $this->imagesDone = true;
+            $array = [];
+            $folderName = Config::inst()->get(self::class, 'folder_for_second_hand_images')?: 'second-hand-images' ;
+            $folder = Folder::find_or_make($folderName);
+            $arrayInner = [];
+            if ($this->ImageID) {
+                $image = $this->Image(); //see Product::has_one()
+                if ($image && $image->exists()) {
+                    $arrayInner[$image->ID] = $image;
+                }
             }
-        }
-        $otherImages = $this->AdditionalImages(); //see Product::many_many()
-        foreach ($otherImages as $otherImage) {
-            if ($otherImage && $otherImage->exists()) {
-                $arrayInner[$otherImage->ID] = $otherImage;
+            $otherImages = $this->AdditionalImages(); //see Product::many_many()
+            foreach ($otherImages as $otherImage) {
+                if ($otherImage && $otherImage->exists()) {
+                    $arrayInner[$otherImage->ID] = $otherImage;
+                }
             }
-        }
-        $count = 0;
-        foreach ($arrayInner as $image) {
-            $filename = $image->getFileName();
-            $oldFileLocationAbsolute = Controller::join_links(ASSETS_PATH, $filename);
-            if (file_exists($oldFileLocationAbsolute) && $image->ParentID !== $folder->ID) {
+            $count = 0;
+            foreach ($arrayInner as $image) {
+                $count++;
                 $extension = pathinfo($image->Name, PATHINFO_EXTENSION);
                 $extension = $extension ? strtolower($extension) : 'jpg';
                 $name = $this->InternalItemID . '_' . $count . '.' . $extension;
-                $title = $this->Title . ' #' . ($count + 1);
-                $image->ParentID = $folder->ID;
-                $image->Name = $name;
-                $image->Title = $title;
-                $image->writeToStage(Versioned::DRAFT);
-                $image->publishSingle();
-                $filename = $image->getFileName();
+                if($image->ParentID !== $folder->ID || $name !== $image->Name) {
+                    $filename = $image->getFileName();
+                    $oldFileLocationAbsolute = Controller::join_links(ASSETS_PATH, $filename);
+                    if (file_exists($oldFileLocationAbsolute)) {
+                        $newFileLocation = Controller::join_links(ASSETS_PATH, $folder->getFileName(), $name);
+                        if(! file_exists($newFileLocation)) {
+                            $title = $this->Title . ' #' . ($count + 1);
+                            $image->ParentID = $folder->ID;
+                            $image->Name = $name;
+                            $image->Title = $title;
+                            $image->write();
+                            $image->publishSingle();
+                        }
+                    }
+                }
             }
         }
+
     }
 
     public function SecondHandProductQualityPercentage()
