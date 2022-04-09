@@ -10,6 +10,8 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\SS_List;
+
+use SilverStripe\Versioned\Versioned;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
@@ -275,21 +277,20 @@ class ExportSecondHandProducts extends Controller
             }
             $count = 0;
             foreach ($arrayInner as $image) {
-                $fileName = $image->FileName;
-                $oldFileLocationAbsolute = Director::baseFolder() . '/' . $image->FileName;
+                $filename = $image->getFileName();
+                $oldFileLocationAbsolute = Controller::join_links(ASSETS_PATH, $filename);
                 if (file_exists($oldFileLocationAbsolute)) {
-                    $extension = pathinfo($image->FileName, PATHINFO_EXTENSION);
+                    $extension = pathinfo($image->Name, PATHINFO_EXTENSION);
                     $extension = $extension ? strtolower($extension) : 'jpg';
                     $name = $secondHandProduct->InternalItemID . '_' . $count . '.' . $extension;
-                    $fileName = $folder->FileName . $name;
                     $title = $secondHandProduct->Title . ' #' . ($count + 1);
                     $image->ParentID = $folder->ID;
                     $image->Name = $name;
-                    $image->FileName = $fileName;
                     $image->Title = $title;
-                    $image->ClassName = Image::class;
-                    $image->write();
-                    $newAbsoluteLocation = Director::baseFolder() . '/' . $image->FileName;
+                    $image->writeToStage(Versioned::DRAFT);
+                    $image->publishRecursive();
+                    $filename = $image->getFileName();
+                    $newAbsoluteLocation = Controller::join_links(ASSETS_PATH, $filename);
                     if (file_exists($newAbsoluteLocation)) {
                         if ($imageSizesOnly) {
                             if (! isset($array[$secondHandProduct->InternalItemID])) {
