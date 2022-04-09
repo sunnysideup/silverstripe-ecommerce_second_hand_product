@@ -81,13 +81,6 @@ class ExportSecondHandProducts extends Controller
     private static $location_to_save_contents = '';
 
     /**
-     * where will the data be saved (if any).
-     *
-     * @var string
-     */
-    private static $folder_for_second_hand_images = 'second-hand-images';
-
-    /**
      * make the page less easy to access
      * (but still accessible)
      * - code => ip address.
@@ -258,7 +251,7 @@ class ExportSecondHandProducts extends Controller
     protected function getImageArray($imageSizesOnly = false)
     {
         $array = [];
-        $folderName = Config::inst()->get(ExportSecondHandProducts::class, 'folder_for_second_hand_images');
+        $folderName = Config::inst()->get(SecondHandProduct::class, 'folder_for_second_hand_images');
         $folder = Folder::find_or_make($folderName);
         $secondHandProducts = SecondHandProduct::get()->filter(['AllowPurchase' => 1])->exclude(['ImageID' => 0]);
         foreach ($secondHandProducts as $secondHandProduct) {
@@ -278,31 +271,18 @@ class ExportSecondHandProducts extends Controller
             $count = 0;
             foreach ($arrayInner as $image) {
                 $filename = $image->getFileName();
-                $oldFileLocationAbsolute = Controller::join_links(ASSETS_PATH, $filename);
-                if (file_exists($oldFileLocationAbsolute)) {
-                    $extension = pathinfo($image->Name, PATHINFO_EXTENSION);
-                    $extension = $extension ? strtolower($extension) : 'jpg';
-                    $name = $secondHandProduct->InternalItemID . '_' . $count . '.' . $extension;
-                    $title = $secondHandProduct->Title . ' #' . ($count + 1);
-                    $image->ParentID = $folder->ID;
-                    $image->Name = $name;
-                    $image->Title = $title;
-                    $image->writeToStage(Versioned::DRAFT);
-                    $image->publishRecursive();
-                    $filename = $image->getFileName();
-                    $newAbsoluteLocation = Controller::join_links(ASSETS_PATH, $filename);
-                    if (file_exists($newAbsoluteLocation)) {
-                        if ($imageSizesOnly) {
-                            if (! isset($array[$secondHandProduct->InternalItemID])) {
-                                $array[$secondHandProduct->InternalItemID] = 0;
-                            }
-                            $array[$secondHandProduct->InternalItemID] += filesize($newAbsoluteLocation);
-                        } else {
-                            if (! isset($array[$secondHandProduct->InternalItemID])) {
-                                $array[$secondHandProduct->InternalItemID] = [];
-                            }
-                            $array[$secondHandProduct->InternalItemID][] = $name;
+                $location = Controller::join_links(ASSETS_PATH, $filename);
+                if (file_exists($location)) {
+                    if ($imageSizesOnly) {
+                        if (! isset($array[$secondHandProduct->InternalItemID])) {
+                            $array[$secondHandProduct->InternalItemID] = 0;
                         }
+                        $array[$secondHandProduct->InternalItemID] += filesize($location);
+                    } else {
+                        if (! isset($array[$secondHandProduct->InternalItemID])) {
+                            $array[$secondHandProduct->InternalItemID] = [];
+                        }
+                        $array[$secondHandProduct->InternalItemID][] = $image->Name;
                     }
                 }
                 ++$count;

@@ -22,6 +22,8 @@ use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Versioned\Versioned;
+
+use SilverStripe\Assets\Folder;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
@@ -72,6 +74,13 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      * @var array
      */
     private static $table_name = 'SecondHandProduct';
+
+    /**
+     * where will the data be saved (if any).
+     *
+     * @var string
+     */
+    private static $folder_for_second_hand_images = 'second-hand-images';
 
     private static $db = [
         'SoldPrice' => 'Currency',
@@ -798,6 +807,44 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         parent::onBeforeWrite();
         if(! $this->DateItemWasBought) {
             $this->DateItemWasBought = $this->Created;
+        }
+    }
+
+    public function onAfterWrite()
+    {
+        parent::onAfterWrite();
+        $array = [];
+        $folderName = Config::inst()->get(self::class, 'folder_for_second_hand_images');
+        $folder = Folder::find_or_make($folderName);
+        $arrayInner = [];
+        if ($this->ImageID) {
+            $image = $this->Image(); //see Product::has_one()
+            if ($image && $image->exists()) {
+                $arrayInner[$image->ID] = $image;
+            }
+        }
+        $otherImages = $this->AdditionalImages(); //see Product::many_many()
+        foreach ($otherImages as $otherImage) {
+            if ($otherImage && $otherImage->exists()) {
+                $arrayInner[$otherImage->ID] = $otherImage;
+            }
+        }
+        $count = 0;
+        foreach ($arrayInner as $image) {
+            $filename = $image->getFileName();
+            $oldFileLocationAbsolute = Controller::join_links(ASSETS_PATH, $filename);
+            if (file_exists($oldFileLocationAbsolute) && $image->ParentID !== $folder->ID) {
+                $extension = pathinfo($image->Name, PATHINFO_EXTENSION);
+                $extension = $extension ? strtolower($extension) : 'jpg';
+                $name = $this->InternalItemID . '_' . $count . '.' . $extension;
+                $title = $this->Title . ' #' . ($count + 1);
+                $image->ParentID = $folder->ID;
+                $image->Name = $name;
+                $image->Title = $title;
+                $image->writeToStage(Versioned::DRAFT);
+                $image->publishSingle();
+                $filename = $image->getFileName();
+            }
         }
     }
 
