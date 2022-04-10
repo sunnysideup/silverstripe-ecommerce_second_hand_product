@@ -99,7 +99,7 @@ class ExportSecondHandProducts extends Controller
         $withImageData = false;
         if (! empty($_GET['withimagedata'])) {
             $withImageData = true;
-            $imageData = $this->getImageArray(true);
+            $imageData = self::get_image_array(true);
         }
         $array = [];
         $products = SecondHandProduct::get()->filter(['AllowPurchase' => 1]);
@@ -168,7 +168,7 @@ class ExportSecondHandProducts extends Controller
 
     public function images()
     {
-        $array = $this->getImageArray();
+        $array = self::get_image_array(false);
 
         return $this->returnJSONorFile($array, 'images');
     }
@@ -248,12 +248,14 @@ class ExportSecondHandProducts extends Controller
         return $dataToBeAdded;
     }
 
-    protected function getImageArray($imageSizesOnly = false)
+    public static function get_image_array(?bool $imageSizesOnly = false, ?bool $getIds = false) : array
     {
         $array = [];
         $folderName = Config::inst()->get(SecondHandProduct::class, 'folder_for_second_hand_images');
         $folder = Folder::find_or_make($folderName);
-        $secondHandProducts = SecondHandProduct::get()->filter(['AllowPurchase' => 1])->exclude(['ImageID' => 0]);
+        $secondHandProducts = SecondHandProduct::get()
+            ->filter(['AllowPurchase' => 1])
+            ->exclude(['ImageID' => 0]);
         foreach ($secondHandProducts as $secondHandProduct) {
             $arrayInner = [];
             if ($secondHandProduct->ImageID) {
@@ -269,24 +271,29 @@ class ExportSecondHandProducts extends Controller
                 }
             }
             $count = 0;
-            foreach ($arrayInner as $image) {
+            foreach ($arrayInner as $imageID => $image) {
                 $filename = $image->getFileName();
                 $location = Controller::join_links(ASSETS_PATH, $filename);
-                if (file_exists($location)) {
-                    if ($imageSizesOnly) {
-                        if (! isset($array[$secondHandProduct->InternalItemID])) {
-                            $array[$secondHandProduct->InternalItemID] = 0;
+                if($getIds !== true) {
+                    if (file_exists($location)) {
+                        if ($imageSizesOnly) {
+                            if (! isset($array[$secondHandProduct->InternalItemID])) {
+                                $array[$secondHandProduct->InternalItemID] = 0;
+                            }
+                            $array[$secondHandProduct->InternalItemID] += filesize($location);
+                        } else {
+                            if (! isset($array[$secondHandProduct->InternalItemID])) {
+                                $array[$secondHandProduct->InternalItemID] = [];
+                            }
+                            $array[$secondHandProduct->InternalItemID][] = $image->Name;
                         }
-                        $array[$secondHandProduct->InternalItemID] += filesize($location);
-                    } else {
-                        if (! isset($array[$secondHandProduct->InternalItemID])) {
-                            $array[$secondHandProduct->InternalItemID] = [];
-                        }
-                        $array[$secondHandProduct->InternalItemID][] = $image->Name;
                     }
+                    ++$count;
                 }
-                ++$count;
             }
+        }
+        if($getIds) {
+            return $arrayInner;
         }
 
         return $array;
