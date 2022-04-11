@@ -25,10 +25,12 @@ class SecondHandProductActions
         $secondHandProduct = SecondHandProduct::get_by_id($id);
         if($secondHandProduct) {
             $currentMember = Security::getCurrentUser();
-            $secondHandProduct->ArchivedByID = $currentMember->ID;
+            if($currentMember) {
+                $secondHandProduct->ArchivedByID = $currentMember->ID;
+            }
             $internalItemID = $secondHandProduct->InternalItemID;
             if ($secondHandProduct->hasMethod('publishRecursive')) {
-                $secondHandProduct->write();
+                $secondHandProduct->writeToStage(Versioned::DRAFT);
                 $secondHandProduct->publishRecursive();
                 $secondHandProduct->deleteFromStage(Versioned::DRAFT);
                 $secondHandProduct->deleteFromStage(Versioned::LIVE);

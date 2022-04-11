@@ -32,11 +32,15 @@ class UpdateSecondHandProduct extends Controller
     {
         $unpublished = false;
         $otherID = $request->param('OtherID');
-        if (isset($otherID)) {
+        if (!empty($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
             $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
             if ($secondHandProduct) {
-                $unpublished = $secondHandProduct->deleteFromStage('Live');
+                $secondHandProduct->AllowPurchase = 0;
+                $secondHandProduct->ShowInMenus = 0;
+                $secondHandProduct->ShowInSearch = 0;
+                $secondHandProduct->writeToStage(Versioned::DRAFT);
+                $secondHandProduct->publishRecursive();
             }
         }
 
@@ -47,11 +51,13 @@ class UpdateSecondHandProduct extends Controller
     {
         $archived = false;
         $otherID = $request->param('OtherID');
-        $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
-        if ($secondHandProduct) {
-            $archived = SecondHandProductActions::archive($secondHandProduct->ID);
+        if (!empty($otherID)) {
+            $internalItemID = Convert::raw2sql($otherID);
+            $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
+            if ($secondHandProduct) {
+                $archived = SecondHandProductActions::archive($secondHandProduct->ID);
+            }
         }
-
         return json_encode($archived);
     }
 

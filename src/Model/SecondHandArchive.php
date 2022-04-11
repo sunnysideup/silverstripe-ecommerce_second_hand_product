@@ -127,6 +127,7 @@ class SecondHandArchive extends DataObject
         $obj->Title = $page->Title;
         $obj->Price = $page->Price;
         $obj->InternalItemID = $page->InternalItemID;
+        $obj->PageID = $page->ID;
         $obj->SerialNumber = $page->SerialNumber;
         $obj->DateItemWasBought = $page->DateItemWasBought;
         $obj->DateItemWasSold = $page->DateItemWasSold;
@@ -136,7 +137,6 @@ class SecondHandArchive extends DataObject
         $obj->SoldPrice = $page->SoldPrice;
         $obj->IncludesBoxOrCase = $page->IncludesBoxOrCase;
         $obj->OriginalManual = $page->OriginalManual;
-        $obj->PageID = $page->ID;
         $obj->Description = $page->ShortDescription;
         $obj->ArchivedByID = $page->ArchivedByID;
 

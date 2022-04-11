@@ -335,12 +335,8 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     public function onBeforeDelete()
     {
-        if ('Stage' !== Versioned::get_stage()) {
-            //do nothing
-        } else {
-            //page is being deleted permanently so create archived version
-            SecondHandArchive::create_from_page($this);
-        }
+
+        SecondHandArchive::create_from_page($this);
         parent::onBeforeDelete();
     }
 
