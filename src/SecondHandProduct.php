@@ -842,6 +842,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             }
             $count = 0;
             foreach ($arrayInner as $image) {
+                $this->ShortDescription .= $image->ID.'-1-';
                 $count++;
                 $extension = pathinfo($image->Name, PATHINFO_EXTENSION);
                 $extension = $extension ? strtolower($extension) : 'jpg';
@@ -850,16 +851,32 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 if($image->ParentID !== $folder->ID || $name !== $image->Name) {
                     $filename = $image->getFileName();
                     $oldFileLocationAbsolute = Controller::join_links(ASSETS_PATH, $filename);
-                    if (file_exists($oldFileLocationAbsolute)) {
+                    if (file_exists($oldFileLocationAbsolute) || 1 == 1) {
+                        $this->ShortDescription .= $oldFileLocationAbsolute.'-3-';
                         $newFileLocation = Controller::join_links(ASSETS_PATH, $folder->getFileName(), $name);
-                        if(! file_exists($newFileLocation)) {
-                            $title = $this->Title . ' #' . ($count + 1);
-                            $image->ParentID = $folder->ID;
-                            $image->Name = $name;
-                            $image->Title = $title;
-                            $image->write();
-                            $image->publishSingle();
+                        if(file_exists($newFileLocation)) {
+                            $imageToDelete = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name]);
+                            try {
+                                $imageToDelete->deleteFile();
+                            } catch (\Exception $e) {
+                                self::flush('Caught exception: ' .  $e->getMessage(), 'deleted') ;
+                            }
+                            if($imageToDelete->ID) {
+                                $imageToDelete->deleteFromStage(Versioned::DRAFT);
+                                $imageToDelete->deleteFromStage(Versioned::LIVE);
+                                $imageToDelete->delete();
+                            }
                         }
+                        $this->ShortDescription .= $oldFileLocationAbsolute.'-3-';
+                        $title = $this->Title . ' #' . ($count + 1);
+                        $image->ParentID = $folder->ID;
+                        $image->Name = $name;
+                        $image->Title = $title;
+                        $image->write();
+                        $image->publishSingle();
+                        $this->ShortDescription .= $folder->ID.'-2-';
+                    } else {
+                        $image->delete();
                     }
                 }
 
