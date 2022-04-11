@@ -124,7 +124,7 @@ class ExportSecondHandProducts extends Controller
                 }
                 $array[$count] += $this->addRelations($product, $relations);
                 if ($withImageData && isset($imageData[$product->InternalItemID])) {
-                    $array[$count]['ImagesFileSize'] = $imageData[$product->InternalItemID];
+                    $array[$count]['ImagesFileSize'] = array_sum($imageData[$product->InternalItemID]);
                 }
                 //next one
                 ++$count;
@@ -274,26 +274,20 @@ class ExportSecondHandProducts extends Controller
             foreach ($arrayInner as $imageID => $image) {
                 $filename = $image->getFileName();
                 $location = Controller::join_links(ASSETS_PATH, $filename);
-                if($getIds !== true) {
-                    if (file_exists($location)) {
-                        if ($imageSizesOnly) {
-                            if (! isset($array[$secondHandProduct->InternalItemID])) {
-                                $array[$secondHandProduct->InternalItemID] = 0;
-                            }
-                            $array[$secondHandProduct->InternalItemID] += filesize($location);
-                        } else {
-                            if (! isset($array[$secondHandProduct->InternalItemID])) {
-                                $array[$secondHandProduct->InternalItemID] = [];
-                            }
-                            $array[$secondHandProduct->InternalItemID][] = $image->Name;
-                        }
+                if (! isset($array[$secondHandProduct->InternalItemID])) {
+                    $array[$secondHandProduct->InternalItemID] = [];
+                }
+                if ($getIds) {
+                    $array[$secondHandProduct->InternalItemID][] = $imageID;
+                } elseif (file_exists($location)) {
+                    if ($imageSizesOnly) {
+                        $array[$secondHandProduct->InternalItemID][] = filesize($location);
+                    } else {
+                        $array[$secondHandProduct->InternalItemID][] = $image->Name;
                     }
                     ++$count;
                 }
             }
-        }
-        if($getIds) {
-            return $arrayInner;
         }
 
         return $array;
