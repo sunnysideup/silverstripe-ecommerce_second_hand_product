@@ -272,13 +272,17 @@ class ExportSecondHandProducts extends Controller
             }
             $count = 0;
             foreach ($arrayInner as $imageID => $image) {
+                if($image->ParentID !== $folder->ID) {
+                    $secondHandProduct->writeToStage(Versioned::DRAFT);
+                    $secondHandProduct->publishRecursive();
+                }
                 $filename = $image->getFileName();
                 $location = Controller::join_links(ASSETS_PATH, $filename);
                 if (! isset($array[$secondHandProduct->InternalItemID])) {
                     $array[$secondHandProduct->InternalItemID] = [];
                 }
                 if ($getIds) {
-                    $array[$secondHandProduct->InternalItemID][$imageID] = $imageID;
+                    $array[$secondHandProduct->InternalItemID][] = $imageID;
                 } elseif (file_exists($location)) {
                     if ($imageSizesOnly) {
                         $array[$secondHandProduct->InternalItemID][] = filesize($location);
