@@ -270,7 +270,7 @@ class ExportSecondHandProducts extends Controller
                     $arrayInner[$otherImage->ID] = $otherImage;
                 }
             }
-            $count = 0;
+
             foreach ($arrayInner as $imageID => $image) {
                 if($image->ParentID !== $folder->ID) {
                     $secondHandProduct->writeToStage(Versioned::DRAFT);
@@ -283,14 +283,13 @@ class ExportSecondHandProducts extends Controller
                     $array[$secondHandProduct->InternalItemID] = [];
                 }
                 if ($getIds) {
-                    $array[$secondHandProduct->InternalItemID][] = $imageID;
+                    $array[$secondHandProduct->InternalItemID][$imageID] = $image->ID;
                 } elseif (file_exists($location)) {
                     if ($imageSizesOnly) {
                         $array[$secondHandProduct->InternalItemID][] = filesize($location);
                     } else {
                         $array[$secondHandProduct->InternalItemID][] = $image->Name;
                     }
-                    ++$count;
                 }
             }
         }
