@@ -275,6 +275,7 @@ class ExportSecondHandProducts extends Controller
                 if($image->ParentID !== $folder->ID) {
                     $secondHandProduct->writeToStage(Versioned::DRAFT);
                     $secondHandProduct->publishRecursive();
+                    $image = Image::get()->byID($image->ID);
                 }
                 $filename = $image->getFileName();
                 $location = Controller::join_links(ASSETS_PATH, $filename);
