@@ -842,7 +842,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             }
             $count = 0;
             foreach ($arrayInner as $image) {
-                $this->ShortDescription .= $image->ID.'-1-';
                 $count++;
                 $extension = pathinfo($image->Name, PATHINFO_EXTENSION);
                 $extension = $extension ? strtolower($extension) : 'jpg';
@@ -852,7 +851,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                     $filename = $image->getFileName();
                     $oldFileLocationAbsolute = Controller::join_links(ASSETS_PATH, $filename);
                     if (file_exists($oldFileLocationAbsolute) || 1 == 1) {
-                        $this->ShortDescription .= $oldFileLocationAbsolute.'-3-';
                         $newFileLocation = Controller::join_links(ASSETS_PATH, $folder->getFileName(), $name);
                         if(file_exists($newFileLocation)) {
                             $imageToDelete = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name]);
@@ -867,14 +865,12 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                                 $imageToDelete->delete();
                             }
                         }
-                        $this->ShortDescription .= $oldFileLocationAbsolute.'-3-';
-                        $title = $this->Title . ' #' . ($count + 1);
+                        $title = $this->Title . ' #' . $count;
                         $image->ParentID = $folder->ID;
                         $image->Name = $name;
                         $image->Title = $title;
                         $image->write();
                         $image->publishSingle();
-                        $this->ShortDescription .= $folder->ID.'-2-';
                     } else {
                         $image->delete();
                     }
