@@ -283,12 +283,12 @@ class ExportSecondHandProducts extends Controller
                     $array[$secondHandProduct->InternalItemID] = [];
                 }
                 if ($getIds) {
-                    $array[$secondHandProduct->InternalItemID][$imageID] = $image->ID;
+                    $array[$secondHandProduct->InternalItemID][$imageID] = filesize($location);
                 } elseif (file_exists($location)) {
                     if ($imageSizesOnly) {
                         $array[$secondHandProduct->InternalItemID][] = filesize($location);
                     } else {
-                        $array[$secondHandProduct->InternalItemID][] = $image->Name;
+                        $array[$secondHandProduct->InternalItemID][] = $image->Name.'*'.filesize($location);
                     }
                 }
             }
