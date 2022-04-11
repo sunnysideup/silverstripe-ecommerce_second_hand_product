@@ -867,47 +867,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         }
     }
 
-    protected function checkForVersions($image, $extension)
-    {
-        $testNamePrev = $image->Name;
-        for($i = 100; $i > 0; $i--) {
-            if ($i > 2) {
-                $testRight = '-v'.$i.'.' . $extension;
-                $testRightPrev = '-v'.($i - 1).'.' . $extension;
-            } else {
-                $testRight = '-v2.' . $extension;
-                $testRightPrev = '.' . $extension;
-            }
-            if (substr($image->Name, strlen($testRight)) == $testRight) {
-                $testNamePrev = str_replace($testRight, $testRightPrev, $image->Name);
-                $testImagePrev = Image::get()
-                    ->filter(['ParentID' => $image->ParentID, 'Name' => $testNamePrev])
-                    ->first();
-                if($testImagePrev) {
-                    $this->deleteFile($testImagePrev);
-                }
-                $image->Name = $testNamePrev;
-            }
-        }
-        $image->Name = $testNamePrev;
-    }
-
-    protected  function deleteFile($file)
-    {
-        if($file) {
-            try {
-                $file->deleteFile();
-            } catch (\Exception $e) {
-                echo 'Caught exception: ' .  $e->getMessage();
-            }
-            if($file->ID) {
-                $file->deleteFromStage(Versioned::DRAFT);
-                $file->deleteFromStage(Versioned::LIVE);
-                $file->delete();
-            }
-        }
-    }
-
     public function SecondHandProductQualityPercentage()
     {
         return $this->ProductQuality * 10;
