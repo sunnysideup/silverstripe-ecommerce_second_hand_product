@@ -871,7 +871,8 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                             $imageToMove = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name]);
                             if($imageToMove && $imageToMove->ID !== $image->ID) {
                                 try {
-                                    $imageToMove->Name =  $this->InternalItemID . '_' . rand(999,999999) . '.' . $extension;
+                                    $imageToMove->Name =  $this->InternalItemID . '_' . rand(999,99999999) . '.' . $extension;
+                                    $imageToMove->ParentID = $folder->ID;
                                     $imageToMove->write();
                                     $imageToMove->publishSingle();
                                 } catch (\Exception $e) {
