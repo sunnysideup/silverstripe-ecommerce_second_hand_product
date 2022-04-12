@@ -59,7 +59,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      *
      * @var int
      */
-    private static $max_number_of_days_for_sale = 999;
+    private static $max_number_of_days_for_sale = 9999;
 
     /**
      * Restrict GoogleAddressField to a specific Country
