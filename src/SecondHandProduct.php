@@ -832,7 +832,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     public function onAfterWrite()
     {
         parent::onAfterWrite();
-
     }
 
     protected function fixImagePosition()
@@ -862,22 +861,25 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 $extension = $extension ? strtolower($extension) : 'jpg';
                 $name = $this->InternalItemID . '_' . $count . '.' . $extension;
 
+                //if there is a different image, we delete that first ...
                 if($image->ParentID !== $folder->ID || $name !== $image->Name) {
                     $filename = $image->getFileName();
                     $oldFileLocationAbsolute = Controller::join_links(ASSETS_PATH, $filename);
-                    if (file_exists($oldFileLocationAbsolute) || 1 == 1) {
+                    if ($image->exists()) {
                         $newFileLocation = Controller::join_links(ASSETS_PATH, $folder->getFileName(), $name);
                         if(file_exists($newFileLocation)) {
                             $imageToDelete = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name]);
-                            try {
-                                $imageToDelete->deleteFile();
-                            } catch (\Exception $e) {
-                                self::flush('Caught exception: ' .  $e->getMessage(), 'deleted') ;
-                            }
-                            if($imageToDelete->ID) {
-                                $imageToDelete->deleteFromStage(Versioned::DRAFT);
-                                $imageToDelete->deleteFromStage(Versioned::LIVE);
-                                $imageToDelete->delete();
+                            if($imageToDelete->ID !== $image->ID) {
+                                try {
+                                    $imageToDelete->deleteFile();
+                                } catch (\Exception $e) {
+                                    self::flush('Caught exception: ' .  $e->getMessage(), 'deleted') ;
+                                }
+                                if($imageToDelete->ID) {
+                                    $imageToDelete->deleteFromStage(Versioned::DRAFT);
+                                    $imageToDelete->deleteFromStage(Versioned::LIVE);
+                                    $imageToDelete->delete();
+                                }
                             }
                         }
                         $title = $this->Title . ' #' . $count;
@@ -887,10 +889,22 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                         $image->write();
                         $image->publishSingle();
                     } else {
-                        $image->delete();
+                        // $image->deleteFile();
+                        // $image->deleteFromStage(Versioned::DRAFT);
+                        // $image->deleteFromStage(Versioned::LIVE);
+                        // $image->delete();
                     }
                 }
 
+            }
+            if(! $this->ImageID) {
+                if(count($arrayInner)) {
+                    $id = array_key_first($arrayInner);
+                    if($id) {
+                        $this->ImageID = $id;
+                        $this->AdditionalImages()->removeByID($id);
+                    }
+                }
             }
         }
     }
