@@ -868,22 +868,14 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                     if ($image->exists()) {
                         $newFileLocation = Controller::join_links(ASSETS_PATH, $folder->getFileName(), $name);
                         if(file_exists($newFileLocation)) {
-                            $imageToDelete = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name]);
-                            if($imageToDelete && $imageToDelete->ID !== $image->ID) {
+                            $imageToMove = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name]);
+                            if($imageToMove && $imageToMove->ID !== $image->ID) {
                                 try {
-                                    $imageToDelete->deleteFile();
+                                    $imageToMove->Name =  $this->InternalItemID . '_' . rand(999,999999) . '.' . $extension;
+                                    $imageToMove->write();
+                                    $imageToMove->publishSingle();
                                 } catch (\Exception $e) {
-                                    self::flush('Caught exception with deletion of file: ' .  $e->getMessage(), 'deleted') ;
-                                }
-                                try {
-                                    if($imageToDelete->ID) {
-                                        $imageToDelete->deleteFromStage(Versioned::DRAFT);
-                                        $imageToDelete->deleteFromStage(Versioned::LIVE);
-                                        $imageToDelete->delete();
-                                    }
-                                    $imageToDelete->deleteFile();
-                                } catch (\Exception $e) {
-                                    self::flush('Caught exception with deletion of DB record: ' .  $e->getMessage(), 'deleted') ;
+                                    self::flush('Caught exception with renameing of file: ' .  $e->getMessage(), 'deleted') ;
                                 }
                             }
                         }
