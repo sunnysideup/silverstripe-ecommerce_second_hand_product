@@ -19,11 +19,15 @@ class EcommerceTaskSecondHandPublishAll extends BuildTask
     public function run($request)
     {
         Environment::increaseTimeLimitTo(600);
-        $products = SecondHandProduct::get();
+        $products = SecondHandProduct::get()->filter(['AllowPurchase' => 1]);
         foreach ($products as $product) {
-            DB::alteration_message('Publish: ' . $product->Title);
-            $product->writeToStage(Versioned::DRAFT);
-            $product->publishRecursive();
+            DB::alteration_message('Publish: ' . $product->Title. ' - '.$product->InternalItemID);
+            try{
+                $product->writeToStage(Versioned::DRAFT);
+                $product->publishRecursive();
+            } catch (\Exception $e) {
+                DB::alteration_message('Caught exception, could not publish ' .  $e->getMessage(), 'deleted') ;
+            }
         }
         DB::alteration_message(' ================= Completed =================  ');
     }

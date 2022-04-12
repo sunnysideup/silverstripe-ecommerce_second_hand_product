@@ -14,6 +14,7 @@ use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\TextField;
+use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
@@ -876,7 +877,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                                     $imageToMove->write();
                                     $imageToMove->publishSingle();
                                 } catch (\Exception $e) {
-                                    self::flush('Caught exception with renameing of file: ' .  $e->getMessage(), 'deleted') ;
+                                    DB::alteration_message('Caught exception with renameing of file: ' .  $e->getMessage(), 'deleted') ;
                                 }
                             }
                         }
