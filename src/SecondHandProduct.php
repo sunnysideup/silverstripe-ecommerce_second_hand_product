@@ -869,7 +869,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                     if ($image->exists()) {
                         $newFileLocation = Controller::join_links(ASSETS_PATH, $folder->getFileName(), $name);
                         if(file_exists($newFileLocation)) {
-                            $imageToMove = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name]);
+                            $imageToMove = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name])->first();
                             if($imageToMove && $imageToMove->ID !== $image->ID) {
                                 try {
                                     $imageToMove->Name =  $this->InternalItemID . '_' . rand(999,99999999) . '.' . $extension;
