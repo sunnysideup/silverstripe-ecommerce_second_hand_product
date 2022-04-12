@@ -869,16 +869,21 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                         $newFileLocation = Controller::join_links(ASSETS_PATH, $folder->getFileName(), $name);
                         if(file_exists($newFileLocation)) {
                             $imageToDelete = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name]);
-                            if($imageToDelete->ID !== $image->ID) {
+                            if($imageToDelete && $imageToDelete->ID !== $image->ID) {
                                 try {
                                     $imageToDelete->deleteFile();
                                 } catch (\Exception $e) {
-                                    self::flush('Caught exception: ' .  $e->getMessage(), 'deleted') ;
+                                    self::flush('Caught exception with deletion of file: ' .  $e->getMessage(), 'deleted') ;
                                 }
-                                if($imageToDelete->ID) {
-                                    $imageToDelete->deleteFromStage(Versioned::DRAFT);
-                                    $imageToDelete->deleteFromStage(Versioned::LIVE);
-                                    $imageToDelete->delete();
+                                try {
+                                    if($imageToDelete->ID) {
+                                        $imageToDelete->deleteFromStage(Versioned::DRAFT);
+                                        $imageToDelete->deleteFromStage(Versioned::LIVE);
+                                        $imageToDelete->delete();
+                                    }
+                                    $imageToDelete->deleteFile();
+                                } catch (\Exception $e) {
+                                    self::flush('Caught exception with deletion of DB record: ' .  $e->getMessage(), 'deleted') ;
                                 }
                             }
                         }
