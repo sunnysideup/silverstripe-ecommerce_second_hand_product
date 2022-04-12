@@ -277,6 +277,10 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      */
     public function canCreate($member = null, $context = [])
     {
+        $extended = $this->extendedCan(__FUNCTION__, $member);
+        if ($extended !== null) {
+            return $extended;
+        }
         return Permission::check(
             EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
             'any',
@@ -293,6 +297,11 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      */
     public function canPublish($member = null)
     {
+        $extended = $this->extendedCan(__FUNCTION__, $member);
+        if ($extended !== null) {
+            return $extended;
+        }
+
         return Permission::check(
             EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
             'any',
@@ -310,6 +319,11 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      */
     public function canEdit($member = null, $context = [])
     {
+        $extended = $this->extendedCan(__FUNCTION__, $member);
+        if ($extended !== null) {
+            return $extended;
+        }
+
         return Permission::check(
             EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
             'any',
@@ -326,6 +340,11 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      */
     public function canDelete($member = null)
     {
+        $extended = $this->extendedCan(__FUNCTION__, $member);
+        if ($extended !== null) {
+            return $extended;
+        }
+
         return Permission::check(
             EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
             'any',
