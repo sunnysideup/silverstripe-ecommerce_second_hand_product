@@ -68,6 +68,7 @@ class SecondHandForSaleList extends DataObject
             'ForSale',
             'Added',
             'Removed',
+            'Archived',
         ]);
         $fields->addFieldsToTab(
             'Root.Main',
@@ -113,6 +114,7 @@ class SecondHandForSaleList extends DataObject
                 }
             }
             $this->Archived = implode(',', $archived);
+            $this->write();
         }
     }
 
@@ -167,6 +169,7 @@ class SecondHandForSaleList extends DataObject
         $html .= '<h2>Removed</h2><div>'.$this->codeToDetails((string) $this->Removed).'</div>';
         $html .= '<h2>Added</h2><div>'.$this->codeToDetails((string) $this->Added).'</div>';
         $html .= '<h2>For Sale</h2><div>'. $this->codeToDetails((string) $this->ForSale) .'</div>';
+        $html .= '<h2>Archived</h2><div>'. $this->codeToDetails((string) $this->Archived) .'</div>';
 
         return $html;
     }
