@@ -43,26 +43,6 @@ class SecondHandForSaleList extends DataObject
         'ID' => 'DESC',
     ];
 
-    public function onBeforeWrite()
-    {
-        parent::onBeforeWrite();
-        if(! $this->ForSale) {
-            $currentArray = SecondHandProduct::get()
-                ->filter(['AllowPurchase' => 1])
-                ->sort('Created DESC')
-                ->column('InternalItemID');
-            $this->ForSale = implode(',', $currentArray);
-            $prev = SecondHandForSaleList::get()
-                ->exclude(['ID' => (int) $this->ID])
-                ->sort(['ID' => 'DESC'])->first();
-            if($prev) {
-                $prevArray = explode(',', (string) $prev->ForSale);
-                $this->Added = implode(',', array_diff($currentArray, $prevArray));
-                $this->Removed = implode(',', array_diff($prevArray, $currentArray));
-            }
-        }
-    }
-
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -84,22 +64,45 @@ class SecondHandForSaleList extends DataObject
         return $fields;
     }
 
+    public function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+        if(! $this->ForSale) {
+            $currentArray = SecondHandProduct::get()
+                ->filter(['AllowPurchase' => 1])
+                ->sort('Created DESC')
+                ->column('InternalItemID');
+            $this->ForSale = implode(',', $currentArray);
+            $prev = SecondHandForSaleList::get()
+                ->exclude(['ID' => (int) $this->ID])
+                ->sort(['ID' => 'DESC'])->first();
+            if($prev) {
+                $prevArray = explode(',', (string) $prev->ForSale);
+                $this->Added = implode(',', array_diff($currentArray, $prevArray));
+                $this->Removed = implode(',', array_diff($prevArray, $currentArray));
+            }
+        }
+    }
+
+
     public function onAfterWrite()
     {
         parent::onAfterWrite();
         if(! $this->Title) {
-            $this->Title = 'For Sale on '.$this->Created;
+            $this->Title = 'Second Hand Products For Sale on '.$this->Created;
             $this->write();
         } else {
             if($this->Config()->email_admin && ! $this->EmailPrepared) {
                 $from = Email::config()->admin_email;
                 $to = Email::config()->admin_email;
-                $subject = 'Second-Hand Changes';
-                $body = $this->HTMLSummary();
-                $email = new Email($from, $to, $subject, $body);
-                $email->send();
-                $this->EmailPrepared = 1;
-                $this->EmailSent = $this->write();
+                if($from) {
+                    $subject = $this->Title;
+                    $body = $this->HTMLSummary();
+                    $email = new Email($from, $to, $subject, $body);
+                    $this->EmailPrepared = 1;
+                    $this->EmailSent = $email->send();
+                    $this->write();
+                }
             }
         }
     }
@@ -131,7 +134,7 @@ class SecondHandForSaleList extends DataObject
         $obj = SecondHandProduct::get()->filter(['InternalItemID' => $code])->first();
         $html = '';
         if($obj) {
-            $html .= '<a href="'.Director::absoluteURL($obj->CMSEditLink()).'">'.$obj->Title.'</a>';
+            $html .= '<a href="'.Director::absoluteURL($obj->CMSEditLink()).'">'.$obj->InternalItemID.' - '.$obj->Title.': '.$obj->Price.'</a>';
         } else {
             $html .= $code;
         }
