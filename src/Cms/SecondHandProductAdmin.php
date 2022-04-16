@@ -17,6 +17,7 @@ use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
 use Sunnysideup\Ecommerce\Traits\EcommerceModelAdminTrait;
 use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs\GridFieldEditOriginalPageConfigSecondHandPage;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
+use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandForSaleList;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
@@ -42,6 +43,7 @@ class SecondHandProductAdmin extends ModelAdmin
     private static $managed_models = [
         SecondHandProduct::class,
         SecondHandArchive::class,
+        SecondHandForSaleList::class,
     ];
 
     private static $allowed_actions = [
@@ -115,7 +117,7 @@ class SecondHandProductAdmin extends ModelAdmin
             $id = (int) $_GET['productid'];
             if ($id) {
                 $restoredPage = SecondHandProductActions::restore($id);
-                if ($parentID) {
+                if ($restoredPage) {
                     $this->getResponse()->addHeader(
                         'X-Status',
                         rawurlencode(_t(
@@ -129,7 +131,7 @@ class SecondHandProductAdmin extends ModelAdmin
                     return Controller::curr()->redirect($cmsEditLink);
                 }
 
-                return new HTTPResponse("Parent Page #{$parentID} is missing", 400);
+                return new HTTPResponse("Parent Page #{$id} is missing", 400);
             }
         }
 

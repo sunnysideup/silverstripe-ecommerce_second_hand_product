@@ -908,6 +908,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         }
     }
 
+
     public function SecondHandProductQualityPercentage()
     {
         return $this->ProductQuality * 10;
