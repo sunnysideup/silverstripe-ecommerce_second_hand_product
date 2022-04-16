@@ -63,19 +63,21 @@ class SecondHandForSaleList extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
-        $fields->removeByName([
-            'Title',
-            'ForSale',
-            'Added',
-            'Removed',
-            'Archived',
-        ]);
         $fields->addFieldsToTab(
-            'Root.Main',
+            'Root.Summary',
             [
                 LiteralField::create(
                     'HTMLSummary',
                     $this->HTMLSummary()
+                )
+            ]
+        );
+        $fields->addFieldsToTab(
+            'Root.ProductsForSale',
+            [
+                ReadonlyField::create(
+                    'ForSale',
+                    'For Sale'
                 )
             ]
         );
@@ -113,7 +115,7 @@ class SecondHandForSaleList extends DataObject
                     SecondHandProductActions::archive($obj);
                 }
             }
-            $this->Archived = implode(',', $aexitrchived);
+            $this->Archived = implode(',', $archived);
             $this->write();
         }
     }
@@ -165,11 +167,11 @@ class SecondHandForSaleList extends DataObject
 
     protected function HTMLSummary(): string
     {
-        $html = '<h1>'.$this->Title.'</h1>';
+        $html = '<h1>'.$this->Title.' ('.$this->ProductCount.')</h1>';
         $html .= '<h2>Removed</h2><div>'.$this->codeToDetails((string) $this->Removed).'</div>';
         $html .= '<h2>Added</h2><div>'.$this->codeToDetails((string) $this->Added).'</div>';
-        $html .= '<h2>For Sale</h2><div>'. $this->codeToDetails((string) $this->ForSale) .'</div>';
         $html .= '<h2>Archived</h2><div>'. $this->codeToDetails((string) $this->Archived) .'</div>';
+        $html .= '<h2>For Sale</h2><div>'. $this->codeToDetails((string) $this->ForSale) .'</div>';
 
         return $html;
     }
@@ -203,5 +205,12 @@ class SecondHandForSaleList extends DataObject
         return false;
     }
 
+    public function canEdit($member = null)
+    {
+        if(strtotime($this->Created) < (time() - 3600)) {
+            return false;
+        }
+        return parent::canEdit($member);
+    }
 
 }
