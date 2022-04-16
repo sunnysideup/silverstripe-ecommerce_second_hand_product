@@ -355,7 +355,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     public function onBeforeDelete()
     {
-
         SecondHandArchive::create_from_page($this);
         parent::onBeforeDelete();
     }

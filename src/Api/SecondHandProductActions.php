@@ -18,6 +18,7 @@ use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs\GridFieldEdit
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
+
 class SecondHandProductActions
 {
     public static function archive(int $id) : ?SecondHandArchive
@@ -32,6 +33,7 @@ class SecondHandProductActions
             if ($secondHandProduct->hasMethod('publishRecursive')) {
                 $secondHandProduct->writeToStage(Versioned::DRAFT);
                 $secondHandProduct->publishRecursive();
+                $secondHandProduct->delete();
                 $secondHandProduct->deleteFromStage(Versioned::DRAFT);
                 $secondHandProduct->deleteFromStage(Versioned::LIVE);
             } elseif ($secondHandProduct) {

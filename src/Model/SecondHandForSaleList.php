@@ -18,8 +18,13 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use SilverStripe\Control\Director;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 
+use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
+
 class SecondHandForSaleList extends DataObject
 {
+
+    private static $keep_for_days = 7;
+
     private static $table_name = 'SecondHandForSaleList';
 
     private static $email_admin = true;
@@ -28,11 +33,23 @@ class SecondHandForSaleList extends DataObject
 
     private static $db = [
         'Title' => 'Varchar',
+        'ProductCount' => 'Int',
         'ForSale' => 'Text',
         'Added' => 'Text',
         'Removed' => 'Text',
+        'Archived' => 'Text',
         'EmailPrepared' => 'Boolean',
         'EmailSent' => 'Boolean',
+    ];
+
+    private static $summary_fields = [
+        'Title' => 'Title',
+        'ProductCount' => 'Count',
+        'Added' => 'Added',
+        'Removed' => 'Removed',
+        'Archived' => 'Archived',
+        'EmailPrepared.Nice' => 'Email Ready',
+        'EmailSent.Nice' => 'Email Sent',
     ];
 
     private static $singular_name = 'For Sale List Entry';
@@ -64,6 +81,42 @@ class SecondHandForSaleList extends DataObject
         return $fields;
     }
 
+    public function deleteOldData()
+    {
+        if($this->Config()->delete_old) {
+            $archived = [];
+            $daysAgo = $this->Config()->keep_for_days;
+            if($daysAgo) {
+                $timeFilter = [
+                    'Created:LessThan' => date('Y-m-d', strtotime('-' . $daysAgo . ' days')) . ' 00:00:00'
+                ];
+                $olderOnes = SecondHandForSaleList::get()->filter($timeFilter)->limit(30);
+                foreach($olderOnes as $item) {
+                    $removeList = explode(',', $item->Removed);
+                    $item->ForSale = '';
+                    $item->write();
+                    foreach($removeList as $code) {
+                        $obj = SecondHandProduct::get()->filter(['AllowPurchase' => 1, 'InternalItemID' => $code])->first();
+                        if($obj) {
+                            $archived[] = $obj->InternalItemID;
+                            SecondHandProductActions::archive($obj);
+                        }
+                    }
+                }
+                $timeFilterLastEdited = [
+                    'LastEdited:LessThan' => date('Y-m-d', strtotime('-' . $daysAgo . ' days')) . ' 00:00:00'
+                ];
+                $objects = SecondHandProduct::get()->filter([$timeFilterLastEdited, 'AllowPurchase' => 0])->limit(30);
+                foreach($objects as $obj) {
+                    $archived[] = $obj->InternalItemID;
+                    SecondHandProductActions::archive($obj);
+                }
+            }
+            $this->Archived = implode(',', $archived);
+        }
+    }
+
+
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
@@ -72,6 +125,7 @@ class SecondHandForSaleList extends DataObject
                 ->filter(['AllowPurchase' => 1])
                 ->sort('Created DESC')
                 ->column('InternalItemID');
+            $this->ProductCount = count($currentArray);
             $this->ForSale = implode(',', $currentArray);
             $prev = SecondHandForSaleList::get()
                 ->exclude(['ID' => (int) $this->ID])
