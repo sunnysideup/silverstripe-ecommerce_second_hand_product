@@ -113,7 +113,7 @@ class SecondHandForSaleList extends DataObject
                     SecondHandProductActions::archive($obj);
                 }
             }
-            $this->Archived = implode(',', $archived);
+            $this->Archived = implode(',', $aexitrchived);
             $this->write();
         }
     }
