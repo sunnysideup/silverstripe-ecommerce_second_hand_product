@@ -33,9 +33,9 @@ class SecondHandProductActions
             if ($secondHandProduct->hasMethod('publishRecursive')) {
                 $secondHandProduct->writeToStage(Versioned::DRAFT);
                 $secondHandProduct->publishRecursive();
-                $secondHandProduct->delete();
                 $secondHandProduct->deleteFromStage(Versioned::DRAFT);
                 $secondHandProduct->deleteFromStage(Versioned::LIVE);
+                $secondHandProduct->delete();
             } elseif ($secondHandProduct) {
                 $secondHandProduct->write();
                 $secondHandProduct->delete();
@@ -49,7 +49,7 @@ class SecondHandProductActions
         $restoredPage = Versioned::get_latest_version(SiteTree::class, $id);
         $parentID = $restoredPage->ParentID;
         if ($parentID) {
-            $restoredPage->ensureParentHasVersion($parentID);
+            self::ensureParentHasVersion($parentID);
             if (! $restoredPage) {
                 return new HTTPResponse("SiteTree #{$id} not found", 400);
             }
@@ -63,7 +63,7 @@ class SecondHandProductActions
      *
      * @param mixed $parentID
      */
-    public function ensureParentHasVersion($parentID)
+    protected static function ensureParentHasVersion($parentID)
     {
         $parentPage = Versioned::get_latest_version(SiteTree::class, $parentID);
         if (! $parentPage) {

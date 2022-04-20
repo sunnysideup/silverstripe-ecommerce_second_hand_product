@@ -8,6 +8,8 @@ use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+
+use SilverStripe\Assets\Image;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
 
@@ -53,7 +55,12 @@ class SecondHandArchive extends DataObject
 
     private static $has_one = [
         'ArchivedBy' => Member::class,
+        'Image' => Image::class,
     ];
+    private static $many_many = [
+        'AdditionalImages' => Image::class,
+    ];
+
 
     private static $singular_name = 'Archived Second Hand Product';
 
@@ -155,9 +162,11 @@ class SecondHandArchive extends DataObject
         $obj->SellersDateOfBirth = $page->SellersDateOfBirth;
         $obj->SellersIDExpiryDate = $page->SellersIDExpiryDate;
         $obj->SellersIDPhotocopy = $page->SellersIDPhotocopy;
-
+        $obj->ImageID = $page->ImageID;
         $obj->write();
-
+        foreach($page->AdditionalImages() as $image) {
+            $obj->AdditionalImages()->add($image);
+        }
         return $obj;
     }
 
@@ -240,12 +249,13 @@ class SecondHandArchive extends DataObject
     {
         $fields = parent::getCMSFields();
         if (Config::inst()->get(SecondHandArchive::class, 'show_restore_button')) {
+            $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandArchive::class);
             $fields->addFieldsToTab(
                 'Root.Main',
                 [
                     EcommerceCMSButtonField::create(
                         'RestoreButton',
-                        '/admin/secondhandproducts/SecondHandProduct/restore/?productid=' . $this->PageID,
+                        SecondHandProduct::restore_link($this->PageID),
                         _t('SecondHandArchive.RESTORE_BUTTON', 'Restore Product')
                     ),
                 ]

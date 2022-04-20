@@ -40,6 +40,7 @@ class SecondHandForSaleList extends DataObject
         'Archived' => 'Text',
         'EmailPrepared' => 'Boolean',
         'EmailSent' => 'Boolean',
+        'Notes' => 'Text',
     ];
 
     private static $summary_fields = [
@@ -81,6 +82,11 @@ class SecondHandForSaleList extends DataObject
                 )
             ]
         );
+        foreach(array_keys($this->Config()->get('db')) as $fieldName) {
+            if($fieldName !== 'Notes') {
+                $fields->replaceField($fieldName, $fields->dataFieldByName($fieldName)->performReadonlyTransformation());
+            }
+        }
         return $fields;
     }
 
@@ -207,7 +213,7 @@ class SecondHandForSaleList extends DataObject
 
     public function canEdit($member = null)
     {
-        if(strtotime($this->Created) < (time() - 3600)) {
+        if($this->Created && strtotime($this->Created) < (time() - 3600)) {
             return false;
         }
         return parent::canEdit($member);

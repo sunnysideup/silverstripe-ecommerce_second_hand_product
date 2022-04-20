@@ -126,7 +126,7 @@ class SecondHandProductAdmin extends ModelAdmin
                             ['title' => $restoredPage->Title]
                         ))
                     );
-                    $cmsEditLink = $restoredPage->ModelAdminLink();
+                    $cmsEditLink = $restoredPage->CMSEditLink();
 
                     return Controller::curr()->redirect($cmsEditLink);
                 }

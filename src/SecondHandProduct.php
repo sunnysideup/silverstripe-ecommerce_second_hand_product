@@ -645,17 +645,15 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return '/admin/secondhandproducts/' . $classURLSegment . '/archive/?productid=' . $this->ID;
     }
 
-    public function RestoreLink() : string
+    public static function restore_link(int $id) : string
     {
         $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandProduct::class);
-        return '/admin/secondhandproducts/' . $classURLSegment . '/restore/?productid=' . $this->ID;
+        return '/admin/secondhandproducts/' . $classURLSegment . '/restore/?productid=' . $id;
     }
 
     public function ModelAdminLink() : string
     {
-        //admin/secondhandproducts/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/EditForm/field/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/item/7760/edit
-        $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandArchive::class);
-        return '/admin/secondhandproducts/' . $classURLSegment . '/EditForm/field/' . $classURLSegment . '/item/' . $this->ID . '/edit';
+        return $this->CMSEditLink();
     }
 
     public function getPrintLink()
