@@ -596,15 +596,15 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
         // If the product has been sold all fields should be disabled
         // Only the shop administrator is allowed to undo this.
+        $fields->insertAfter(
+            'AllowPurchase',
+            EcommerceCMSButtonField::create(
+                'ArchiveButton',
+                $this->ArchiveLink(),
+                _t('SecondHandProduct.ARCHIVE_BUTTON', 'Archive Product')
+            )
+        );
         if ($this->HasBeenSold()) {
-            $fields->insertAfter(
-                'AllowPurchase',
-                EcommerceCMSButtonField::create(
-                    'ArchiveButton',
-                    $this->ArchiveLink(),
-                    _t('SecondHandProduct.ARCHIVE_BUTTON', 'Archive Product')
-                )
-            );
             $fields = $fields->makeReadonly();
             $fields->replaceField($categoriesTable->Name, $categoriesTable);
             $categoriesTable->setConfig(GridFieldConfig_RecordViewer::create());
