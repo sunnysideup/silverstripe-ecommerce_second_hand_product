@@ -115,7 +115,7 @@ class SecondHandForSaleList extends DataObject
                 $timeFilterLastEdited = [
                     'LastEdited:LessThan' => date('Y-m-d', strtotime('-' . $daysAgo . ' days')) . ' 00:00:00'
                 ];
-                $objects = SecondHandProduct::get()->filter([$timeFilterLastEdited, 'AllowPurchase' => 0])->limit(30);
+                $objects = SecondHandProduct::get()->filter($timeFilterLastEdited + ['AllowPurchase' => 0])->limit(50);
                 foreach($objects as $obj) {
                     $archived[] = $obj->InternalItemID;
                     SecondHandProductActions::archive($obj);
