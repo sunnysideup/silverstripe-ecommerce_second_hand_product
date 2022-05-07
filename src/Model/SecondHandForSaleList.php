@@ -133,7 +133,7 @@ class SecondHandForSaleList extends DataObject
         if(! $this->ForSale) {
             $currentArray = SecondHandProduct::get()
                 ->filter(['AllowPurchase' => 1])
-                ->sort('Created DESC')
+                ->sort('Title ASC')
                 ->column('InternalItemID');
             $this->ProductCount = count($currentArray);
             $this->ForSale = implode(',', $currentArray);
