@@ -108,7 +108,7 @@ class SecondHandForSaleList extends DataObject
                         $obj = SecondHandProduct::get()->filter(['AllowPurchase' => 1, 'InternalItemID' => $code])->first();
                         if($obj) {
                             $archived[] = $obj->InternalItemID;
-                            SecondHandProductActions::archive($obj);
+                            SecondHandProductActions::archive($obj->ID);
                         }
                     }
                 }
@@ -118,7 +118,7 @@ class SecondHandForSaleList extends DataObject
                 $objects = SecondHandProduct::get()->filter($timeFilterLastEdited + ['AllowPurchase' => 0])->limit(50);
                 foreach($objects as $obj) {
                     $archived[] = $obj->InternalItemID;
-                    SecondHandProductActions::archive($obj);
+                    SecondHandProductActions::archive($obj->ID);
                 }
             }
             $this->Archived = implode(',', $archived);
