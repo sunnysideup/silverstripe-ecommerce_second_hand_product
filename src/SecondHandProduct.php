@@ -35,6 +35,8 @@ use Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
 use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
+
+use Sunnysideup\EcommerceSecondHandProduct\Api\CodeGenerator;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 
 class SecondHandProduct extends Product implements PermissionProviderFactoryProvider
@@ -799,7 +801,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         }
         //set the IternatlItemID if it doesn't already exist
         if (! $this->InternalItemID) {
-            $this->InternalItemID = 'S-H-' . strtoupper(substr(md5(microtime()), rand(0, 20), 8));
+            $this->InternalItemID = 'S-H-' . CodeGenerator::generate();
         }
         $this->URLSegment = $this->generateURLSegment($this->Title . '-' . $this->InternalItemID);
 
