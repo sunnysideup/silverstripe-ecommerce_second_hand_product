@@ -952,6 +952,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                     'SITETREE_VIEW_ALL',
                     'SITETREE_EDIT_ALL',
                     'CMS_ACCESS_SecondHandProductAdmin',
+                    'CMS_ACCESS_Sunnysideup\\EcommerceSecondHandProduct\\Cms\\SecondHandProductAdmin',
                 ]
             )
 
