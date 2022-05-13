@@ -22,6 +22,7 @@ use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
+use SilverStripe\Security\PermissionChecker;
 use SilverStripe\Versioned\Versioned;
 
 use SilverStripe\Assets\Image;
@@ -931,6 +932,14 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     public function InternalItemIDNice()
     {
         return $this->InternalItemID;
+    }
+
+    public function canView($member = NULL)
+    {
+        if(Permission::check('CMS_ACCESS_SecondHandProductAdmin')) {
+            return true;
+        }
+        return parent::canView($member);
     }
 
     public static function permission_provider_factory_runner(): Group
