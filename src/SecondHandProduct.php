@@ -37,6 +37,8 @@ use Sunnysideup\GoogleAddressField\GoogleAddressField;
 use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 
 use Sunnysideup\EcommerceSecondHandProduct\Api\CodeGenerator;
+
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 
 class SecondHandProduct extends Product implements PermissionProviderFactoryProvider
@@ -801,7 +803,11 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         }
         //set the IternatlItemID if it doesn't already exist
         if (! $this->InternalItemID) {
-            $this->InternalItemID = 'S-H-' . CodeGenerator::generate();
+            $x = 0;
+            while($this->anotherOneWithThisCodeExists() && $x < 50) {
+                $this->InternalItemID = 'S-H-' . CodeGenerator::generate();
+                $x++;
+            }
         }
         $this->URLSegment = $this->generateURLSegment($this->Title . '-' . $this->InternalItemID);
 
@@ -824,6 +830,16 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             $this->DateItemWasBought = $this->Created;
         }
         $this->fixImagePosition();
+    }
+
+    protected function anotherOneWithThisCodeExists() : bool
+    {
+        if(!$this->InternalItemID) {
+            return true;
+        }
+        $a = SecondHandProduct::get()->filter(['InternalItemID' => $this->InternalItemID])->exclude(['ID' => $this->ID])->exists();
+        $b = SecondHandArchive::get()->filter(['InternalItemID' => $this->InternalItemID])->exists();
+        return $a || $b;
     }
 
     protected $imagesDone = false;
