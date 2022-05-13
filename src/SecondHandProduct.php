@@ -950,6 +950,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             ->setPermissionArray(
                 [
                     'SITETREE_VIEW_ALL',
+                    'SITETREE_EDIT_ALL',
                     'CMS_ACCESS_SecondHandProductAdmin',
                 ]
             )
