@@ -237,6 +237,11 @@ class SecondHandArchive extends DataObject
         return self::$plural_name;
     }
 
+    public function CMSEditLink() : string
+    {
+        return $this->ModelAdminLink();
+    }
+
     public function ModelAdminLink() : string
     {
         //admin/secondhandproducts/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/EditForm/field/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/item/7760/edit
