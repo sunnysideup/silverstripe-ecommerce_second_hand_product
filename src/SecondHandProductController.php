@@ -38,19 +38,17 @@ class SecondHandProductController extends ProductController
                 $fieldsWeNeed[$fieldKey] = $labels[$fieldKey];
             }
         }
+
         $fields = $this->dataRecord->Config()->get('db');
         foreach ($fieldsWeNeed as $key => $description) {
             if (isset($fields[$key])) {
-                $type = preg_replace('/\(.*\)/', '', $fields[$key]);
+                $type = preg_replace('#\(.*\)#', '', $fields[$key]);
                 $dbField = DBField::create_field($type, $this->{$key});
-                if ($dbField->hasMethod('Nice')) {
-                    $value = $dbField->Nice();
-                } else {
-                    $value = $dbField->Raw();
-                }
+                $value = $dbField->hasMethod('Nice') ? $dbField->Nice() : $dbField->Raw();
             } else {
                 $value = '';
             }
+
             $al->push(
                 ArrayData::create(
                     [

@@ -3,10 +3,9 @@
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
-
-use SilverStripe\Core\Injector\Injector;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 
 class SecondHandProductGroup extends ProductGroup
@@ -98,31 +97,6 @@ class SecondHandProductGroup extends ProductGroup
     }
 
     /**
-     * Event handler called before writing to the database.
-     */
-    public function onBeforeWrite()
-    {
-        parent::onBeforeWrite();
-        $this->RootParent = false;
-        if ($this->ParentID) {
-            $parent = SiteTree::get_by_id($this->ParentID);
-            if ($parent) {
-                if ($parent instanceof SecondHandProductGroup) {
-                    $this->RootParent = false;
-                } else {
-                    if (! $this->hasOtherSecondHandProductGroupsOnThisLevel()) {
-                        $this->RootParent = true;
-                    }
-                }
-            }
-        } else {
-            if (! $this->hasOtherSecondHandProductGroupsOnThisLevel()) {
-                $this->RootParent = true;
-            }
-        }
-    }
-
-    /**
      * @return SecondHandProductGroup
      */
     public function BestRootParentPage()
@@ -144,6 +118,27 @@ class SecondHandProductGroup extends ProductGroup
     public function getBuyableClassName(): string
     {
         return SecondHandProduct::class;
+    }
+
+    /**
+     * Event handler called before writing to the database.
+     */
+    protected function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+        $this->RootParent = false;
+        if ($this->ParentID) {
+            $parent = SiteTree::get_by_id($this->ParentID);
+            if ($parent) {
+                if ($parent instanceof SecondHandProductGroup) {
+                    $this->RootParent = false;
+                } elseif (! $this->hasOtherSecondHandProductGroupsOnThisLevel()) {
+                    $this->RootParent = true;
+                }
+            }
+        } elseif (! $this->hasOtherSecondHandProductGroupsOnThisLevel()) {
+            $this->RootParent = true;
+        }
     }
 
     protected function hasOtherSecondHandProductGroupsOnThisLevel(): bool

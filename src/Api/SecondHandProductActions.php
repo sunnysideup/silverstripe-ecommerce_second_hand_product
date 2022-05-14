@@ -1,34 +1,25 @@
 <?php
+
 namespace Sunnysideup\EcommerceSecondHandProduct\Api;
 
-use SilverStripe\Admin\ModelAdmin;
-use SilverStripe\CMS\Controllers\CMSMain;
 use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPResponse;
-use SilverStripe\Forms\GridField\GridField;
-use SilverStripe\Forms\GridField\GridFieldExportButton;
 use SilverStripe\Security\Security;
 use SilverStripe\Versioned\Versioned;
-use SilverStripe\View\Requirements;
-use Sunnysideup\Ecommerce\Api\ClassHelpers;
-use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
-use Sunnysideup\Ecommerce\Traits\EcommerceModelAdminTrait;
-use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs\GridFieldEditOriginalPageConfigSecondHandPage;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-use Sunnysideup\GoogleAddressField\GoogleAddressField;
 
 class SecondHandProductActions
 {
-    public static function archive(int $id) : ?SecondHandArchive
+    public static function archive(int $id): ?SecondHandArchive
     {
         $secondHandProduct = SecondHandProduct::get_by_id($id);
-        if($secondHandProduct) {
+        if ($secondHandProduct) {
             $currentMember = Security::getCurrentUser();
-            if($currentMember) {
+            if ($currentMember) {
                 $secondHandProduct->ArchivedByID = $currentMember->ID;
             }
+
             $internalItemID = $secondHandProduct->InternalItemID;
             if ($secondHandProduct->hasMethod('publishRecursive')) {
                 $secondHandProduct->writeToStage(Versioned::DRAFT);
@@ -41,6 +32,7 @@ class SecondHandProductActions
                 $secondHandProduct->delete();
             }
         }
+
         return SecondHandArchive::get()->filter(['InternalItemID' => $internalItemID])->first();
     }
 
@@ -53,8 +45,8 @@ class SecondHandProductActions
             if (! $restoredPage) {
                 return new HTTPResponse("SiteTree #{$id} not found", 400);
             }
-            $restoredPage = $restoredPage->doRestoreToStage();
-            return $restoredPage;
+
+            return $restoredPage->doRestoreToStage();
         }
     }
 
@@ -74,5 +66,4 @@ class SecondHandProductActions
             }
         }
     }
-
 }

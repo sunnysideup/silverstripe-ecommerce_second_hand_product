@@ -9,18 +9,13 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\GridField\GridField;
 use SilverStripe\Forms\GridField\GridFieldExportButton;
-use SilverStripe\Security\Security;
-use SilverStripe\Versioned\Versioned;
 use SilverStripe\View\Requirements;
-use Sunnysideup\Ecommerce\Api\ClassHelpers;
-use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
 use Sunnysideup\Ecommerce\Traits\EcommerceModelAdminTrait;
+use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
 use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs\GridFieldEditOriginalPageConfigSecondHandPage;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandForSaleList;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-
-use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
 
 /**
@@ -65,6 +60,7 @@ class SecondHandProductAdmin extends ModelAdmin
         foreach (GoogleAddressField::js_requirements() as $jsFile) {
             Requirements::javascript($jsFile);
         }
+
         $form = parent::getEditForm();
         if (singleton($this->modelClass) instanceof SiteTree) {
             $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass));
@@ -137,5 +133,4 @@ class SecondHandProductAdmin extends ModelAdmin
 
         return new HTTPResponse('ERROR!', 400);
     }
-
 }

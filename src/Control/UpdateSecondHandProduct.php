@@ -2,15 +2,12 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
-use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Convert;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
-use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-
 use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 class UpdateSecondHandProduct extends Controller
 {
@@ -32,7 +29,7 @@ class UpdateSecondHandProduct extends Controller
     {
         $unpublished = false;
         $otherID = $request->param('OtherID');
-        if (!empty($otherID)) {
+        if (! empty($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
             $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
             if ($secondHandProduct) {
@@ -51,13 +48,14 @@ class UpdateSecondHandProduct extends Controller
     {
         $archived = false;
         $otherID = $request->param('OtherID');
-        if (!empty($otherID)) {
+        if (! empty($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
             $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
             if ($secondHandProduct) {
                 $archived = SecondHandProductActions::archive($secondHandProduct->ID);
             }
         }
+
         return json_encode($archived);
     }
 

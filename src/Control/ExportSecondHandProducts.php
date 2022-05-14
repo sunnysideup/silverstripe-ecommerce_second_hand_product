@@ -10,7 +10,6 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\SS_List;
-
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
@@ -101,6 +100,7 @@ class ExportSecondHandProducts extends Controller
             $withImageData = true;
             $imageData = self::get_image_array(true);
         }
+
         $array = [];
         $products = SecondHandProduct::get()->filter(['AllowPurchase' => 1]);
         $count = 0;
@@ -118,14 +118,17 @@ class ExportSecondHandProducts extends Controller
                 foreach ($doNotCopy as $field) {
                     unset($array[$count][$field]);
                 }
+
                 $parent = $product->ParentGroup();
                 if ($parent) {
                     $array[$count][$parentURLSegmentField] = $parent->ID === $rootSecondHandPage->ID ? false : $parent->URLSegment;
                 }
+
                 $array[$count] += $this->addRelations($product, $relations);
                 if ($withImageData && isset($imageData[$product->InternalItemID])) {
                     $array[$count]['ImagesFileSize'] = array_sum($imageData[$product->InternalItemID]);
                 }
+
                 //next one
                 ++$count;
             }
@@ -151,10 +154,12 @@ class ExportSecondHandProducts extends Controller
                     foreach ($doNotCopy as $field) {
                         unset($array[$count][$field]);
                     }
+
                     $parent = $group->getParent();
                     if ($parent) {
                         $array[$count][$parentURLSegmentField] = $parent->ID === $rootSecondHandPage->ID ? false : $parent->URLSegment;
                     }
+
                     $array[$count] += $this->addRelations($group, $relations);
 
                     //next one
@@ -184,6 +189,59 @@ class ExportSecondHandProducts extends Controller
         return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
     }
 
+    public static function get_image_array(?bool $imageSizesOnly = false, ?bool $getIds = false): array
+    {
+        $array = [];
+        $folderName = Config::inst()->get(SecondHandProduct::class, 'folder_for_second_hand_images');
+        $folder = Folder::find_or_make($folderName);
+        $secondHandProducts = SecondHandProduct::get()
+            ->filter(['AllowPurchase' => 1])
+            ->exclude(['ImageID' => 0])
+        ;
+        foreach ($secondHandProducts as $secondHandProduct) {
+            $arrayInner = [];
+            if ($secondHandProduct->ImageID) {
+                $image = $secondHandProduct->Image(); //see Product::has_one()
+                if ($image && $image->exists()) {
+                    $arrayInner[$image->ID] = $image;
+                }
+            }
+
+            $otherImages = $secondHandProduct->AdditionalImages(); //see Product::many_many()
+            foreach ($otherImages as $otherImage) {
+                if ($otherImage && $otherImage->exists()) {
+                    $arrayInner[$otherImage->ID] = $otherImage;
+                }
+            }
+
+            foreach ($arrayInner as $imageID => $image) {
+                if ($image->ParentID !== $folder->ID) {
+                    $secondHandProduct->writeToStage(Versioned::DRAFT);
+                    $secondHandProduct->publishRecursive();
+                    $image = Image::get()->byID($image->ID);
+                }
+
+                $filename = $image->getFileName();
+                $location = Controller::join_links(ASSETS_PATH, $filename);
+                if (! isset($array[$secondHandProduct->InternalItemID])) {
+                    $array[$secondHandProduct->InternalItemID] = [];
+                }
+
+                if ($getIds) {
+                    $array[$secondHandProduct->InternalItemID][$imageID] = filesize($location);
+                } elseif (file_exists($location)) {
+                    if ($imageSizesOnly) {
+                        $array[$secondHandProduct->InternalItemID][] = filesize($location);
+                    } else {
+                        $array[$secondHandProduct->InternalItemID][] = $image->Name . '*' . filesize($location);
+                    }
+                }
+            }
+        }
+
+        return $array;
+    }
+
     protected function init()
     {
         parent::init();
@@ -201,15 +259,18 @@ class ExportSecondHandProducts extends Controller
             $json = str_replace(["\t", "\r", "\n"], [' ', ' ', ' '], $json);
             $json = preg_replace('#\s\s+#', ' ', $json);
         }
+
         $fileName = $this->Config()->get('location_to_save_contents');
         if ($fileName) {
             if ($filenameAppendix) {
                 $fileName = str_replace('.json', '.' . $filenameAppendix . '.json', $fileName);
             }
+
             $fileNameFull = Director::baseFolder() . '/' . $fileName;
             file_put_contents($fileNameFull, $json);
             die('COMPLETED');
         }
+
         $this->response->addHeader('Content-Type', 'application/json');
 
         return $json;
@@ -233,6 +294,7 @@ class ExportSecondHandProducts extends Controller
                     foreach ($relFields as $relField) {
                         $innerDataToBeAdded[$count][$relField] = $relItem->{$relField};
                     }
+
                     ++$count;
                 }
             } elseif ($relData instanceof DataObject) {
@@ -240,60 +302,12 @@ class ExportSecondHandProducts extends Controller
                     $innerDataToBeAdded = [$relField => $relData->{$relField}];
                 }
             }
+
             //do nothing
 
             $dataToBeAdded[$myField] = $innerDataToBeAdded;
         }
 
         return $dataToBeAdded;
-    }
-
-    public static function get_image_array(?bool $imageSizesOnly = false, ?bool $getIds = false) : array
-    {
-        $array = [];
-        $folderName = Config::inst()->get(SecondHandProduct::class, 'folder_for_second_hand_images');
-        $folder = Folder::find_or_make($folderName);
-        $secondHandProducts = SecondHandProduct::get()
-            ->filter(['AllowPurchase' => 1])
-            ->exclude(['ImageID' => 0]);
-        foreach ($secondHandProducts as $secondHandProduct) {
-            $arrayInner = [];
-            if ($secondHandProduct->ImageID) {
-                $image = $secondHandProduct->Image(); //see Product::has_one()
-                if ($image && $image->exists()) {
-                    $arrayInner[$image->ID] = $image;
-                }
-            }
-            $otherImages = $secondHandProduct->AdditionalImages(); //see Product::many_many()
-            foreach ($otherImages as $otherImage) {
-                if ($otherImage && $otherImage->exists()) {
-                    $arrayInner[$otherImage->ID] = $otherImage;
-                }
-            }
-
-            foreach ($arrayInner as $imageID => $image) {
-                if($image->ParentID !== $folder->ID) {
-                    $secondHandProduct->writeToStage(Versioned::DRAFT);
-                    $secondHandProduct->publishRecursive();
-                    $image = Image::get()->byID($image->ID);
-                }
-                $filename = $image->getFileName();
-                $location = Controller::join_links(ASSETS_PATH, $filename);
-                if (! isset($array[$secondHandProduct->InternalItemID])) {
-                    $array[$secondHandProduct->InternalItemID] = [];
-                }
-                if ($getIds) {
-                    $array[$secondHandProduct->InternalItemID][$imageID] = filesize($location);
-                } elseif (file_exists($location)) {
-                    if ($imageSizesOnly) {
-                        $array[$secondHandProduct->InternalItemID][] = filesize($location);
-                    } else {
-                        $array[$secondHandProduct->InternalItemID][] = $image->Name.'*'.filesize($location);
-                    }
-                }
-            }
-        }
-
-        return $array;
     }
 }

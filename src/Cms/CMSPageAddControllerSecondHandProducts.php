@@ -21,9 +21,8 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 
 /**
- * adds a special kind of add form for new second had products
+ * adds a special kind of add form for new second had products.
  */
-
 class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
 {
     private static $url_segment = 'addsecondhandproduct';
@@ -139,7 +138,7 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
 
     public function doAdd($data, $form)
     {
-        $className = isset($data['PageType']) ? $data['PageType'] : 'Page';
+        $className = isset($data['PageType']) ? $data['PageType'] : \Page::class;
         $parentID = isset($data['ParentID']) ? (int) $data['ParentID'] : 0;
 
         $suffix = isset($data['Suffix']) ? '-' . $data['Suffix'] : null;
@@ -181,6 +180,7 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
 
             return $this->getResponseNegotiator()->respond($this->getRequest());
         }
+
         $this->getRequest()->getSession()->set(
             'FormInfo.Form_EditForm.formError.message',
             _t('CMSMain.PageAdded', 'Successfully created page')

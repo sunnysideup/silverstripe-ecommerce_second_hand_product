@@ -2,15 +2,12 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
+use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
-
-use SilverStripe\Core\Environment;
-
 use SilverStripe\Versioned\Versioned;
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-
 use Sunnysideup\Ecommerce\Model\OrderItem;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 class EcommerceTaskSecondHandSoldCodes extends BuildTask
 {
@@ -19,6 +16,7 @@ class EcommerceTaskSecondHandSoldCodes extends BuildTask
     protected $description = '';
 
     protected $fix = true;
+
     protected $forSale = false;
 
     public function run($request)
@@ -29,19 +27,20 @@ class EcommerceTaskSecondHandSoldCodes extends BuildTask
         $ids = OrderItem::get()->filter(['BuyableClassName' => SecondHandProduct::class])->column('BuyableID');
         $products = SecondHandProduct::get()->filterAny(['AllowPurchase' => 0, 'ID' => $ids]);
         foreach ($products as $product) {
-            if($product->AllowPurchase) {
-                DB::alteration_message('<a href="/'.$product->CMSEditLink().'">ERROR WITH '.$product->InternalItemID . ' | '.$product->Title.'</a>', 'deleted');
+            if ($product->AllowPurchase) {
+                DB::alteration_message('<a href="/' . $product->CMSEditLink() . '">ERROR WITH ' . $product->InternalItemID . ' | ' . $product->Title . '</a>', 'deleted');
                 $this->markAsSold($product);
             } else {
                 DB::alteration_message($product->InternalItemID);
             }
         }
-        DB::alteration_message(' ================= For Sale =================  ');
 
+        DB::alteration_message(' ================= For Sale =================  ');
     }
+
     protected function markAsSold($product)
     {
-        if($this->fix) {
+        if ($this->fix) {
             $product->AllowPurchase = 0;
             $product->writeToStage(Versioned::DRAFT);
             $product->publishRecursive();

@@ -2,15 +2,11 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
+use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
-
-use SilverStripe\Core\Environment;
-
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-
-use Sunnysideup\Ecommerce\Model\OrderItem;
 
 class EcommerceTaskSecondCheckSoldItems extends BuildTask
 {
@@ -22,33 +18,36 @@ class EcommerceTaskSecondCheckSoldItems extends BuildTask
     {
         Environment::increaseTimeLimitTo(600);
         DB::alteration_message(' ================= Started =================  ');
-        echo '<p>'.$this->description.'</p>';
+        echo '<p>' . $this->description . '</p>';
         $errors = [];
-        if(isset($_POST['codes'])) {
+        if (isset($_POST['codes'])) {
             $codes = $_POST['codes'];
-            $codesArray = explode("|||", str_replace(array("\n", "\t", "\r", ","), "|||", $codes));
-            foreach($codesArray as $key => $code) {
+            $codesArray = explode('|||', str_replace(["\n", "\t", "\r", ','], '|||', $codes));
+            foreach ($codesArray as $key => $code) {
                 $code = trim($code);
-                if($code) {
+                if ($code) {
                     $forSaleProduct = SecondHandProduct::get()->filter(['InternalItemID' => $code, 'AllowPurchase' => 1])->first();
-                    if($forSaleProduct) {
-                        if(! empty($_POST['markassold'])) {
+                    if ($forSaleProduct) {
+                        if (! empty($_POST['markassold'])) {
                             $forSaleProduct->AllowPurchase = false;
                         }
-                        if($forSaleProduct->DateItemWasSold || ! empty($_POST['markassold'])) {
+
+                        if ($forSaleProduct->DateItemWasSold || ! empty($_POST['markassold'])) {
                             $forSaleProduct->writeToStage(Versioned::DRAFT);
                             $forSaleProduct->publishRecursive();
                         }
-                        if($forSaleProduct->AllowPurchase) {
-                            DB::alteration_message('<a href="/'.$forSaleProduct->CMSEditLink().'">ERROR WITH '.$code . ' | '.$forSaleProduct->Title.'</a>', 'deleted');
+
+                        if ($forSaleProduct->AllowPurchase) {
+                            DB::alteration_message('<a href="/' . $forSaleProduct->CMSEditLink() . '">ERROR WITH ' . $code . ' | ' . $forSaleProduct->Title . '</a>', 'deleted');
                         }
                     }
                 } else {
                     unset($codesArray[$key]);
                 }
             }
+
             DB::alteration_message(' ================= Completed =================  ');
-            DB::alteration_message('OK: '.print_r(implode(', ', $codesArray),1));
+            DB::alteration_message('OK: ' . print_r(implode(', ', $codesArray), 1));
             echo '<p><a href="/dev/tasks/Sunnysideup-EcommerceSecondHandProduct-Tasks-EcommerceTaskSecondCheckSoldItems?">again?</a></p>';
         } else {
             echo '
@@ -66,6 +65,5 @@ class EcommerceTaskSecondCheckSoldItems extends BuildTask
         }
 
         echo '<p><a href="/dev/tasks/Sunnysideup-EcommerceSecondHandProduct-Tasks-EcommerceTaskSecondHandSoldCodes">Get a list of items sold on this site</a></p>';
-
     }
 }

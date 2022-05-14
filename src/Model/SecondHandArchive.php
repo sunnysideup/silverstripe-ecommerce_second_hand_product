@@ -2,21 +2,17 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Model;
 
+use SilverStripe\Assets\Image;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
-
-use SilverStripe\Assets\Image;
+use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
-
-use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-
-use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 
 class SecondHandArchive extends DataObject
 {
@@ -59,10 +55,10 @@ class SecondHandArchive extends DataObject
         'ArchivedBy' => Member::class,
         'Image' => Image::class,
     ];
+
     private static $many_many = [
         'AdditionalImages' => Image::class,
     ];
-
 
     private static $singular_name = 'Archived Second Hand Product';
 
@@ -133,6 +129,7 @@ class SecondHandArchive extends DataObject
         if (! $obj) {
             $obj = SecondHandArchive::create($filter);
         }
+
         $obj->Title = $page->Title;
         $obj->OriginalItemCreated = $page->Created;
         $obj->OriginalItemLastEdited = $page->LastEdited;
@@ -168,9 +165,10 @@ class SecondHandArchive extends DataObject
         $obj->SellersIDPhotocopy = $page->SellersIDPhotocopy;
         $obj->ImageID = $page->ImageID;
         $obj->write();
-        foreach($page->AdditionalImages() as $image) {
+        foreach ($page->AdditionalImages() as $image) {
             $obj->AdditionalImages()->add($image);
         }
+
         return $obj;
     }
 
@@ -237,15 +235,16 @@ class SecondHandArchive extends DataObject
         return self::$plural_name;
     }
 
-    public function CMSEditLink() : string
+    public function CMSEditLink(): string
     {
         return $this->ModelAdminLink();
     }
 
-    public function ModelAdminLink() : string
+    public function ModelAdminLink(): string
     {
         //admin/secondhandproducts/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/EditForm/field/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/item/7760/edit
         $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandArchive::class);
+
         return '/admin/secondhandproducts/' . $classURLSegment . '/EditForm/field/' . $classURLSegment . '/item/' . $this->ID . '/edit';
     }
 
@@ -270,6 +269,7 @@ class SecondHandArchive extends DataObject
                 ]
             );
         }
+
         $fields->addFieldsToTab(
             'Root.Main',
             [

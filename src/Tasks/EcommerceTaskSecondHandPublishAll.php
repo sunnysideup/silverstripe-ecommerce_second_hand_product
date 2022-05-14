@@ -2,11 +2,9 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
+use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
-
-use SilverStripe\Core\Environment;
-
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
@@ -21,14 +19,16 @@ class EcommerceTaskSecondHandPublishAll extends BuildTask
         Environment::increaseTimeLimitTo(600);
         $products = SecondHandProduct::get()->filter(['AllowPurchase' => 1]);
         foreach ($products as $product) {
-            DB::alteration_message('Publish: ' . $product->Title. ' - '.$product->InternalItemID);
-            try{
+            DB::alteration_message('Publish: ' . $product->Title . ' - ' . $product->InternalItemID);
+
+            try {
                 $product->writeToStage(Versioned::DRAFT);
                 $product->publishRecursive();
-            } catch (\Exception $e) {
-                DB::alteration_message('Caught exception, could not publish ' .  $e->getMessage(), 'deleted') ;
+            } catch (\Exception $exception) {
+                DB::alteration_message('Caught exception, could not publish ' . $exception->getMessage(), 'deleted');
             }
         }
+
         DB::alteration_message(' ================= Completed =================  ');
     }
 }

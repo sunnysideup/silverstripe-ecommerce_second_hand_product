@@ -24,6 +24,7 @@ class SecondHandProductValue extends Report
         $sum = array_sum($values);
         $object = DBCurrency::create('Sum');
         $object->setValue($sum);
+
         $name = _t(
             'EcommerceSideReport.SECOND_HAND_REPORT_TOTAL_STOCK_VALUE',
             'Second Hand Products, total stock value'

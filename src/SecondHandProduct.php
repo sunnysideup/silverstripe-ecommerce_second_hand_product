@@ -3,6 +3,8 @@
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
 use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\Assets\Folder;
+use SilverStripe\Assets\Image;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\CheckboxField;
@@ -22,24 +24,17 @@ use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
-use SilverStripe\Security\PermissionChecker;
 use SilverStripe\Versioned\Versioned;
-
-use SilverStripe\Assets\Image;
-use SilverStripe\Assets\Folder;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
 use Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole;
 use Sunnysideup\Ecommerce\Pages\Product;
+use Sunnysideup\EcommerceSecondHandProduct\Api\CodeGenerator;
 use Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
 use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
-
-use Sunnysideup\EcommerceSecondHandProduct\Api\CodeGenerator;
-
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 
 class SecondHandProduct extends Product implements PermissionProviderFactoryProvider
@@ -48,6 +43,8 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      * @var string
      */
     protected static $treshold_sql_cache = '';
+
+    protected $imagesDone = false;
 
     private static $can_be_root = false;
 
@@ -284,9 +281,10 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     public function canCreate($member = null, $context = [])
     {
         $extended = $this->extendedCan(__FUNCTION__, $member);
-        if ($extended !== null) {
+        if (null !== $extended) {
             return $extended;
         }
+
         return Permission::check(
             EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
             'any',
@@ -304,7 +302,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     public function canPublish($member = null)
     {
         $extended = $this->extendedCan(__FUNCTION__, $member);
-        if ($extended !== null) {
+        if (null !== $extended) {
             return $extended;
         }
 
@@ -326,7 +324,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     public function canEdit($member = null, $context = [])
     {
         $extended = $this->extendedCan(__FUNCTION__, $member);
-        if ($extended !== null) {
+        if (null !== $extended) {
             return $extended;
         }
 
@@ -347,7 +345,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     public function canDelete($member = null)
     {
         $extended = $this->extendedCan(__FUNCTION__, $member);
-        if ($extended !== null) {
+        if (null !== $extended) {
             return $extended;
         }
 
@@ -425,6 +423,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 )
             );
         }
+
         $fields->addFieldsToTab(
             'Root.Main',
             [
@@ -468,6 +467,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         $boxOrCaseField->setDescription('Does this product come with a box, case or both?');
         $contentField->setDescription('Optional text only description, the maximum length of this description is 255 characters.');
         $contentField->setMaxLength(255);
+
         $qualityFieldDescription = DBField::create_field(
             'HTMLText',
             'A <strong>Condition Rating Page</strong> has yet to be setup'
@@ -476,6 +476,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         if ($obj->exists()) {
             $qualityFieldDescription = 'An explanation of the ratings scale can be found by clicking this <a href="' . $obj->Link() . '">link</a>';
         }
+
         $productQualityField->setDescription($qualityFieldDescription);
         $boughtDate->setDescription('Date Format (dd-mm-YYYY). Example: 3rd of May 1992 should be entered as 03-05-1992');
         $mainImageField->setDescription(
@@ -556,6 +557,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 if ($country_code) {
                     $geocodingField->setRestrictToCountryCode($country_code);
                 }
+
                 //$geocodingField->setAlwaysShowFields(true);
             }
         }
@@ -592,8 +594,10 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                     )
                 );
             }
+
             $fields->removeByName('SellersAddressGeocodingField');
         }
+
         $fields->addFieldToTab(
             'Root.Under',
             $categoriesTable = $this->getProductGroupsTableField()
@@ -628,6 +632,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             );
             $fields->replaceField('DateItemWasSold', DateField::create('DateItemWasSold', 'Date this item was sold'));
         }
+
         $fields->addFieldsToTab(
             'Root.Status',
             [
@@ -644,19 +649,21 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $fields;
     }
 
-    public function ArchiveLink() : string
+    public function ArchiveLink(): string
     {
         $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandProduct::class);
+
         return '/admin/secondhandproducts/' . $classURLSegment . '/archive/?productid=' . $this->ID;
     }
 
-    public static function restore_link(int $id) : string
+    public static function restore_link(int $id): string
     {
         $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandProduct::class);
+
         return '/admin/secondhandproducts/' . $classURLSegment . '/restore/?productid=' . $id;
     }
 
-    public function ModelAdminLink() : string
+    public function ModelAdminLink(): string
     {
         return $this->CMSEditLink();
     }
@@ -691,19 +698,18 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     }
 
     /**
-     * products that can be sold SQL
-     * @return string
+     * products that can be sold SQL.
      */
     public static function get_treshold_sql(): string
     {
         if ('' === self::$treshold_sql_cache) {
             $stage = self::get_stage();
-            $daysMin = intval(Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days'));
+            $daysMin = (int) Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
             $minThreshold = date(
                 'Y-m-d H:i:s',
                 strtotime('-' . $daysMin . ' days', DBDatetime::now()->getTimestamp())
             );
-            $daysMax = intval(Config::inst()->get(SecondHandProduct::class, 'max_number_of_days_for_sale'));
+            $daysMax = (int) Config::inst()->get(SecondHandProduct::class, 'max_number_of_days_for_sale');
             $maxThreshold = date(
                 'Y-m-d H:i:s',
                 strtotime('-' . $daysMax . ' days', DBDatetime::now()->getTimestamp())
@@ -712,8 +718,8 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 (
                     "AllowPurchase" = 1 AND
                     SecondHandProduct' . $stage . '.DateItemWasBought IS NOT NULL AND
-                    SecondHandProduct' . $stage . '.DateItemWasBought <= \'' . $minThreshold . '\' AND
-                    SecondHandProduct' . $stage . '.DateItemWasBought > \'' . $maxThreshold . '\'
+                    SecondHandProduct' . $stage . ".DateItemWasBought <= '" . $minThreshold . '\' AND
+                    SecondHandProduct' . $stage . ".DateItemWasBought > '" . $maxThreshold . '\'
                 )
             ';
         }
@@ -726,9 +732,11 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         if ($this->HasBeenSold()) {
             return false;
         }
+
         if ($this->isUnderEmbargo()) {
             return false;
         }
+
         if (! $this->isListed()) {
             return false;
         }
@@ -743,39 +751,38 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     public function isListed(): bool
     {
-        return SecondHandProduct::get()
+        return (bool) SecondHandProduct::get()
             ->where(self::get_treshold_sql())
-            ->byId($this->ID) ? true : false;
+            ->byId($this->ID)
+        ;
     }
 
     /**
-     * this is the same as the
+     * this is the same as the.
+     *
      * @return bool [description]
      */
-     public function isUnderEmbargo(): bool
-     {
-         $embargoDays = Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
-         if (intval($embargoDays) > 0) {
-             if ($this->DateItemWasBought) {
-                 $date = $this->DateItemWasBought;
-             } else {
-                 $date = $this->Created;
-             }
-             $createdDate = strtotime($date);
-             $daysOld = (time() - $createdDate) / (60 * 60 * 24);
-             if ($daysOld <= $embargoDays) {
-                 return true;
-             }
-         }
+    public function isUnderEmbargo(): bool
+    {
+        $embargoDays = Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
+        if ((int) $embargoDays > 0) {
+            $date = $this->DateItemWasBought ? $this->DateItemWasBought : $this->Created;
+            $createdDate = strtotime($date);
+            $daysOld = (time() - $createdDate) / (60 * 60 * 24);
+            if ($daysOld <= $embargoDays) {
+                return true;
+            }
+        }
 
-         return false;
-     }
+        return false;
+    }
 
     public function didNotSell(): bool
     {
-        $daysMax = intval(Config::inst()->get(SecondHandProduct::class, 'max_number_of_days_for_sale'));
+        $daysMax = (int) Config::inst()->get(SecondHandProduct::class, 'max_number_of_days_for_sale');
         $shouldBeListedAfterTs = strtotime('-' . $daysMax . ' days', DBDatetime::now()->getTimestamp());
         $listedTs = strtotime($this->Created);
+
         return $listedTs < $shouldBeListedAfterTs;
     }
 
@@ -784,145 +791,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         if (parent::HasBeenSold()) {
             return true;
         }
-        if ($this->DateItemWasSold) {
-            return true;
-        }
 
-        return false;
+        return (bool) $this->DateItemWasSold;
     }
-
-    public function onBeforeWrite()
-    {
-        if ($this->BasedOnID) {
-            $basedOn = $this->BasedOn();
-            if ($basedOn && $basedOn->exists()) {
-                $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
-                foreach ($list as $field) {
-                    $this->{$field} = $basedOn->{$field};
-                }
-            }
-        }
-        //set the IternatlItemID if it doesn't already exist
-        if (! $this->InternalItemID) {
-            $x = 0;
-            while($this->anotherOneWithThisCodeExists() && $x < 50) {
-                $this->InternalItemID = 'S-H-' . CodeGenerator::generate();
-                $x++;
-            }
-        }
-        $this->URLSegment = $this->generateURLSegment($this->Title . '-' . $this->InternalItemID);
-
-        if ($this->Title && strlen($this->MetaDescription) < 30) {
-            $this->MetaDescription = 'Second Hand Product: ' . $this->Title;
-        }
-
-        if($this->DateItemWasSold) {
-            $this->AllowPurchase = 0;
-        }
-
-        // Save the date when the product was sold.
-        if ($this->HasBeenSold()) {
-            if (! $this->DateItemWasSold) {
-                $this->DateItemWasSold = DBDatetime::now()->Rfc2822();
-            }
-        }
-        parent::onBeforeWrite();
-        if(! $this->DateItemWasBought) {
-            $this->DateItemWasBought = $this->Created;
-        }
-        $this->fixImagePosition();
-    }
-
-    protected function anotherOneWithThisCodeExists() : bool
-    {
-        if(!$this->InternalItemID) {
-            return true;
-        }
-        $a = SecondHandProduct::get()->filter(['InternalItemID' => $this->InternalItemID])->exclude(['ID' => $this->ID])->exists();
-        $b = SecondHandArchive::get()->filter(['InternalItemID' => $this->InternalItemID])->exists();
-        return $a || $b;
-    }
-
-    protected $imagesDone = false;
-
-    public function onAfterWrite()
-    {
-        parent::onAfterWrite();
-    }
-
-    protected function fixImagePosition()
-    {
-        if(! $this->imagesDone) {
-            $this->imagesDone = true;
-            $array = [];
-            $folderName = Config::inst()->get(self::class, 'folder_for_second_hand_images')?: 'second-hand-images' ;
-            $folder = Folder::find_or_make($folderName);
-            $arrayInner = [];
-            if ($this->ImageID) {
-                $image = $this->Image(); //see Product::has_one()
-                if ($image && $image->exists()) {
-                    $arrayInner[$image->ID] = $image;
-                }
-            }
-            $otherImages = $this->AdditionalImages(); //see Product::many_many()
-            foreach ($otherImages as $otherImage) {
-                if ($otherImage && $otherImage->exists()) {
-                    $arrayInner[$otherImage->ID] = $otherImage;
-                }
-            }
-            $count = 0;
-            foreach ($arrayInner as $image) {
-                $count++;
-                $extension = pathinfo($image->Name, PATHINFO_EXTENSION);
-                $extension = $extension ? strtolower($extension) : 'jpg';
-                $name = $this->InternalItemID . '_' . $count . '.' . $extension;
-
-                //if there is a different image, we delete that first ...
-                if($image->ParentID !== $folder->ID || $name !== $image->Name) {
-                    $filename = $image->getFileName();
-                    $oldFileLocationAbsolute = Controller::join_links(ASSETS_PATH, $filename);
-                    if ($image->exists()) {
-                        $newFileLocation = Controller::join_links(ASSETS_PATH, $folder->getFileName(), $name);
-                        if(file_exists($newFileLocation)) {
-                            $imageToMove = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name])->first();
-                            if($imageToMove && $imageToMove->ID !== $image->ID) {
-                                try {
-                                    $imageToMove->Name =  $this->InternalItemID . '_' . rand(999,99999999) . '.' . $extension;
-                                    $imageToMove->ParentID = $folder->ID;
-                                    $imageToMove->write();
-                                    $imageToMove->publishSingle();
-                                } catch (\Exception $e) {
-                                    DB::alteration_message('Caught exception with renameing of file: ' .  $e->getMessage(), 'deleted') ;
-                                }
-                            }
-                        }
-                        $title = $this->Title . ' #' . $count;
-                        $image->ParentID = $folder->ID;
-                        $image->Name = $name;
-                        $image->Title = $title;
-                        $image->write();
-                        $image->publishSingle();
-                    } else {
-                        // $image->deleteFile();
-                        // $image->deleteFromStage(Versioned::DRAFT);
-                        // $image->deleteFromStage(Versioned::LIVE);
-                        // $image->delete();
-                    }
-                }
-
-            }
-            if(! $this->ImageID) {
-                if(count($arrayInner)) {
-                    $id = array_key_first($arrayInner);
-                    if($id) {
-                        $this->ImageID = $id;
-                        $this->AdditionalImages()->removeByID($id);
-                    }
-                }
-            }
-        }
-    }
-
 
     public function SecondHandProductQualityPercentage()
     {
@@ -934,11 +805,12 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $this->InternalItemID;
     }
 
-    public function canView($member = NULL)
+    public function canView($member = null)
     {
-        if(Permission::check('CMS_ACCESS_SecondHandProductAdmin')) {
+        if (Permission::check('CMS_ACCESS_SecondHandProductAdmin')) {
             return true;
         }
+
         return parent::canView($member);
     }
 
@@ -991,11 +863,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     public function getCreatedNice()
     {
-        if ($this->DateItemWasBought) {
-            $date = $this->DateItemWasBought;
-        } else {
-            $date = $this->Created;
-        }
+        $date = $this->DateItemWasBought ? $this->DateItemWasBought : $this->Created;
 
         return $date . ' = ' . DBField::create_field(DBDate::class, $date)->Ago();
     }
@@ -1014,6 +882,145 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         $fields->fieldByName('AllowPurchase')->setValue('');
 
         return $fields;
+    }
+
+    protected function onBeforeWrite()
+    {
+        if ($this->BasedOnID) {
+            $basedOn = $this->BasedOn();
+            if ($basedOn && $basedOn->exists()) {
+                $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
+                foreach ($list as $field) {
+                    $this->{$field} = $basedOn->{$field};
+                }
+            }
+        }
+
+        //set the IternatlItemID if it doesn't already exist
+        if (! $this->InternalItemID) {
+            $x = 0;
+            while ($this->anotherOneWithThisCodeExists() && $x < 50) {
+                $this->InternalItemID = 'S-H-' . CodeGenerator::generate();
+                ++$x;
+            }
+        }
+
+        $this->URLSegment = $this->generateURLSegment($this->Title . '-' . $this->InternalItemID);
+
+        if ($this->Title && strlen($this->MetaDescription) < 30) {
+            $this->MetaDescription = 'Second Hand Product: ' . $this->Title;
+        }
+
+        if ($this->DateItemWasSold) {
+            $this->AllowPurchase = 0;
+        }
+
+        // Save the date when the product was sold.
+        if ($this->HasBeenSold()) {
+            if (! $this->DateItemWasSold) {
+                $this->DateItemWasSold = DBDatetime::now()->Rfc2822();
+            }
+        }
+
+        parent::onBeforeWrite();
+        if (! $this->DateItemWasBought) {
+            $this->DateItemWasBought = $this->Created;
+        }
+
+        $this->fixImagePosition();
+    }
+
+    protected function onAfterWrite()
+    {
+        parent::onAfterWrite();
+    }
+
+    protected function anotherOneWithThisCodeExists(): bool
+    {
+        if (! $this->InternalItemID) {
+            return true;
+        }
+
+        $a = SecondHandProduct::get()->filter(['InternalItemID' => $this->InternalItemID])->exclude(['ID' => $this->ID])->exists();
+        $b = SecondHandArchive::get()->filter(['InternalItemID' => $this->InternalItemID])->exists();
+
+        return $a || $b;
+    }
+
+    protected function fixImagePosition()
+    {
+        if (! $this->imagesDone) {
+            $this->imagesDone = true;
+            $array = [];
+            $folderName = Config::inst()->get(self::class, 'folder_for_second_hand_images') ?: 'second-hand-images';
+            $folder = Folder::find_or_make($folderName);
+            $arrayInner = [];
+            if ($this->ImageID) {
+                $image = $this->Image(); //see Product::has_one()
+                if ($image && $image->exists()) {
+                    $arrayInner[$image->ID] = $image;
+                }
+            }
+
+            $otherImages = $this->AdditionalImages(); //see Product::many_many()
+            foreach ($otherImages as $otherImage) {
+                if ($otherImage && $otherImage->exists()) {
+                    $arrayInner[$otherImage->ID] = $otherImage;
+                }
+            }
+
+            $count = 0;
+            foreach ($arrayInner as $image) {
+                ++$count;
+                $extension = pathinfo($image->Name, PATHINFO_EXTENSION);
+                $extension = $extension ? strtolower($extension) : 'jpg';
+                $name = $this->InternalItemID . '_' . $count . '.' . $extension;
+
+                //if there is a different image, we delete that first ...
+                if ($image->ParentID !== $folder->ID || $name !== $image->Name) {
+                    $filename = $image->getFileName();
+                    $oldFileLocationAbsolute = Controller::join_links(ASSETS_PATH, $filename);
+                    if ($image->exists()) {
+                        $newFileLocation = Controller::join_links(ASSETS_PATH, $folder->getFileName(), $name);
+                        if (file_exists($newFileLocation)) {
+                            $imageToMove = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name])->first();
+                            if ($imageToMove && $imageToMove->ID !== $image->ID) {
+                                try {
+                                    $imageToMove->Name = $this->InternalItemID . '_' . rand(999, 99999999) . '.' . $extension;
+                                    $imageToMove->ParentID = $folder->ID;
+                                    $imageToMove->write();
+                                    $imageToMove->publishSingle();
+                                } catch (\Exception $exception) {
+                                    DB::alteration_message('Caught exception with renameing of file: ' . $exception->getMessage(), 'deleted');
+                                }
+                            }
+                        }
+
+                        $title = $this->Title . ' #' . $count;
+                        $image->ParentID = $folder->ID;
+                        $image->Name = $name;
+                        $image->Title = $title;
+                        $image->write();
+                        $image->publishSingle();
+                    }
+
+                    // $image->deleteFile();
+                        // $image->deleteFromStage(Versioned::DRAFT);
+                        // $image->deleteFromStage(Versioned::LIVE);
+                        // $image->delete();
+                }
+            }
+
+            if (! $this->ImageID) {
+                if ([] !== $arrayInner) {
+                    $id = array_key_first($arrayInner);
+                    if ($id) {
+                        $this->ImageID = $id;
+                        $this->AdditionalImages()->removeByID($id);
+                    }
+                }
+            }
+        }
     }
 
     /**
