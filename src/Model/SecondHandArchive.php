@@ -51,6 +51,8 @@ class SecondHandArchive extends DataObject
         'SellersDateOfBirth' => 'Date',
         'SellersIDExpiryDate' => 'Date',
         'SellersIDPhotocopy' => 'Boolean',
+        'OriginalItemLastEdited' => 'DBDatetime',
+        'OriginalItemCreated' => 'DBDatetime',
     ];
 
     private static $has_one = [
@@ -132,6 +134,8 @@ class SecondHandArchive extends DataObject
             $obj = SecondHandArchive::create($filter);
         }
         $obj->Title = $page->Title;
+        $obj->OriginalItemCreated = $page->Created;
+        $obj->OriginalItemLastEdited = $page->LastEdited;
         $obj->Price = $page->Price;
         $obj->InternalItemID = $page->InternalItemID;
         $obj->PageID = $page->ID;

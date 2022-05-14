@@ -37,7 +37,9 @@ class SecondHandForSaleList extends DataObject
         'ForSale' => 'Text',
         'Added' => 'Text',
         'Removed' => 'Text',
+        'AutoArchived' => 'Text',
         'Archived' => 'Text',
+        'LastItemArchived' => 'Varchar(10)',
         'EmailPrepared' => 'Boolean',
         'EmailSent' => 'Boolean',
         'Notes' => 'Text',
@@ -48,7 +50,8 @@ class SecondHandForSaleList extends DataObject
         'ProductCount' => 'Count',
         'Added' => 'Added',
         'Removed' => 'Removed',
-        'Archived' => 'Archived',
+        'AutoArchived' => 'Auto Archived',
+        'Archived' => 'Manually Archived',
         'EmailPrepared.Nice' => 'Email Ready',
         'EmailSent.Nice' => 'Email Sent',
     ];
@@ -107,7 +110,7 @@ class SecondHandForSaleList extends DataObject
                     foreach($removeList as $code) {
                         $obj = SecondHandProduct::get()->filter(['AllowPurchase' => 1, 'InternalItemID' => $code])->first();
                         if($obj) {
-                            $archived[] = $obj->InternalItemID;
+                            $archived[$obj->InternalItemID] = $obj->InternalItemID;
                             SecondHandProductActions::archive($obj->ID);
                         }
                     }
@@ -117,11 +120,11 @@ class SecondHandForSaleList extends DataObject
                 ];
                 $objects = SecondHandProduct::get()->filter($timeFilterLastEdited + ['AllowPurchase' => 0])->limit(50);
                 foreach($objects as $obj) {
-                    $archived[] = $obj->InternalItemID;
+                    $archived[$obj->InternalItemID] = $obj->InternalItemID;
                     SecondHandProductActions::archive($obj->ID);
                 }
             }
-            $this->Archived = implode(',', $archived);
+            $this->AutoArchived = implode(',', $archived);
             $this->write();
         }
     }
@@ -141,11 +144,40 @@ class SecondHandForSaleList extends DataObject
                 ->exclude(['ID' => (int) $this->ID])
                 ->sort(['ID' => 'DESC'])->first();
             if($prev) {
+                $archivedSinceLastTime = $this->getLatestArchived($prev);
                 $prevArray = explode(',', (string) $prev->ForSale);
                 $this->Added = implode(',', array_diff($currentArray, $prevArray));
                 $this->Removed = implode(',', array_diff($prevArray, $currentArray));
+                $this->Archived = implode(',', $archivedSinceLastTime);
+                if(count($archivedSinceLastTime)) {
+                    $this->LastItemArchived = array_shift($archivedSinceLastTime);
+                }
             }
         }
+        if(! $this->LastItemArchived) {
+            $last = SecondHandArchive::get()->sort(['ID' => 'DESC'])->first();
+            if ($last) {
+                $this->LastItemArchived = $last->InternalItemID;
+            }
+        }
+    }
+
+
+    protected function getLatestArchived(SecondHandForSaleList $prev)
+    {
+        $lastOneArchivedCode = $prev->LastItemArchived;
+        if($lastOneArchivedCode) {
+            $lastOneArchivedObject = SecondHandArchive::get()->filter(['InternalItemID' => $lastOneArchivedCode])->first();
+            if($lastOneArchivedObject) {
+                return SecondHandArchive::get()
+                    ->sort(['ID' => 'DESC'])
+                    ->filter(['ID:GreaterThan' => $lastOneArchivedObject->ID])
+                    ->column('InternalItemID')
+                ;
+            }
+        }
+        return [];
+
     }
 
 
@@ -176,7 +208,8 @@ class SecondHandForSaleList extends DataObject
         $html = '<h1>'.$this->Title.' ('.$this->ProductCount.')</h1>';
         $html .= '<h2>Removed</h2><div>'.$this->codeToDetails((string) $this->Removed).'</div>';
         $html .= '<h2>Added</h2><div>'.$this->codeToDetails((string) $this->Added).'</div>';
-        $html .= '<h2>Archived</h2><div>'. $this->codeToDetails((string) $this->Archived) .'</div>';
+        $html .= '<h2>Auto Archived</h2><div>'. $this->codeToDetails((string) $this->AutoArchived) .'</div>';
+        $html .= '<h2>Manually Archived</h2><div>'. $this->codeToDetails((string) $this->Archived) .'</div>';
         $html .= '<h2>For Sale</h2><div>'. $this->codeToDetails((string) $this->ForSale) .'</div>';
 
         return $html;
