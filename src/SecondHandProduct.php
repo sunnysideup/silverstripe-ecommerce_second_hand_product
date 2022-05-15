@@ -75,7 +75,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     /**
      * stadard SS declaration.
      *
-     * @var array
+     * @var string
      */
     private static $table_name = 'SecondHandProduct';
 

@@ -11,9 +11,6 @@ class ControllerPermissionChecker extends Controller
     /**
      * checks that the url is contains the secret code and is coming from the correct IP address (if not set to wildcard).
      *
-     * @var array
-     * @var array - ID parameter in URL
-     *
      * @param mixed $codesWithIPs
      * @param mixed $code
      *

@@ -108,7 +108,7 @@ class SecondHandProductGroup extends ProductGroup
         if ($obj) {
             return $obj;
         }
-
+        /** @return SecondHandProductGroup */
         return SecondHandProductGroup::get()->first();
     }
 

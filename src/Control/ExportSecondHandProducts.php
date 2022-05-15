@@ -84,7 +84,7 @@ class ExportSecondHandProducts extends Controller
      * (but still accessible)
      * - code => ip address.
      *
-     * @var string
+     * @var array[string]
      */
     private static $secret_codes = [];
 
