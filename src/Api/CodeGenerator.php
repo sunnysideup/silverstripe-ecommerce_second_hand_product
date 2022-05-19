@@ -28,7 +28,7 @@ class CodeGenerator
     }
 
     /**
-     * @return string t
+     * @return string
      */
     private static function randomChar(): string
     {

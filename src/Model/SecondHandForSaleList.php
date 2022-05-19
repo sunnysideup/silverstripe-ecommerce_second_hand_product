@@ -199,10 +199,10 @@ class SecondHandForSaleList extends DataObject
 
     protected function workOutDoubleUps(array $currentArray, array $notCurrentArray): array
     {
-        $allArray = array_merge($currentArray, $notCurrentArray);
         $archived = SecondHandArchive::get()->column('InternalItemID');
+        $allNotCurrentArray = array_merge($notCurrentArray, $currentArray);
 
-        return array_intersect($allArray, $archived);
+        return array_intersect($currentArray, $allNotCurrentArray);
     }
 
     protected function getLatestArchived(SecondHandForSaleList $prev): array
