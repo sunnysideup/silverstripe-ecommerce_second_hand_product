@@ -2,7 +2,7 @@
 Name: ecommerce_second_hand_product
 Before:
   - '#app/'
-After: 
+After:
   - '#coreconfig'
   - '#cmsextensions'
   - '#ecommerce'
@@ -10,12 +10,14 @@ After:
 Sunnysideup\Ecommerce\Model\Config\EcommerceDBConfig:
   extensions:
     - Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandEcommerceConfigExtension
+
 Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup:
   base_buyable_class: Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct
   sort_options:
     default:
       Title: 'Default Order - (Most Recent)'
       SQL: '"Created" DESC'
+
 Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole:
   admin_role_permission_codes:
     - CMS_ACCESS_SecondHandProductAdmin
