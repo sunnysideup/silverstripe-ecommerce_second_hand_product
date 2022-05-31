@@ -5,7 +5,10 @@ namespace Sunnysideup\EcommerceSecondHandProduct\Model;
 use SilverStripe\Assets\Image;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\ReadonlyField;
+
+use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
@@ -13,6 +16,8 @@ use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+
+use Sunnysideup\Vardump\ArrayToTable;
 
 class SecondHandArchive extends DataObject
 {
@@ -269,7 +274,10 @@ class SecondHandArchive extends DataObject
                 ]
             );
         }
-
+        $fields->dataFieldByName('AdditionalImages')
+            ->getConfig()
+            ->getComponentByType(GridFieldDataColumns::class)
+            ->setDisplayFields(['CMSTumbnail'],);
         $fields->addFieldsToTab(
             'Root.Main',
             [
@@ -295,7 +303,26 @@ class SecondHandArchive extends DataObject
                 $fields->dataFieldByName('SellersIDPhotocopy'),
             ]
         );
-
+        $fields->addFieldsToTab(
+            'Root.History',
+            [
+                LiteralField::create(
+                    'ChangeHistory',
+                    ArrayToTable::convert($this->getHistoryData()).
+                    '<p><a href="/admin/pages/history/show/'.$this->ID.'">Full History</a></p>'
+                )
+            ]
+        );
         return $fields;
+    }
+    public function getHistoryData(?string $code = '') : array
+    {
+        $obj = DataObject::get_one(SecondHandProduct::class);
+        $array = [];
+        if ($obj) {
+            $array = $obj->getHistoryData($this->InternalItemID);
+        }
+
+        return $array;
     }
 }

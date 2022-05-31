@@ -175,15 +175,15 @@ class SecondHandForSaleList extends DataObject
                 $this->LastItemArchived = $last->InternalItemID;
             }
         }
-    }
-
-    protected function onAfterWrite()
-    {
-        parent::onAfterWrite();
         if (! $this->Title) {
             $this->Title = 'Second Hand Products For Sale on ' . $this->Created;
-            $this->write();
-        } elseif ($this->Config()->email_admin && ! $this->EmailPrepared) {
+        }
+
+    }
+
+    public function sendEmail()
+    {
+        if ($this->Config()->email_admin && ! $this->EmailPrepared) {
             $from = Email::config()->admin_email;
             $to = Email::config()->admin_email;
             if ($from) {
@@ -252,6 +252,8 @@ class SecondHandForSaleList extends DataObject
     protected function codeToDetailsInner(string $code): string
     {
         $obj = SecondHandProduct::get()->filter(['InternalItemID' => $code])->first();
+        $firstCreated = $obj->Created;
+        $lastEdited = $obj->Created;
         if (! $obj) {
             $obj = SecondHandArchive::get()->filter(['InternalItemID' => $code])->first();
         }
@@ -266,6 +268,8 @@ class SecondHandForSaleList extends DataObject
             $html .= $code;
         }
 
-        return '<li>' . $html . '</li>';
+        $historyTable = ArrayToTable::convert($obj->getHistoryData($code));
+
+        return '<li>' . $html . '<br />'.$historyTable.'</li>';
     }
 }
