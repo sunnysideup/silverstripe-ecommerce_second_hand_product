@@ -9,6 +9,8 @@ use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\ReadonlyField;
 
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
+
+use SilverStripe\Forms\HeaderField;
 use SilverStripe\ORM\DataObject;
 
 use SilverStripe\ORM\FieldType\DBField;
@@ -282,12 +284,6 @@ class SecondHandArchive extends DataObject
             ->getComponentByType(GridFieldDataColumns::class)
             ->setDisplayFields(['CMSTumbnail'],);
         $fields->addFieldsToTab(
-            'Root.Main',
-            [
-                ReadonlyField::create('Created', 'Created'),
-            ]
-        );
-        $fields->addFieldsToTab(
             'Root.SellersDetails',
             [
                 $fields->dataFieldByName('SellersName'),
@@ -308,23 +304,30 @@ class SecondHandArchive extends DataObject
         );
         $archivedByLink = '';
         if($this->ArchivedByID) {
-            $archivingMember = Member::get()->byID($this->ArchivedByID);
-            if($archivingMember) {
-                $archivedByLink = DBField::create_field(
-                    'HTMLText',
-                    '<a href="'.$archivingMember->CMSEditLink().'">
-                        '.$archivingMember->getTitle().': '.$archivingMember->Email.
-                    '</a>'
-                );
-            }
+            $archivedByLink = DBField::create_field(
+                'HTMLText',
+                '<a href="/admin/security/EditForm/field/Members/item/'.$this->ArchivedByID.'/edit">View archiver details</a>'
+            );
         }
         $fields->addFieldsToTab(
             'Root.History',
             [
-                $fields->dataFieldByName('Created')->setTitle('Archived'),
-                $fields->dataFieldByName('OriginalItemCreated')->setTitle('Product Created'),
-                $fields->dataFieldByName('OriginalItemLastEdited')->setTitle('Product Last Edited'),
+                HeaderField::create(
+                    'ArchiveHistory',
+                    'Archive History'
+                ),
+                ReadonlyField::create(
+                    'Created',
+                    'Archived'
+                ),
+                $fields->dataFieldByName('AutoArchived')->setTitle('Archived by system?'),
                 $fields->dataFieldByName('ArchivedByID')->setDescription($archivedByLink),
+                HeaderField::create(
+                    'ProductHistory',
+                    'Product History (not all information may be available)'
+                ),
+                $fields->dataFieldByName('OriginalItemCreated')->setTitle('Product Created')->setDescription(''),
+                $fields->dataFieldByName('OriginalItemLastEdited')->setTitle('Product Last Edited')->setDescription(''),
                 LiteralField::create(
                     'ChangeHistory',
                     '<h2>Selected History</h2><p>Only shows available history.</p>'.
@@ -332,6 +335,18 @@ class SecondHandArchive extends DataObject
                 )
             ]
         );
+        $currentProduct = SecondHandProduct::get()->filter(['InternalItemID' => $this->InternalItemID])->first();
+        if($currentProduct) {
+            $fields->addFieldsToTab(
+                'Root.Error',
+                [
+                    LiteralField::create(
+                        'LiveProduct',
+                        '<h2>There is a live product with the same code: <a href="'.$currentProduct->CMSEditLink().'">'.$currentProduct->Title.'</a></h2>'
+                    )
+                ]
+            );
+        }
         return $fields;
     }
     public function getHistoryData(?string $code = '') : array

@@ -16,7 +16,7 @@ use Sunnysideup\Vardump\ArrayToTable;
 
 class SecondHandForSaleList extends DataObject
 {
-    private static $keep_for_days = 7;
+    private static $keep_for_days = 21;
 
     private static $table_name = 'SecondHandForSaleList';
 
@@ -289,6 +289,7 @@ class SecondHandForSaleList extends DataObject
         } else {
             $html .= $code;
         }
+        $historyTable = '';
         if($obj && $showHistory) {
             $historyTable = ArrayToTable::convert($obj->getHistoryData($code));
         }
