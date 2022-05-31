@@ -10,6 +10,8 @@ use SilverStripe\Forms\ReadonlyField;
 
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\ORM\DataObject;
+
+use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
@@ -54,6 +56,7 @@ class SecondHandArchive extends DataObject
         'SellersIDPhotocopy' => 'Boolean',
         'OriginalItemLastEdited' => 'DBDatetime',
         'OriginalItemCreated' => 'DBDatetime',
+        'AutoArchived' => 'Boolean',
     ];
 
     private static $has_one = [
@@ -303,13 +306,29 @@ class SecondHandArchive extends DataObject
                 $fields->dataFieldByName('SellersIDPhotocopy'),
             ]
         );
+        $archivedByLink = '';
+        if($this->ArchivedByID) {
+            $archivingMember = Member::get()->byID($this->ArchivedByID);
+            if($archivingMember) {
+                $archivedByLink = DBField::create_field(
+                    'HTMLText',
+                    '<a href="'.$archivingMember->CMSEditLink().'">
+                        '.$archivingMember->getTitle().': '.$archivingMember->Email.
+                    '</a>'
+                );
+            }
+        }
         $fields->addFieldsToTab(
             'Root.History',
             [
+                $fields->dataFieldByName('Created')->setTitle('Archived'),
+                $fields->dataFieldByName('OriginalItemCreated')->setTitle('Product Created'),
+                $fields->dataFieldByName('OriginalItemLastEdited')->setTitle('Product Last Edited'),
+                $fields->dataFieldByName('ArchivedByID')->setDescription($archivedByLink),
                 LiteralField::create(
                     'ChangeHistory',
-                    ArrayToTable::convert($this->getHistoryData()).
-                    '<p><a href="/admin/pages/history/show/'.$this->ID.'">Full History</a></p>'
+                    '<h2>Selected History</h2><p>Only shows available history.</p>'.
+                    '<blockquote>'.ArrayToTable::convert($this->getHistoryData()).'</blockquote>'
                 )
             ]
         );
@@ -319,7 +338,7 @@ class SecondHandArchive extends DataObject
     {
         $obj = DataObject::get_one(SecondHandProduct::class);
         $array = [];
-        if ($obj) {
+        if ($obj && $this->InternalItemID) {
             $array = $obj->getHistoryData($this->InternalItemID);
         }
 

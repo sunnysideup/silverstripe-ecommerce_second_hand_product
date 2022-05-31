@@ -10,6 +10,10 @@ use SilverStripe\ORM\DataObject;
 use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
+use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
+
+use Sunnysideup\Vardump\ArrayToTable;
+
 class SecondHandForSaleList extends DataObject
 {
     private static $keep_for_days = 7;
@@ -33,6 +37,7 @@ class SecondHandForSaleList extends DataObject
         'EmailPrepared' => 'Boolean',
         'EmailSent' => 'Boolean',
         'Notes' => 'Text',
+        'CalculationsCompleted' => 'Boolean',
     ];
 
     private static $summary_fields = [
@@ -84,7 +89,7 @@ class SecondHandForSaleList extends DataObject
         return $fields;
     }
 
-    public function deleteOldData()
+    public function archiveStaleProducts()
     {
         if ($this->Config()->delete_old) {
             $archived = [];
@@ -96,13 +101,16 @@ class SecondHandForSaleList extends DataObject
                 $olderOnes = SecondHandForSaleList::get()->filter($timeFilter)->limit(30);
                 foreach ($olderOnes as $item) {
                     $removeList = explode(',', $item->Removed);
+                    // clearning the for sale - to save space!
                     $item->ForSale = '';
                     $item->write();
                     foreach ($removeList as $code) {
-                        $obj = SecondHandProduct::get()->filter(['AllowPurchase' => 1, 'InternalItemID' => $code])->first();
-                        if ($obj) {
-                            $archived[$obj->InternalItemID] = $obj->InternalItemID;
-                            SecondHandProductActions::archive($obj->ID);
+                        if($code) {
+                            $obj = SecondHandProduct::get()->filter(['AllowPurchase' => false, 'InternalItemID' => $code])->first();
+                            if ($obj) {
+                                $archived[$obj->InternalItemID] = $obj->InternalItemID;
+                                $this->autoArchiveProduct($obj);
+                            }
                         }
                     }
                 }
@@ -110,15 +118,25 @@ class SecondHandForSaleList extends DataObject
                 $timeFilterLastEdited = [
                     'LastEdited:LessThan' => date('Y-m-d', strtotime('-' . $daysAgo . ' days')) . ' 00:00:00',
                 ];
-                $objects = SecondHandProduct::get()->filter($timeFilterLastEdited + ['AllowPurchase' => 0])->limit(50);
+                $objects = SecondHandProduct::get()->filter($timeFilterLastEdited + ['AllowPurchase' => false])->limit(50);
                 foreach ($objects as $obj) {
                     $archived[$obj->InternalItemID] = $obj->InternalItemID;
-                    SecondHandProductActions::archive($obj->ID);
+                    $this->autoArchiveProduct($obj);
                 }
             }
 
             $this->AutoArchived = implode(',', $archived);
-            $this->write();
+        }
+    }
+
+    protected function autoArchiveProduct(SecondHandProduct $obj)
+    {
+        $archivedRecord = SecondHandProductActions::archive($obj->ID);
+        if($archivedRecord && $archivedRecord instanceof SecondHandArchive) {
+            $archivedRecord->AutoArchive = true;
+            $archivedRecord->write();
+        } else {
+            user_error('Could not archive '.$obj->InternalItemID);
         }
     }
 
@@ -139,7 +157,8 @@ class SecondHandForSaleList extends DataObject
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        if (! $this->ForSale) {
+        if (! $this->CalculationsCompleted) {
+            $this->CalculationsCompleted = true;
             $currentArray = SecondHandProduct::get()
                 ->filter(['AllowPurchase' => 1])
                 ->sort('Title ASC')
@@ -152,20 +171,23 @@ class SecondHandForSaleList extends DataObject
             ;
             $this->ProductCount = count($currentArray);
             $this->ForSale = implode(',', $currentArray);
+            $this->DoubleUps = implode(',', $this->workOutDoubleUps($currentArray, $notCurrentArray));
+
+            // compare to previous
             $prev = SecondHandForSaleList::get()
                 ->exclude(['ID' => (int) $this->ID])
                 ->sort(['ID' => 'DESC'])->first();
-            $this->DoubleUps = implode(',', $this->workOutDoubleUps($currentArray, $notCurrentArray));
             if ($prev) {
                 $archivedSinceLastTime = $this->getLatestArchived($prev);
-                $this->Archived = implode(',', $archivedSinceLastTime);
                 $prevArray = explode(',', (string) $prev->ForSale);
+                $this->Archived = implode(',', $archivedSinceLastTime);
                 $this->Added = implode(',', array_diff($currentArray, $prevArray));
                 $this->Removed = implode(',', array_diff($prevArray, array_merge($currentArray, $archivedSinceLastTime)));
                 // this has to be done last.
                 if ([] !== $archivedSinceLastTime) {
                     $this->LastItemArchived = array_shift($archivedSinceLastTime);
                 }
+                $this->archiveStaleProducts();
             }
         }
 
@@ -213,7 +235,7 @@ class SecondHandForSaleList extends DataObject
             if ($lastOneArchivedObject) {
                 return SecondHandArchive::get()
                     ->sort(['ID' => 'DESC'])
-                    ->filter(['ID:GreaterThan' => $lastOneArchivedObject->ID])
+                    ->filter(['ID:GreaterThan' => $lastOneArchivedObject->ID, 'AutoArchived' => false])
                     ->column('InternalItemID')
                 ;
             }
@@ -225,16 +247,16 @@ class SecondHandForSaleList extends DataObject
     protected function HTMLSummary(): string
     {
         $html = '<h1>' . $this->Title . ' (' . $this->ProductCount . ')</h1>';
-        $html .= '<h2>Double-Ups</h2><div>' . $this->codeToDetails((string) $this->DoubleUps, 'No Double-Ups') . '</div>';
-        $html .= '<h2>Removed</h2><div>' . $this->codeToDetails((string) $this->Removed) . '</div>';
-        $html .= '<h2>Added</h2><div>' . $this->codeToDetails((string) $this->Added) . '</div>';
-        $html .= '<h2>Auto Archived</h2><div>' . $this->codeToDetails((string) $this->AutoArchived) . '</div>';
-        $html .= '<h2>Manually Archived</h2><div>' . $this->codeToDetails((string) $this->Archived) . '</div>';
+        $html .= '<h2>Double-Ups</h2><div>' . $this->codeToDetails((string) $this->DoubleUps, 'No Double-Ups', false) . '</div>';
+        $html .= '<h2>Removed</h2><div>' . $this->codeToDetails((string) $this->Removed, 'Nothing removed', false) . '</div>';
+        $html .= '<h2>Added</h2><div>' . $this->codeToDetails((string) $this->Added, 'Nothing added', false) . '</div>';
+        $html .= '<h2>Auto Archived</h2><div>' . $this->codeToDetails((string) $this->AutoArchived, 'Nothing automatically archived', false) . '</div>';
+        $html .= '<h2>Manually Archived</h2><div>' . $this->codeToDetails((string) $this->Archived, 'Nothing manually archived', false) . '</div>';
 
         return $html . ('<h2>For Sale</h2><div>' . $this->codeToDetails((string) $this->ForSale, 'No Items For Sale') . '</div>');
     }
 
-    protected function codeToDetails(string $list, $noListPhrase = 'No Change'): string
+    protected function codeToDetails(string $list, $noListPhrase = 'No Change', ?bool $showHistory = false): string
     {
         if (! $list) {
             return '<p>' . $noListPhrase . '</p>';
@@ -249,7 +271,7 @@ class SecondHandForSaleList extends DataObject
         return '<ol>' . $html . '</ol>';
     }
 
-    protected function codeToDetailsInner(string $code): string
+    protected function codeToDetailsInner(string $code, ?bool $showHistory = false): string
     {
         $obj = SecondHandProduct::get()->filter(['InternalItemID' => $code])->first();
         $firstCreated = $obj->Created;
@@ -267,8 +289,9 @@ class SecondHandForSaleList extends DataObject
         } else {
             $html .= $code;
         }
-
-        $historyTable = ArrayToTable::convert($obj->getHistoryData($code));
+        if($obj && $showHistory) {
+            $historyTable = ArrayToTable::convert($obj->getHistoryData($code));
+        }
 
         return '<li>' . $html . '<br />'.$historyTable.'</li>';
     }
