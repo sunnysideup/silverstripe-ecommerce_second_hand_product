@@ -20,8 +20,6 @@ class SecondHandForSaleList extends DataObject
 
     private static $max_items_to_archive = 20;
 
-    private static $delete_old_data = true;
-
     private static $table_name = 'SecondHandForSaleList';
 
     private static $email_admin = true;
@@ -109,9 +107,9 @@ class SecondHandForSaleList extends DataObject
                     ->filter($timeFilter)
                     ->limit(5)
                     ->exclude(['ID' => $this->ID])
-                    ->sort(['ID' => 'DESC']);
-                foreach ($olderOnes as $item) {
-                    $removeList = explode(',', $item->Removed);
+                    ->sort(['ID' => 'ASC']);
+                foreach ($olderOnes as $oldList) {
+                    $removeList = explode(',', $oldList->Removed);
                     // clearning the for sale - to save space!
                     foreach ($removeList as $code) {
                         if($code) {
@@ -122,15 +120,13 @@ class SecondHandForSaleList extends DataObject
                             }
                         }
                     }
-                    if($deleteOldLists) {
-                        $item->delete();
-                    }
+                    $oldList->delete();
                 }
 
                 $timeFilterLastEdited = [
                     'LastEdited:LessThan' => date('Y-m-d', strtotime('-' . $daysAgo . ' days')) . ' 00:00:00',
                 ];
-                $objects = SecondHandProduct::get()->filter($timeFilterLastEdited + ['AllowPurchase' => false])->limit(50);
+                $objects = SecondHandProduct::get()->filter($timeFilterLastEdited + ['AllowPurchase' => false])->limit($this->Config()->max_items_to_archive);
                 foreach ($objects as $obj) {
                     $archived[$obj->InternalItemID] = $obj->InternalItemID;
                     $this->autoArchiveProduct($obj);
@@ -173,7 +169,7 @@ class SecondHandForSaleList extends DataObject
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        if ($this->exists() && ! $this->CalculationsCompleted && !$this->ForSale) {
+        if (! $this->CalculationsCompleted) {
             $this->CalculationsCompleted = true;
             $currentArray = SecondHandProduct::get()
                 ->filter(['AllowPurchase' => 1])
