@@ -22,7 +22,7 @@ class SecondHandForSaleList extends DataObject
 
     private static $table_name = 'SecondHandForSaleList';
 
-    private static $email_admin = true;
+    private static $send_email_to_admin = true;
 
     private static $delete_old = true;
 
@@ -226,7 +226,7 @@ class SecondHandForSaleList extends DataObject
 
     public function sendEmail()
     {
-        if ($this->Config()->email_admin && ! $this->EmailPrepared) {
+        if ($this->Config()->send_email_to_admin && ! $this->EmailPrepared) {
             $from = Email::config()->admin_email;
             $to = Email::config()->admin_email;
             if ($from) {
