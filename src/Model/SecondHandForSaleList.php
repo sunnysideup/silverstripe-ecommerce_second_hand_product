@@ -43,6 +43,7 @@ class SecondHandForSaleList extends DataObject
     ];
 
     private static $summary_fields = [
+        'Created.Nice' => 'Created',
         'Title' => 'Title',
         'ProductCount' => 'Count',
         'Added' => 'Added',
@@ -64,6 +65,15 @@ class SecondHandForSaleList extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
+        $fields->addFieldsToTab(
+            'Root.Summary',
+            [
+                ReadonlyField::create(
+                    'Created',
+                    'Created'
+                ),
+            ]
+        );
         $fields->addFieldsToTab(
             'Root.Summary',
             [
