@@ -349,6 +349,7 @@ class SecondHandArchive extends DataObject
         }
         return $fields;
     }
+
     public function getHistoryData(?string $code = '') : array
     {
         $obj = DataObject::get_one(SecondHandProduct::class);

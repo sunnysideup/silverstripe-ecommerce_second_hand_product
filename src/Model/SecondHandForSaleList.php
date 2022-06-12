@@ -18,9 +18,11 @@ class SecondHandForSaleList extends DataObject
 {
     private static $keep_for_days = 21;
 
+    private static $max_items_to_archive = 70;
+
     private static $table_name = 'SecondHandForSaleList';
 
-    private static $email_admin = true;
+    private static $send_email_to_admin = true;
 
     private static $delete_old = true;
 
@@ -41,6 +43,7 @@ class SecondHandForSaleList extends DataObject
     ];
 
     private static $summary_fields = [
+        'Created.Nice' => 'Created',
         'Title' => 'Title',
         'ProductCount' => 'Count',
         'Added' => 'Added',
@@ -62,6 +65,15 @@ class SecondHandForSaleList extends DataObject
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
+        $fields->addFieldsToTab(
+            'Root.Summary',
+            [
+                ReadonlyField::create(
+                    'Created',
+                    'Created'
+                ),
+            ]
+        );
         $fields->addFieldsToTab(
             'Root.Summary',
             [
@@ -89,21 +101,26 @@ class SecondHandForSaleList extends DataObject
         return $fields;
     }
 
+    protected static $archive_count = 0;
+
     public function archiveStaleProducts()
     {
         if ($this->Config()->delete_old) {
             $archived = [];
             $daysAgo = $this->Config()->keep_for_days;
+            $deleteOldLists = $this->Config()->delete_old_data;
             if ($daysAgo) {
                 $timeFilter = [
                     'Created:LessThan' => date('Y-m-d', strtotime('-' . $daysAgo . ' days')) . ' 00:00:00',
                 ];
-                $olderOnes = SecondHandForSaleList::get()->filter($timeFilter)->limit(30)->exclude(['ID' => $this->ID]);
-                foreach ($olderOnes as $item) {
-                    $removeList = explode(',', $item->Removed);
+                $olderOnes = SecondHandForSaleList::get()
+                    ->filter($timeFilter)
+                    ->limit(5)
+                    ->exclude(['ID' => $this->ID])
+                    ->sort(['ID' => 'ASC']);
+                foreach ($olderOnes as $oldList) {
+                    $removeList = explode(',', $oldList->Removed);
                     // clearning the for sale - to save space!
-                    $item->ForSale = '';
-                    $item->write();
                     foreach ($removeList as $code) {
                         if($code) {
                             $obj = SecondHandProduct::get()->filter(['AllowPurchase' => false, 'InternalItemID' => $code])->first();
@@ -113,12 +130,13 @@ class SecondHandForSaleList extends DataObject
                             }
                         }
                     }
+                    $oldList->delete();
                 }
 
                 $timeFilterLastEdited = [
                     'LastEdited:LessThan' => date('Y-m-d', strtotime('-' . $daysAgo . ' days')) . ' 00:00:00',
                 ];
-                $objects = SecondHandProduct::get()->filter($timeFilterLastEdited + ['AllowPurchase' => false])->limit(50);
+                $objects = SecondHandProduct::get()->filter($timeFilterLastEdited + ['AllowPurchase' => false])->limit($this->Config()->max_items_to_archive);
                 foreach ($objects as $obj) {
                     $archived[$obj->InternalItemID] = $obj->InternalItemID;
                     $this->autoArchiveProduct($obj);
@@ -131,12 +149,16 @@ class SecondHandForSaleList extends DataObject
 
     protected function autoArchiveProduct(SecondHandProduct $obj)
     {
-        $archivedRecord = SecondHandProductActions::archive($obj->ID);
-        if($archivedRecord && $archivedRecord instanceof SecondHandArchive) {
-            $archivedRecord->AutoArchive = true;
-            $archivedRecord->write();
-        } else {
-            user_error('Could not archive '.$obj->InternalItemID);
+        $maxItemsToArchive = $this->Config()->max_items_to_archive;
+        if(self::$archive_count < $maxItemsToArchive) {
+            self::$archive_count++;
+            $archivedRecord = SecondHandProductActions::archive($obj->ID);
+            if($archivedRecord && $archivedRecord instanceof SecondHandArchive) {
+                $archivedRecord->AutoArchive = true;
+                $archivedRecord->write();
+            } else {
+                user_error('Could not archive '.$obj->InternalItemID);
+            }
         }
     }
 
@@ -187,7 +209,6 @@ class SecondHandForSaleList extends DataObject
                 if ([] !== $archivedSinceLastTime) {
                     $this->LastItemArchived = array_shift($archivedSinceLastTime);
                 }
-                $this->archiveStaleProducts();
             }
         }
 
@@ -205,7 +226,7 @@ class SecondHandForSaleList extends DataObject
 
     public function sendEmail()
     {
-        if ($this->Config()->email_admin && ! $this->EmailPrepared) {
+        if ($this->Config()->send_email_to_admin && ! $this->EmailPrepared) {
             $from = Email::config()->admin_email;
             $to = Email::config()->admin_email;
             if ($from) {
