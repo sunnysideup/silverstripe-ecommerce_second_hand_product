@@ -98,7 +98,7 @@ class SecondHandForSaleList extends DataObject
                 $timeFilter = [
                     'Created:LessThan' => date('Y-m-d', strtotime('-' . $daysAgo . ' days')) . ' 00:00:00',
                 ];
-                $olderOnes = SecondHandForSaleList::get()->filter($timeFilter)->limit(30);
+                $olderOnes = SecondHandForSaleList::get()->filter($timeFilter)->limit(30)->exclude(['ID' => $this->ID]);
                 foreach ($olderOnes as $item) {
                     $removeList = explode(',', $item->Removed);
                     // clearning the for sale - to save space!
