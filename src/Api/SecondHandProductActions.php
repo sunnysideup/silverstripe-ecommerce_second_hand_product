@@ -31,9 +31,10 @@ class SecondHandProductActions
                 $secondHandProduct->write();
                 $secondHandProduct->delete();
             }
+            return SecondHandArchive::get()->filter(['InternalItemID' => $internalItemID])->first();
         }
+        return null;
 
-        return SecondHandArchive::get()->filter(['InternalItemID' => $internalItemID])->first();
     }
 
     public static function restore(int $id)
