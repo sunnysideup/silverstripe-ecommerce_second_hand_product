@@ -32,7 +32,7 @@ class CodeGenerator
      */
     private static function randomChar(): string
     {
-        $index = mt_rand(0, strlen(self::CHARS));
+        $index = mt_rand(0, strlen(self::CHARS) - 1);
 
         return (string) self::CHARS[$index];
     }

@@ -864,6 +864,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     public function getCreatedNice()
     {
         $date = $this->DateItemWasBought ? $this->DateItemWasBought : $this->Created;
+        if(!$this->DateItemWasBought || (strtotime($date) > (strtotime('now') - ( 7 * 86400)))) {
+            $date = $this->Created;
+        }
 
         return $date . ' = ' . DBField::create_field(DBDate::class, $date)->Ago();
     }
