@@ -326,11 +326,13 @@ class SecondHandForSaleList extends DataObject
 
         $listArray = explode(',', $list);
         $html = '';
+        $list = [];
         foreach ($listArray as $code) {
-            $html .= $this->codeToDetailsInner($code);
+            $list[] = $this->codeToDetailsInner($code);
         }
-
-        return '<ol>' . $html . '</ol>';
+        // important, sort alpabetically.
+        sort($list);
+        return '<ol>' . implode($list) . '</ol>';
     }
 
     protected function codeToDetailsInner(string $code, ?bool $showHistory = false): string
@@ -344,10 +346,11 @@ class SecondHandForSaleList extends DataObject
         if ($obj) {
             $firstCreated = $obj->Created;
             $lastEdited = $obj->Created;
-            $html .= '
-                <a href="' . Director::absoluteURL($obj->CMSEditLink()) . '">' . $obj->InternalItemID . ' - ' . $obj->Title . ': ' . $obj->Price . '
-                </a> ' .
-                '(' . $obj->i18n_singular_name() . ')';
+            $html .=
+                $obj->Title .
+                ' (<a href="' . Director::absoluteURL($obj->CMSEditLink()) . '">' . $obj->InternalItemID . '</a>)'.
+                ' $' . $obj->Price .
+                ' (' . $obj->i18n_singular_name() . ')';
         } else {
             $html .= $code;
         }
