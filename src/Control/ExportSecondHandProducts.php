@@ -137,6 +137,7 @@ class ExportSecondHandProducts extends Controller
                 $parent = $page->getParent();
                 if ($parent && $parent instanceof SiteTree && $parent->exists()) {
                     $array[$count][$parentURLSegmentField] = ($parent->ID === $rootSecondHandPage->ID ? false : $parent->CleanURLSegment());
+                    $array[$count]['ParentTitle'] = ($parent->ID === $rootSecondHandPage->ID ? false : $parent->Title);
                 }
 
                 $array[$count] += $this->addRelations($page, $relations);
