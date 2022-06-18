@@ -149,4 +149,6 @@ class SecondHandProductGroup extends ProductGroup
             ->exists()
         ;
     }
+
+
 }
