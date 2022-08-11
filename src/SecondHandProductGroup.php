@@ -51,7 +51,7 @@ class SecondHandProductGroup extends ProductGroup
      */
     private static $description = 'A product category page specifically for second had products';
 
-    private static $maximum_number_of_products_to_list = 100;
+    private static $maximum_number_of_products_to_list = 1000;
 
     public static function main_second_hand_page()
     {
