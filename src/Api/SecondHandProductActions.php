@@ -30,7 +30,7 @@ class SecondHandProductActions
                     $secondHandProduct->deleteFromStage(Versioned::LIVE);
                     $secondHandProduct->delete();
                 } catch (Exception $e) {
-
+                    echo 'Could not archive '.$secondHandProduct->Title. ' - '.$secondHandProduct->ID . ' please check dates';
                 }
             } elseif ($secondHandProduct) {
                 $secondHandProduct->write();
