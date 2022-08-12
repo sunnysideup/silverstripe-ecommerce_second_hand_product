@@ -5,7 +5,10 @@ namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 use SilverStripe\Assets\Folder;
 use SilverStripe\Assets\Image;
 use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\Director;
+
+use SilverStripe\Control\Middleware\HTTPCacheControlMiddleware;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
@@ -99,10 +102,10 @@ class ExportSecondHandProducts extends Controller
     public function products()
     {
         $withImageData = false;
+        $additionalData = [];
         if (! empty($_GET['withimagedata'])) {
             $withImageData = true;
             $imageData = self::get_image_array(true);
-            $additionalData = [];
             foreach(array_keys($withImageData) as $internalItemID) {
                 $additionalData[$internalItemID] = array_sum($imageData[$internalItemID]);
             }
@@ -116,10 +119,10 @@ class ExportSecondHandProducts extends Controller
     {
         $list = SecondHandProductGroup::get()->exclude(['RootParent' => true]);
         $relations = Config::inst()->get(ExportSecondHandProducts::class, 'relationships_to_include_with_groups');
-        return $this->returnJSONorFile($this->createList($list, $relations), 'groups');
+        $this->returnJSONorFile($this->createList($list, $relations), 'groups');
     }
 
-    protected function createList(DataList $list, array $relations, ?array $additionalData = []) : array
+    protected function createList(DataList $list, array $relations, ?array $additionalData = [])
     {
         $array = [];
         $count = 0;
@@ -171,6 +174,12 @@ class ExportSecondHandProducts extends Controller
         return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
     }
 
+    /**
+     * images file name and size are separated by *
+     * @param  boolean $imageSizesOnly
+     * @param  boolean $getIds
+     * @return array
+     */
     public static function get_image_array(?bool $imageSizesOnly = false, ?bool $getIds = false): array
     {
         $array = [];
@@ -198,9 +207,11 @@ class ExportSecondHandProducts extends Controller
 
             foreach ($arrayInner as $imageID => $image) {
                 if ($image->ParentID !== $folder->ID) {
-                    $secondHandProduct->writeToStage(Versioned::DRAFT);
-                    $secondHandProduct->publishRecursive();
-                    $image = Image::get()->byID($image->ID);
+                    if($secondHandProduct->IsPublished()) {
+                        $secondHandProduct->writeToStage(Versioned::DRAFT);
+                        $secondHandProduct->publishRecursive();
+                        $image = Image::get()->byID($image->ID);
+                    }
                 }
 
                 $filename = $image->getFileName();
@@ -252,10 +263,16 @@ class ExportSecondHandProducts extends Controller
             file_put_contents($fileNameFull, $json);
             die('COMPLETED');
         }
-
-        $this->response->addHeader('Content-Type', 'application/json');
-
-        return $json;
+        $response = (new HTTPResponse($json));
+        $response->addHeader('Content-Type', 'application/json; charset="utf-8"');
+        $response->addHeader('Pragma', 'no-cache');
+        $response->addHeader('cache-control', 'no-cache, no-store, must-revalidate');
+        $response->addHeader('Access-Control-Allow-Origin', '*');
+        $response->addHeader('Expires', 0);
+        HTTPCacheControlMiddleware::singleton()
+                   ->disableCache();
+        $response->output();
+        die();
     }
 
     /**
