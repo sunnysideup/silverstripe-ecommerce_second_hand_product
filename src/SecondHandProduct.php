@@ -930,7 +930,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             $this->DateItemWasBought = $this->Created;
         }
 
-        $this->fixImagePosition();
+        $this->fixImageFileNames();
     }
 
     protected function onAfterWrite()
@@ -950,7 +950,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $a || $b;
     }
 
-    protected function fixImagePosition()
+    public function fixImageFileNames()
     {
         if (! $this->imagesDone) {
             $this->imagesDone = true;
@@ -989,7 +989,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                             $imageToMove = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name])->first();
                             if ($imageToMove && $imageToMove->ID !== $image->ID) {
                                 try {
-                                    $imageToMove->Name = $this->InternalItemID . '_' . rand(999, 99999999) . '.' . $extension;
+                                    $imageToMove->Name = $this->InternalItemID . '_' . (1000 . '_' . $image->ID) . '.' . $extension;
                                     $imageToMove->ParentID = $folder->ID;
                                     $imageToMove->write();
                                     $imageToMove->publishSingle();
