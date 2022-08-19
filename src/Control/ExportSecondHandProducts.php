@@ -207,11 +207,7 @@ class ExportSecondHandProducts extends Controller
 
             foreach ($arrayInner as $imageID => $image) {
                 if ($image->ParentID !== $folder->ID) {
-                    if($secondHandProduct->IsPublished()) {
-                        $secondHandProduct->writeToStage(Versioned::DRAFT);
-                        $secondHandProduct->publishRecursive();
-                        $image = Image::get()->byID($image->ID);
-                    }
+                    $secondHandProduct->fixImageFileNames();
                 }
 
                 $filename = $image->getFileName();
