@@ -27,7 +27,7 @@ class SecondHandForSaleList extends DataObject
     private static $delete_old = true;
 
     private static $db = [
-        'Title' => 'Varchar',
+        'Title' => 'Varchar(100)',
         'ProductCount' => 'Int',
         'ForSale' => 'Text',
         'Added' => 'Text',
@@ -218,10 +218,9 @@ class SecondHandForSaleList extends DataObject
                 $this->LastItemArchived = $last->InternalItemID;
             }
         }
-        if (! $this->Title) {
+        if (! $this->Title && $this->Created) {
             $this->Title = 'Second Hand Products For Sale on ' . $this->Created;
         }
-
     }
 
     public function sendEmail()
