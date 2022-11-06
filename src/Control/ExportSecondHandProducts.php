@@ -5,13 +5,19 @@ namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 use SilverStripe\Assets\Folder;
 use SilverStripe\Assets\Image;
 use SilverStripe\Control\Controller;
+use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\Director;
+
+use SilverStripe\Control\Middleware\HTTPCacheControlMiddleware;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\SS_List;
+use SilverStripe\ORM\DataList;
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
+
+use SilverStripe\CMS\Model\SiteTree;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 
@@ -96,80 +102,59 @@ class ExportSecondHandProducts extends Controller
     public function products()
     {
         $withImageData = false;
+        $additionalData = [];
         if (! empty($_GET['withimagedata'])) {
             $withImageData = true;
             $imageData = self::get_image_array(true);
+            foreach(array_keys($withImageData) as $internalItemID) {
+                $additionalData[$internalItemID] = array_sum($imageData[$internalItemID]);
+            }
         }
+        $list = SecondHandProduct::get()->filter(['AllowPurchase' => 1]);
+        $relations = Config::inst()->get(ExportSecondHandProducts::class, 'relationships_to_include_with_products');
+        return $this->returnJSONorFile($this->createList($list, $relations, $additionalData), 'groups');
+    }
 
+    public function groups()
+    {
+        $list = SecondHandProductGroup::get()->exclude(['RootParent' => true]);
+        $relations = Config::inst()->get(ExportSecondHandProducts::class, 'relationships_to_include_with_groups');
+        $this->returnJSONorFile($this->createList($list, $relations), 'groups');
+    }
+
+    protected function createList(DataList $list, array $relations, ?array $additionalData = [])
+    {
         $array = [];
-        $products = SecondHandProduct::get()->filter(['AllowPurchase' => 1]);
         $count = 0;
         $doNotCopy = $this->Config()->get('do_not_copy');
         $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
-        $singleton = Injector::inst()->get(SecondHandProductGroup::class);
-        $rootSecondHandPage = $singleton->BestRootParentPage();
-        $relations = Config::inst()->get(ExportSecondHandProducts::class, 'relationships_to_include_with_products');
+        $rootSecondHandPage = Injector::inst()->get(SecondHandProductGroup::class)->BestRootParentPage();
+        $relations = Config::inst()->get(ExportSecondHandProducts::class, 'relationships_to_include_with_groups');
         if ($rootSecondHandPage) {
-            foreach ($products as $product) {
-                $productData = $product->toMap();
-                $archivedVersion = SecondHandArchive::get()->filter(['InternalItemID' => $product->InternalItemID])->first();
-                $productData['HasBeenArchived'] = (bool) $archivedVersion;
-                $array[$count] = $productData;
+            foreach ($list as $page) {
+                $array[$count] = $page->toMap();
                 foreach ($doNotCopy as $field) {
                     unset($array[$count][$field]);
                 }
 
-                $parent = $product->ParentGroup();
-                if ($parent) {
-                    $array[$count][$parentURLSegmentField] = $parent->ID === $rootSecondHandPage->ID ? false : $parent->URLSegment;
+                $parent = $page->getParent();
+                if ($parent && $parent instanceof SiteTree && $parent->exists()) {
+                    $array[$count][$parentURLSegmentField] = ($parent->ID === $rootSecondHandPage->ID ? false : $parent->CleanURLSegment());
+                    $array[$count]['ParentTitle'] = ($parent->ID === $rootSecondHandPage->ID ? false : $parent->Title);
                 }
 
-                $array[$count] += $this->addRelations($product, $relations);
-                if ($withImageData && isset($imageData[$product->InternalItemID])) {
-                    $array[$count]['ImagesFileSize'] = array_sum($imageData[$product->InternalItemID]);
-                }
+                $array[$count] += $this->addRelations($page, $relations);
+                $array[$count] += $additionalData;
 
                 //next one
                 ++$count;
             }
         }
 
-        return $this->returnJSONorFile($array);
-    }
-
-    public function groups()
-    {
-        $array = [];
-        $groups = SecondHandProductGroup::get();
-        $count = 0;
-        $doNotCopy = $this->Config()->get('do_not_copy');
-        $parentURLSegmentField = $this->Config()->get('url_segment_of_parent_field_name');
-        $singleton = Injector::inst()->get(SecondHandProductGroup::class);
-        $rootSecondHandPage = $singleton->BestRootParentPage();
-        $relations = Config::inst()->get(ExportSecondHandProducts::class, 'relationships_to_include_with_groups');
-        if ($rootSecondHandPage) {
-            foreach ($groups as $group) {
-                if (! $group->RootParent) {
-                    $array[$count] = $group->toMap();
-                    foreach ($doNotCopy as $field) {
-                        unset($array[$count][$field]);
-                    }
-
-                    $parent = $group->getParent();
-                    if ($parent) {
-                        $array[$count][$parentURLSegmentField] = $parent->ID === $rootSecondHandPage->ID ? false : $parent->URLSegment;
-                    }
-
-                    $array[$count] += $this->addRelations($group, $relations);
-
-                    //next one
-                    ++$count;
-                }
-            }
-        }
-
         return $this->returnJSONorFile($array, 'groups');
     }
+
+
 
     public function images()
     {
@@ -189,6 +174,12 @@ class ExportSecondHandProducts extends Controller
         return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
     }
 
+    /**
+     * images file name and size are separated by *
+     * @param  boolean $imageSizesOnly
+     * @param  boolean $getIds
+     * @return array
+     */
     public static function get_image_array(?bool $imageSizesOnly = false, ?bool $getIds = false): array
     {
         $array = [];
@@ -216,9 +207,7 @@ class ExportSecondHandProducts extends Controller
 
             foreach ($arrayInner as $imageID => $image) {
                 if ($image->ParentID !== $folder->ID) {
-                    $secondHandProduct->writeToStage(Versioned::DRAFT);
-                    $secondHandProduct->publishRecursive();
-                    $image = Image::get()->byID($image->ID);
+                    $secondHandProduct->fixImageFileNames();
                 }
 
                 $filename = $image->getFileName();
@@ -270,10 +259,16 @@ class ExportSecondHandProducts extends Controller
             file_put_contents($fileNameFull, $json);
             die('COMPLETED');
         }
-
-        $this->response->addHeader('Content-Type', 'application/json');
-
-        return $json;
+        $response = (new HTTPResponse($json));
+        $response->addHeader('Content-Type', 'application/json; charset="utf-8"');
+        $response->addHeader('Pragma', 'no-cache');
+        $response->addHeader('cache-control', 'no-cache, no-store, must-revalidate');
+        $response->addHeader('Access-Control-Allow-Origin', '*');
+        $response->addHeader('Expires', 0);
+        HTTPCacheControlMiddleware::singleton()
+                   ->disableCache();
+        $response->output();
+        die();
     }
 
     /**
@@ -282,7 +277,7 @@ class ExportSecondHandProducts extends Controller
      *
      * @return array
      */
-    protected function addRelations($currentObject, $relations)
+    protected function addRelations($currentObject, array $relations) : array
     {
         $dataToBeAdded = [];
         foreach ($relations as $myField => $relFields) {

@@ -12,7 +12,7 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 class UpdateSecondHandProduct extends Controller
 {
     private static $allowed_actions = [
-        'unpublish' => '->MyPermissionCheck',
+        'removefromsale' => '->MyPermissionCheck',
         'archive' => '->MyPermissionCheck',
     ];
 
@@ -25,7 +25,7 @@ class UpdateSecondHandProduct extends Controller
      */
     private static $secret_codes = [];
 
-    public function unpublish($request)
+    public function removefromsale($request)
     {
         $unpublished = false;
         $otherID = $request->param('OtherID');

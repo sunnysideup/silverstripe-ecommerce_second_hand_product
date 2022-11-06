@@ -8,7 +8,7 @@ use SilverStripe\Security\Security;
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-
+use Exception;
 class SecondHandProductActions
 {
     public static function archive(int $id): ?SecondHandArchive
@@ -22,18 +22,24 @@ class SecondHandProductActions
 
             $internalItemID = $secondHandProduct->InternalItemID;
             if ($secondHandProduct->hasMethod('publishRecursive')) {
-                $secondHandProduct->writeToStage(Versioned::DRAFT);
-                $secondHandProduct->publishRecursive();
-                $secondHandProduct->deleteFromStage(Versioned::DRAFT);
-                $secondHandProduct->deleteFromStage(Versioned::LIVE);
-                $secondHandProduct->delete();
+                $secondHandProduct->AllowPurchase = false;
+                try {
+                    $secondHandProduct->writeToStage(Versioned::DRAFT);
+                    $secondHandProduct->publishRecursive();
+                    $secondHandProduct->deleteFromStage(Versioned::DRAFT);
+                    $secondHandProduct->deleteFromStage(Versioned::LIVE);
+                    $secondHandProduct->delete();
+                } catch (Exception $e) {
+                    echo 'Could not archive '.$secondHandProduct->Title. ' - '.$secondHandProduct->ID . ' please check dates';
+                }
             } elseif ($secondHandProduct) {
                 $secondHandProduct->write();
                 $secondHandProduct->delete();
             }
+            return SecondHandArchive::get()->filter(['InternalItemID' => $internalItemID])->first();
         }
+        return null;
 
-        return SecondHandArchive::get()->filter(['InternalItemID' => $internalItemID])->first();
     }
 
     public static function restore(int $id)
