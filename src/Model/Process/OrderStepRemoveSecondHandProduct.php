@@ -12,6 +12,8 @@ use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
+use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
+
 class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInterface
 {
     /**
@@ -57,17 +59,9 @@ class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInt
     public function doStep(Order $order): bool
     {
         foreach ($order->Buyables() as $buyable) {
-            if ($buyable instanceof SecondHandProduct) {
-                $buyable->ArchivedByID = $order->MemberID;
-                if (is_a($buyable, EcommerceConfigClassNames::getName(SiteTree::class))) {
-                    $buyable->write();
-                    $buyable->publishRecursive();
-                    $buyable->deleteFromStage(Versioned::LIVE);
-                    $buyable->deleteFromStage(Versioned::DRAFT);
-                } else {
-                    $buyable->write();
-                }
-                $buyable->delete();
+            if ($buyable && $buyable instanceof SecondHandProduct) {
+                SecondHandProductActions::quick_disable($buyable, $order->MemberID);
+                $buyable->doArchive();
             }
         }
 

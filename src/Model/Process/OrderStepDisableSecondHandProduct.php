@@ -9,6 +9,9 @@ use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
+use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
+use SilverStripe\Versioned\Versioned;
+
 class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepInterface
 {
     /**
@@ -54,14 +57,8 @@ class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepIn
     public function doStep(Order $order): bool
     {
         foreach ($order->Buyables() as $buyable) {
-            if ($buyable instanceof SecondHandProduct) {
-                $buyable->AllowPurchase = 0;
-                if (is_a($buyable, EcommerceConfigClassNames::getName(SiteTree::class))) {
-                    $buyable->writeToStage('Stage');
-                    $buyable->publish('Stage', 'Live');
-                } else {
-                    $buyable->write();
-                }
+            if ($buyable && $buyable instanceof SecondHandProduct) {
+                SecondHandProductActions::quick_disable($buyable);
             }
         }
 

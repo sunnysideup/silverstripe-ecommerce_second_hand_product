@@ -7,6 +7,7 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\ORM\DB;
 
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
 
@@ -100,7 +101,6 @@ class SecondHandArchive extends DataObject
         'SellersIDPhotocopy',
         'ImageID',
     ];
-
 
     private static $has_one = [
         'ArchivedBy' => Member::class,
@@ -252,16 +252,6 @@ class SecondHandArchive extends DataObject
         return false;
     }
 
-    public function i18n_singular_name()
-    {
-        return self::$singular_name;
-    }
-
-    public function i18n_plural_name()
-    {
-        return self::$plural_name;
-    }
-
     public function CMSEditLink(): string
     {
         return $this->ModelAdminLink();
@@ -273,6 +263,14 @@ class SecondHandArchive extends DataObject
         $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandArchive::class);
 
         return '/admin/secondhandproducts/' . $classURLSegment . '/EditForm/field/' . $classURLSegment . '/item/' . $this->ID . '/edit';
+    }
+
+    public function onBeforeWrite()
+    {
+        parent::onBeforeWrite();
+        if (! $this->OriginalItemLastEdited) {
+            $this->OriginalItemLastEdited = $this->Created;
+        }
     }
 
     /**

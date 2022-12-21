@@ -31,13 +31,19 @@ class UpdateSecondHandProduct extends Controller
         $otherID = $request->param('OtherID');
         if (! empty($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
-            $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
-            if ($secondHandProduct) {
-                $secondHandProduct->AllowPurchase = 0;
-                $secondHandProduct->ShowInMenus = 0;
-                $secondHandProduct->ShowInSearch = 0;
-                $secondHandProduct->writeToStage(Versioned::DRAFT);
-                $secondHandProduct->publishRecursive();
+            if($internalItemID) {
+                // do not use caching here - ...
+                // $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
+                $secondHandProduct = SecondHandProduct::get()->filter(['InternalItemID' => $internalItemID])->first();
+                if ($secondHandProduct) {
+                    $secondHandProduct->AllowPurchase = 0;
+                    $secondHandProduct->ShowInMenus = 0;
+                    $secondHandProduct->ShowInSearch = 0;
+                    $secondHandProduct->writeToStage(Versioned::DRAFT);
+
+                    //no need to publish recursively here to reduct time!
+                    $secondHandProduct->publishSingle();
+                }
             }
         }
 
@@ -50,7 +56,7 @@ class UpdateSecondHandProduct extends Controller
         $otherID = $request->param('OtherID');
         if (! empty($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
-            $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
+            $secondHandProduct = SecondHandProduct::get()->filter(['InternalItemID' => $internalItemID])->first();
             if ($secondHandProduct) {
                 $archived = SecondHandProductActions::archive($secondHandProduct->ID);
             }

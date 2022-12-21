@@ -23,6 +23,7 @@ use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
+use SilverStripe\Security\Security;
 use SilverStripe\Security\Permission;
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
@@ -359,6 +360,13 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     public function onBeforeDelete()
     {
         SecondHandArchive::create_from_page($this);
+        if (! $this->ArchivedByID) {
+            $currentMember = Security::getCurrentUser();
+            if ($currentMember) {
+                $this->ArchivedByID = $currentMember->ID;
+            }
+        }
+
         parent::onBeforeDelete();
     }
 
@@ -924,6 +932,8 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             if (! $this->DateItemWasSold) {
                 $this->DateItemWasSold = DBDatetime::now()->Rfc2822();
             }
+        } else {
+            $this->ArchivedByID = 0;
         }
 
         parent::onBeforeWrite();
@@ -981,9 +991,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             $count = 0;
             foreach ($arrayInner as $image) {
                 ++$count;
-                $extension = pathinfo($image->Name, PATHINFO_EXTENSION);
-                $extension = $extension ? strtolower($extension) : 'jpg';
-                $name = $this->InternalItemID . '_' . $count . '.' . $extension;
+                $ext = pathinfo($image->Name, PATHINFO_EXTENSION);
+                $ext = $ext ? strtolower($ext) : 'jpg';
+                $name = $this->InternalItemID . '_' . $count . '.' . $ext;
 
                 if ($image->ParentID !== $folder->ID || $name !== $image->Name) {
                     $filename = $image->getFileName();
@@ -994,7 +1004,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                             $imageToMove = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name])->first();
                             if ($imageToMove && $imageToMove->ID !== $image->ID) {
                                 try {
-                                    $imageToMove->Name = $this->InternalItemID . '_' . (1000 . '_' . $image->ID) . '.' . $extension;
+                                    $imageToMove->Name = $this->InternalItemID . '_' . (1000 . '_' . $image->ID) . '.' . $ext;
                                     $imageToMove->ParentID = $folder->ID;
                                     $imageToMove->write();
                                     $imageToMove->publishSingle();
