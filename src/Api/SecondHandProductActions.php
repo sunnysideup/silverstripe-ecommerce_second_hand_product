@@ -21,14 +21,9 @@ class SecondHandProductActions
             }
 
             $internalItemID = $secondHandProduct->InternalItemID;
-            if ($secondHandProduct->hasMethod('publishRecursive')) {
-                $secondHandProduct->AllowPurchase = false;
+            if ($secondHandProduct->hasExtension(Versioned::class)) {
                 try {
-                    $secondHandProduct->writeToStage(Versioned::DRAFT);
-                    $secondHandProduct->publishRecursive();
-                    $secondHandProduct->deleteFromStage(Versioned::DRAFT);
-                    $secondHandProduct->deleteFromStage(Versioned::LIVE);
-                    $secondHandProduct->delete();
+                    $secondHandProduct->doArchive();
                 } catch (Exception $e) {
                     echo 'Could not archive '.$secondHandProduct->Title. ' - '.$secondHandProduct->ID . ' please check dates';
                 }
@@ -36,10 +31,11 @@ class SecondHandProductActions
                 $secondHandProduct->write();
                 $secondHandProduct->delete();
             }
+
             return SecondHandArchive::get()->filter(['InternalItemID' => $internalItemID])->first();
         }
-        return null;
 
+        return null;
     }
 
     public static function restore(int $id)
