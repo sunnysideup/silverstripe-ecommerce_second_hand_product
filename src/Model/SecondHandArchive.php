@@ -68,7 +68,6 @@ class SecondHandArchive extends DataObject
         'SoldOnBehalf' => 'SellingOnBehalf',
     ];
 
-
     private const OTHER_MAPPABLE_FIELDS = [
         'Title',
         'Price',
@@ -182,11 +181,19 @@ class SecondHandArchive extends DataObject
             $obj = SecondHandArchive::create($filter);
         }
 
+        // fields that do not match
         foreach(self::MAPPING_FROM_ARCHIVE_TO_SH_PRODUCT as $myField => $pageField) {
             $obj->$myField = $page->$pageField;
         }
+
+        // fields that match
         foreach(self::OTHER_MAPPABLE_FIELDS as $myField) {
             $obj->$myField = $page->$myField;
+        }
+
+        $obj->write();
+        foreach ($page->AdditionalImages() as $image) {
+            $obj->AdditionalImages()->add($image);
         }
 
         return $obj;
