@@ -34,23 +34,22 @@ class SecondHandProductActions
             $dbName = $databaseName ? $databaseName : DB::get_conn()->getSelectedDatabase();
 
             foreach(['', '_Live'] as $ext) {
+                $archivedByLine = '';
+                $dateItemSoldLine = '';
+                $priceLine = '';
+                $zeroOrOne = 0;
                 if($enable === false) {
-                    $archivedByLine = '';
                     if ($archivedByID) {
                         $archivedByLine = 'SecondHandProduct'.$ext.'.ArchivedByID = '.$archivedByID.',';
                     }
-                    $dateItemSoldLine = '';
-                    if ($enable !== true) {
-                        $dateItemSoldLine = '' . $dbName . '."SecondHandProduct'.$ext.'"."DateItemWasSold" = \''.date('Y-m-d').'\',';
-                    }
+                    $dateItemSoldLine = '' . $dbName . '."SecondHandProduct'.$ext.'"."DateItemWasSold" = \''.date('Y-m-d').'\',';
+                    $zeroOrOne = 1;
                 } else {
+                    $priceLine = 'Product'.$ext.'.Price = '.$buyable->Price.',';
                     $archivedByLine = 'SecondHandProduct'.$ext.'.ArchivedByID = 0,';
                     $dateItemSoldLine = '' . $dbName . '."SecondHandProduct'.$ext.'"."DateItemWasSold" = \'\',';
-                }
-                $zeroOrOne = 0;
-                if($enable) {
-                    $zeroOrOne = 1;
-                }
+                    $zeroOrOne = 0;
+                }    
                 $sql = '
                     UPDATE ' . $dbName . '.Product'.$ext.'
                         INNER JOIN ' . $dbName . '.SiteTree'.$ext.'
@@ -59,6 +58,7 @@ class SecondHandProductActions
                             ON ' . $dbName . '.SecondHandProduct'.$ext.'.ID = ' . $dbName . '.Product'.$ext.'.ID
 
                     SET
+                        '.$priceLine.'
                         '.$dateItemSoldLine.'
                         '.$archivedByLine.'
                         ' . $dbName . '."Product'.$ext.'"."FeaturedProduct" = '.($zerOrOne ? 0 : 0).',
