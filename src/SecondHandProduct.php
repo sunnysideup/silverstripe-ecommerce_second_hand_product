@@ -889,7 +889,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     protected function onBeforeWrite()
     {
-        if ($this->BasedOnID) {
+        if ($this->BasedOnID && $this->BasedOnID !== $this->ID) {
             $basedOn = $this->BasedOn();
             if ($basedOn && $basedOn->exists()) {
                 $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
@@ -901,6 +901,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
         //set the IternatlItemID if it doesn't already exist
         if (! $this->InternalItemID) {
+            $this->InternalItemID = 'S-H-' . CodeGenerator::generate();
             $x = 0;
             while ($this->anotherOneWithThisCodeExists() && $x < 50) {
                 $this->InternalItemID = 'S-H-' . CodeGenerator::generate();
@@ -926,11 +927,16 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         }
 
         parent::onBeforeWrite();
-        if (! $this->DateItemWasBought) {
+
+        // must be after parent::onBeforeWrite
+        if (! $this->DateItemWasBought && $this->Created) {
             $this->DateItemWasBought = $this->Created;
         }
 
-        $this->fixImageFileNames();
+        // fix the images if it is still worth fixing!
+        if (! $this->HasBeenSold()) {
+            $this->fixImageFileNames();
+        }
     }
 
     protected function onAfterWrite()
@@ -979,7 +985,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 $extension = $extension ? strtolower($extension) : 'jpg';
                 $name = $this->InternalItemID . '_' . $count . '.' . $extension;
 
-                //if there is a different image, we delete that first ...
                 if ($image->ParentID !== $folder->ID || $name !== $image->Name) {
                     $filename = $image->getFileName();
                     $oldFileLocationAbsolute = Controller::join_links(ASSETS_PATH, $filename);
@@ -994,7 +999,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                                     $imageToMove->write();
                                     $imageToMove->publishSingle();
                                 } catch (\Exception $exception) {
-                                    DB::alteration_message('Caught exception with renameing of file: ' . $exception->getMessage(), 'deleted');
+                                    DB::alteration_message('Caught exception with renaming of file: ' . $exception->getMessage(), 'deleted');
                                 }
                             }
                         }
@@ -1014,6 +1019,8 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 }
             }
 
+            // if there are additional images but no primary images then
+            // make the first additional image the primary image.
             if (! $this->ImageID) {
                 if ([] !== $arrayInner) {
                     $id = array_key_first($arrayInner);

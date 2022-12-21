@@ -61,6 +61,48 @@ class SecondHandArchive extends DataObject
         'AutoArchived' => 'Boolean',
     ];
 
+    private const MAPPING_FROM_ARCHIVE_TO_SH_PRODUCT = [
+        'OriginalItemCreated' => 'Created',
+        'OriginalItemLastEdited' => 'LastEdited',
+        'PageID' => 'ID',
+        'SoldOnBehalf' => 'SellingOnBehalf',
+    ];
+
+
+    private const OTHER_MAPPABLE_FIELDS = [
+        'Title',
+        'Price',
+        'InternalItemID',
+        'SerialNumber',
+        'DateItemWasBought',
+        'DateItemWasSold',
+        'ProductQuality',
+        'PurchasePrice',
+        'SoldPrice',
+        'IncludesBoxOrCase',
+        'OriginalManual',
+        'Description',
+        'ArchivedByID',
+
+        //sellers details
+        'SellersName',
+        'SellersPhone',
+        'SellersEmail',
+        'SellersAddress',
+        'SellersAddress2',
+        'SellersCity',
+        'SellersPostalCode',
+        'SellersRegionCode',
+        'SellersCountry',
+        'SellersIDType',
+        'SellersIDNumber',
+        'SellersDateOfBirth',
+        'SellersIDExpiryDate',
+        'SellersIDPhotocopy',
+        'ImageID',
+    ];
+
+
     private static $has_one = [
         'ArchivedBy' => Member::class,
         'Image' => Image::class,
@@ -130,53 +172,21 @@ class SecondHandArchive extends DataObject
 
     public static function create_from_page($page)
     {
-        $filter = $page->InternalItemID ? [
-            'InternalItemID' => $page->InternalItemID,
-        ] : [
-            'PageID' => $page->ID,
-        ];
+        if ($page->InternalItemID) {
+            $filter = ['InternalItemID' => $page->InternalItemID,];
+        } else {
+            $filter = ['PageID' => $page->ID,];
+        }
         $obj = SecondHandArchive::get()->filter($filter)->first();
         if (! $obj) {
             $obj = SecondHandArchive::create($filter);
         }
 
-        $obj->Title = $page->Title;
-        $obj->OriginalItemCreated = $page->Created;
-        $obj->OriginalItemLastEdited = $page->LastEdited;
-        $obj->Price = $page->Price;
-        $obj->InternalItemID = $page->InternalItemID;
-        $obj->PageID = $page->ID;
-        $obj->SerialNumber = $page->SerialNumber;
-        $obj->DateItemWasBought = $page->DateItemWasBought;
-        $obj->DateItemWasSold = $page->DateItemWasSold;
-        $obj->ProductQuality = $page->ProductQuality;
-        $obj->SoldOnBehalf = $page->SellingOnBehalf;
-        $obj->PurchasePrice = $page->PurchasePrice;
-        $obj->SoldPrice = $page->SoldPrice;
-        $obj->IncludesBoxOrCase = $page->IncludesBoxOrCase;
-        $obj->OriginalManual = $page->OriginalManual;
-        $obj->Description = $page->ShortDescription;
-        $obj->ArchivedByID = $page->ArchivedByID;
-
-        //sellers details
-        $obj->SellersName = $page->SellersName;
-        $obj->SellersPhone = $page->SellersPhone;
-        $obj->SellersEmail = $page->SellersEmail;
-        $obj->SellersAddress = $page->SellersAddress;
-        $obj->SellersAddress2 = $page->SellersAddress2;
-        $obj->SellersCity = $page->SellersCity;
-        $obj->SellersPostalCode = $page->SellersPostalCode;
-        $obj->SellersRegionCode = $page->SellersRegionCode;
-        $obj->SellersCountry = $page->SellersCountry;
-        $obj->SellersIDType = $page->SellersIDType;
-        $obj->SellersIDNumber = $page->SellersIDNumber;
-        $obj->SellersDateOfBirth = $page->SellersDateOfBirth;
-        $obj->SellersIDExpiryDate = $page->SellersIDExpiryDate;
-        $obj->SellersIDPhotocopy = $page->SellersIDPhotocopy;
-        $obj->ImageID = $page->ImageID;
-        $obj->write();
-        foreach ($page->AdditionalImages() as $image) {
-            $obj->AdditionalImages()->add($image);
+        foreach(self::MAPPING_FROM_ARCHIVE_TO_SH_PRODUCT as $myField => $pageField) {
+            $obj->$myField = $page->$pageField;
+        }
+        foreach(self::OTHER_MAPPABLE_FIELDS as $myField) {
+            $obj->$myField = $page->$myField;
         }
 
         return $obj;
