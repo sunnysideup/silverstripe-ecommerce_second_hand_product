@@ -923,12 +923,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             $this->MetaDescription = 'Second Hand Product: ' . $this->Title;
         }
 
-        if ($this->DateItemWasSold) {
-            $this->AllowPurchase = 0;
-        }
-
         // Save the date when the product was sold.
         if ($this->HasBeenSold()) {
+            $this->AllowPurchase = 0;
             if (! $this->DateItemWasSold) {
                 $this->DateItemWasSold = DBDatetime::now()->Rfc2822();
             }
