@@ -39,13 +39,6 @@ class ExportSecondHandProducts extends Controller
         'FullSiteTreeSort',
         'FullName',
         'ID',
-        'RecordClassName',
-        'parser',
-        'Lat',
-        'Lng',
-        'Lng',
-        'ExcludeFromSearchEngines',
-        'FooterMenuOrder',
         'RootParent',
     ];
 
@@ -101,25 +94,23 @@ class ExportSecondHandProducts extends Controller
 
     public function products()
     {
-        $withImageData = false;
         $additionalData = [];
         if (! empty($_GET['withimagedata'])) {
-            $withImageData = true;
             $imageData = self::get_image_array(true);
-            foreach(array_keys($withImageData) as $internalItemID) {
+            foreach(array_keys($imageData) as $internalItemID) {
                 $additionalData[$internalItemID] = array_sum($imageData[$internalItemID]);
             }
         }
         $list = SecondHandProduct::get()->filter(['AllowPurchase' => 1]);
         $relations = Config::inst()->get(ExportSecondHandProducts::class, 'relationships_to_include_with_products');
-        return $this->returnJSONorFile($this->createList($list, $relations, $additionalData), 'groups');
+        return $this->createList($list, $relations, $additionalData);
     }
 
     public function groups()
     {
         $list = SecondHandProductGroup::get()->exclude(['RootParent' => true]);
         $relations = Config::inst()->get(ExportSecondHandProducts::class, 'relationships_to_include_with_groups');
-        $this->returnJSONorFile($this->createList($list, $relations), 'groups');
+        return $this->createList($list, $relations);
     }
 
     protected function createList(DataList $list, array $relations, ?array $additionalData = [])
