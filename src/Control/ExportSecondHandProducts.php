@@ -174,7 +174,7 @@ class ExportSecondHandProducts extends Controller
     public static function get_image_array(?bool $imageSizesOnly = false, ?bool $getIds = false): array
     {
         $array = [];
-        $folderName = Config::inst()->get(SecondHandProduct::class, 'folder_for_second_hand_images');
+        $folderName = Injector::inst()->get(SecondHandProduct::class)->getFolderName();
         $folder = Folder::find_or_make($folderName);
         $secondHandProducts = SecondHandProduct::get()
             ->filter(['AllowPurchase' => 1])

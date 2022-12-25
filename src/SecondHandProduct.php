@@ -45,8 +45,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      */
     protected static $treshold_sql_cache = '';
 
-    protected $imagesDone = false;
-
     private static $can_be_root = false;
 
     /**
@@ -81,11 +79,11 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     private static $table_name = 'SecondHandProduct';
 
     /**
-     * where will the data be saved (if any).
+     * place to save images and other files...
      *
      * @var string
      */
-    private static $folder_for_second_hand_images = 'second-hand-images';
+    private static $folder_name_for_images = 'second-hand-images';
 
     private static $db = [
         'SoldPrice' => 'Currency',
@@ -961,83 +959,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         $b = SecondHandArchive::get()->filter(['InternalItemID' => $this->InternalItemID])->exists();
 
         return $a || $b;
-    }
-
-    public function fixImageFileNames()
-    {
-        if (! $this->imagesDone) {
-            $this->imagesDone = true;
-            $array = [];
-            $folderName = Config::inst()->get(self::class, 'folder_for_second_hand_images') ?: 'second-hand-images';
-            $folder = Folder::find_or_make($folderName);
-            $arrayInner = [];
-            if ($this->ImageID) {
-                $image = $this->Image(); //see Product::has_one()
-                if ($image && $image->exists()) {
-                    $arrayInner[$image->ID] = $image;
-                }
-            }
-
-            $otherImages = $this->AdditionalImages(); //see Product::many_many()
-            foreach ($otherImages as $otherImage) {
-                if ($otherImage && $otherImage->exists()) {
-                    $arrayInner[$otherImage->ID] = $otherImage;
-                }
-            }
-
-            $count = 0;
-            foreach ($arrayInner as $image) {
-                ++$count;
-                $ext = pathinfo($image->Name, PATHINFO_EXTENSION);
-                $ext = $ext ? strtolower($ext) : 'jpg';
-                $name = $this->InternalItemID . '_' . $count . '.' . $ext;
-
-                if ($image->ParentID !== $folder->ID || $name !== $image->Name) {
-                    $filename = $image->getFileName();
-                    $oldFileLocationAbsolute = Controller::join_links(ASSETS_PATH, $filename);
-                    if ($image->exists()) {
-                        $newFileLocation = Controller::join_links(ASSETS_PATH, $folder->getFileName(), $name);
-                        if (file_exists($newFileLocation)) {
-                            $imageToMove = Image::get()->filter(['ParentID' => $folder->ID, 'Name' => $name])->first();
-                            if ($imageToMove && $imageToMove->ID !== $image->ID) {
-                                try {
-                                    $imageToMove->Name = $this->InternalItemID . '_' . (1000 . '_' . $image->ID) . '.' . $ext;
-                                    $imageToMove->ParentID = $folder->ID;
-                                    $imageToMove->write();
-                                    $imageToMove->publishSingle();
-                                } catch (\Exception $exception) {
-                                    DB::alteration_message('Caught exception with renaming of file: ' . $exception->getMessage(), 'deleted');
-                                }
-                            }
-                        }
-
-                        $title = $this->Title . ' #' . $count;
-                        $image->ParentID = $folder->ID;
-                        $image->Name = $name;
-                        $image->Title = $title;
-                        $image->write();
-                        $image->publishSingle();
-                    }
-
-                    // $image->deleteFile();
-                        // $image->deleteFromStage(Versioned::DRAFT);
-                        // $image->deleteFromStage(Versioned::LIVE);
-                        // $image->delete();
-                }
-            }
-
-            // if there are additional images but no primary images then
-            // make the first additional image the primary image.
-            if (! $this->ImageID) {
-                if ([] !== $arrayInner) {
-                    $id = array_key_first($arrayInner);
-                    if ($id) {
-                        $this->ImageID = $id;
-                        $this->AdditionalImages()->removeByID($id);
-                    }
-                }
-            }
-        }
     }
 
     /**
