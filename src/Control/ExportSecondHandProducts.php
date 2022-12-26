@@ -21,8 +21,12 @@ use SilverStripe\CMS\Model\SiteTree;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 
+
 class ExportSecondHandProducts extends Controller
 {
+
+    public const SIZE_SEPARATOR = '*';
+
     private static $do_not_copy = [
         'ClassName',
         'ParentID',
@@ -174,46 +178,39 @@ class ExportSecondHandProducts extends Controller
     public static function get_image_array(?bool $imageSizesOnly = false, ?bool $getIds = false): array
     {
         $array = [];
-        $folderName = Injector::inst()->get(SecondHandProduct::class)->getFolderName();
-        $folder = Folder::find_or_make($folderName);
         $secondHandProducts = SecondHandProduct::get()
             ->filter(['AllowPurchase' => 1])
-            ->exclude(['ImageID' => 0])
         ;
+        $folder = null;
         foreach ($secondHandProducts as $secondHandProduct) {
-            $arrayInner = [];
-            if ($secondHandProduct->ImageID) {
-                $image = $secondHandProduct->Image(); //see Product::has_one()
-                if ($image && $image->exists()) {
-                    $arrayInner[$image->ID] = $image;
-                }
+            if(! $folder) {
+                $folderName = $secondHandProduct->getFolderName();
+                $folder = Folder::find_or_make($folderName);
             }
+            if ($folder) {
+                $arrayInner = $secondHandProduct->getArrayOfImages();
+                foreach ($arrayInner as $imageID => $image) {
+                    if ($image->ParentID !== $folder->ID) {
+                        $secondHandProduct->fixImageFileNames();
+                    }
 
-            $otherImages = $secondHandProduct->AdditionalImages(); //see Product::many_many()
-            foreach ($otherImages as $otherImage) {
-                if ($otherImage && $otherImage->exists()) {
-                    $arrayInner[$otherImage->ID] = $otherImage;
-                }
-            }
-
-            foreach ($arrayInner as $imageID => $image) {
-                if ($image->ParentID !== $folder->ID) {
-                    $secondHandProduct->fixImageFileNames();
-                }
-
-                $filename = $image->getFileName();
-                $location = Controller::join_links(ASSETS_PATH, $filename);
-                if (! isset($array[$secondHandProduct->InternalItemID])) {
-                    $array[$secondHandProduct->InternalItemID] = [];
-                }
-
-                if ($getIds) {
-                    $array[$secondHandProduct->InternalItemID][$imageID] = filesize($location);
-                } elseif (file_exists($location)) {
-                    if ($imageSizesOnly) {
-                        $array[$secondHandProduct->InternalItemID][] = filesize($location);
-                    } else {
-                        $array[$secondHandProduct->InternalItemID][] = $image->Name . '*' . filesize($location);
+                    $filename = $image->getFileName();
+                    $location = Controller::join_links(ASSETS_PATH, $filename);
+                    if (! isset($array[$secondHandProduct->InternalItemID])) {
+                        $array[$secondHandProduct->InternalItemID] = [];
+                    }
+                    $fileSize = 0;
+                    if (file_exists($location)) {
+                        $fileSize = filesize($location);
+                    }
+                    if ($getIds) {
+                        $array[$secondHandProduct->InternalItemID][$imageID] = $fileSize;
+                    } elseif ($fileSize) {
+                        if ($imageSizesOnly) {
+                            $array[$secondHandProduct->InternalItemID][] = $fileSize;
+                        } else {
+                            $array[$secondHandProduct->InternalItemID][] = $image->Name . self::SIZE_SEPARATOR . $fileSize;
+                        }
                     }
                 }
             }

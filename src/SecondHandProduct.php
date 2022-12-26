@@ -895,17 +895,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     protected function onBeforeWrite()
     {
-        if ($this->BasedOnID && $this->BasedOnID !== $this->ID) {
-            $basedOn = $this->BasedOn();
-            if ($basedOn && $basedOn->exists()) {
-                $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
-                foreach ($list as $field) {
-                    $this->{$field} = $basedOn->{$field};
-                }
-            }
-        }
-
-        //set the IternatlItemID if it doesn't already exist
+        // set this first!
         if (! $this->InternalItemID) {
             $this->InternalItemID = 'S-H-' . CodeGenerator::generate();
             $x = 0;
@@ -915,23 +905,41 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             }
         }
 
+        // then the URL Segment!
         $this->URLSegment = $this->generateURLSegment($this->Title . '-' . $this->InternalItemID);
 
-        if ($this->Title && strlen($this->MetaDescription) < 30) {
+        // get parent values
+        parent::onBeforeWrite();
+
+        // now we can do other stuff.
+        if($this->exists()) {
+            if ($this->HasBeenSold()) {
+                $this->AllowPurchase = 0;
+                if (! $this->DateItemWasSold) {
+                    $this->DateItemWasSold = DBDatetime::now()->Rfc2822();
+                }
+            } else {
+
+                $this->ArchivedByID = 0;
+
+                if ($this->BasedOnID && $this->BasedOnID !== $this->ID) {
+                    $basedOn = $this->BasedOn();
+                    if ($basedOn && $basedOn->exists()) {
+                        $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
+                        foreach ($list as $field) {
+                            $this->{$field} = $basedOn->{$field};
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($this->Title && strlen($this->MetaDescription) < 22) {
             $this->MetaDescription = 'Second Hand Product: ' . $this->Title;
         }
 
         // Save the date when the product was sold.
-        if ($this->HasBeenSold()) {
-            $this->AllowPurchase = 0;
-            if (! $this->DateItemWasSold) {
-                $this->DateItemWasSold = DBDatetime::now()->Rfc2822();
-            }
-        } else {
-            $this->ArchivedByID = 0;
-        }
 
-        parent::onBeforeWrite();
 
         // must be after parent::onBeforeWrite
         if (! $this->DateItemWasBought && $this->Created) {
@@ -939,15 +947,8 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         }
 
         // fix the images if it is still worth fixing!
-        if (! $this->HasBeenSold()) {
-            $this->fixImageFileNames();
-        }
     }
 
-    protected function onAfterWrite()
-    {
-        parent::onAfterWrite();
-    }
 
     protected function anotherOneWithThisCodeExists(): bool
     {
