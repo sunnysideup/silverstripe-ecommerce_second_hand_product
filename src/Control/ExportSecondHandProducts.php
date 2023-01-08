@@ -190,9 +190,9 @@ class ExportSecondHandProducts extends Controller
             if ($folder) {
                 $arrayInner = $secondHandProduct->getArrayOfImages();
                 foreach ($arrayInner as $imageID => $image) {
-                    if ($image->ParentID !== $folder->ID) {
-                        $secondHandProduct->fixImageFileNames();
-                    }
+                    // if ($image->ParentID !== $folder->ID) {
+                    //     $secondHandProduct->fixImageFileNames();
+                    // }
 
                     $filename = $image->getFileName();
                     $location = Controller::join_links(ASSETS_PATH, $filename);
@@ -204,12 +204,12 @@ class ExportSecondHandProducts extends Controller
                         $fileSize = filesize($location);
                     }
                     if ($getIds) {
-                        $array[$secondHandProduct->InternalItemID][$imageID] = $fileSize;
+                        $array[$secondHandProduct->InternalItemID][$imageID] = $image->Name . self::SIZE_SEPARATOR . $fileSize;
                     } elseif ($fileSize) {
                         if ($imageSizesOnly) {
                             $array[$secondHandProduct->InternalItemID][] = $fileSize;
                         } else {
-                            $array[$secondHandProduct->InternalItemID][] = $image->Name . self::SIZE_SEPARATOR . $fileSize;
+                            $array[$secondHandProduct->InternalItemID][] = $image->Name . self::SIZE_SEPARATOR . $fileSize ;
                         }
                     }
                 }
