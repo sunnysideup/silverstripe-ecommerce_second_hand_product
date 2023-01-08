@@ -101,15 +101,17 @@ class SecondHandProductGroup extends ProductGroup
      */
     public function BestRootParentPage()
     {
-        $obj = DataObject::get_one(
+        /** @var SecondHandProductGroup $obj */
+        $obj = SecondHandProductGroup::get_one(
             SecondHandProductGroup::class,
             ['RootParent' => 1]
         );
-        if ($obj) {
-            return $obj;
+        if (! $obj) {
+            /** @var SecondHandProductGroup $obj */
+            $obj = SecondHandProductGroup::get()->first();
         }
         /** @return SecondHandProductGroup */
-        return SecondHandProductGroup::get()->first();
+        return $obj;
     }
 
     /**

@@ -49,7 +49,7 @@ class SecondHandProductActions
                     $archivedByLine = 'SecondHandProduct'.$ext.'.ArchivedByID = 0,';
                     $dateItemSoldLine = '' . $dbName . '."SecondHandProduct'.$ext.'"."DateItemWasSold" = \'\',';
                     $zeroOrOne = 0;
-                }    
+                }
                 $sql = '
                     UPDATE ' . $dbName . '.Product'.$ext.'
                         INNER JOIN ' . $dbName . '.SiteTree'.$ext.'
@@ -61,10 +61,10 @@ class SecondHandProductActions
                         '.$priceLine.'
                         '.$dateItemSoldLine.'
                         '.$archivedByLine.'
-                        ' . $dbName . '."Product'.$ext.'"."FeaturedProduct" = '.($zerOrOne ? 0 : 0).',
-                        ' . $dbName . '."Product'.$ext.'"."AllowPurchase" = '.$zerOrOne.',
-                        ' . $dbName . '."SiteTree'.$ext.'"."ShowInMenus" = '.$zerOrOne.',
-                        ' . $dbName . '."SiteTree'.$ext.'"."ShowInSearch" = '.$zerOrOne.'
+                        ' . $dbName . '."Product'.$ext.'"."FeaturedProduct" = '.($zeroOrOne).',
+                        ' . $dbName . '."Product'.$ext.'"."AllowPurchase" = '.$zeroOrOne.',
+                        ' . $dbName . '."SiteTree'.$ext.'"."ShowInMenus" = '.$zeroOrOne.',
+                        ' . $dbName . '."SiteTree'.$ext.'"."ShowInSearch" = '.$zeroOrOne.'
 
                     WHERE
                         ' . $dbName . '."Product'.$ext.'"."InternalItemID" = \'' . $buyable->InternalItemID . '\'
