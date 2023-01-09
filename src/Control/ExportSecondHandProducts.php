@@ -194,7 +194,7 @@ class ExportSecondHandProducts extends Controller
                     //     $secondHandProduct->fixImageFileNames();
                     // }
 
-                    $filename = $image->getFileName();
+                    $filename = $image->getFilename();
                     $location = Controller::join_links(ASSETS_PATH, $filename);
                     if (! isset($array[$secondHandProduct->InternalItemID])) {
                         $array[$secondHandProduct->InternalItemID] = [];
