@@ -41,7 +41,7 @@ class UpdateSecondHandProduct extends Controller
                     $secondHandProduct->ShowInSearch = 0;
                     $secondHandProduct->writeToStage(Versioned::DRAFT);
 
-                    //no need to publish recursively here to reduct time!
+                    //no need to publish recursive here to reduce time!
                     $secondHandProduct->publishSingle();
                 }
             }
