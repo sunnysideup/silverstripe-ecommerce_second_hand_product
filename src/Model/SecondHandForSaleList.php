@@ -127,8 +127,11 @@ class SecondHandForSaleList extends DataObject
 
     public function canEdit($member = null)
     {
-        if ($this->Created && strtotime((string) $this->Created) < (time() - 3600)) {
-            return false;
+        if ($this->Created) {
+            $test = strtotime((string) $this->Created) < (time() - 3600);
+            if ($test) {
+                return false;
+            }
         }
 
         return parent::canEdit($member);
