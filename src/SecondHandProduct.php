@@ -3,8 +3,6 @@
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
 use SilverStripe\AssetAdmin\Forms\UploadField;
-use SilverStripe\Assets\Folder;
-use SilverStripe\Assets\Image;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\CheckboxField;
@@ -16,15 +14,13 @@ use SilverStripe\Forms\NumericField;
 use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\TextField;
-use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBBoolean;
-use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
-use SilverStripe\Security\Security;
 use SilverStripe\Security\Permission;
+use SilverStripe\Security\Security;
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
@@ -870,7 +866,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     public function getCreatedNice()
     {
         $date = $this->DateItemWasBought ? $this->DateItemWasBought : $this->Created;
-        if(!$this->DateItemWasBought || (strtotime((string) $this->DateItemWasBought) > (strtotime('now') - ( 7 * 86400)))) {
+        if (! $this->DateItemWasBought || (strtotime((string) $this->DateItemWasBought) > (strtotime('now') - (7 * 86400)))) {
             $date = $this->Created;
         }
 
@@ -912,14 +908,13 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         parent::onBeforeWrite();
 
         // now we can do other stuff.
-        if($this->exists()) {
+        if ($this->exists()) {
             if ($this->HasBeenSold()) {
                 $this->AllowPurchase = 0;
                 if (! $this->DateItemWasSold) {
                     $this->DateItemWasSold = DBDatetime::now()->Rfc2822();
                 }
             } else {
-
                 $this->ArchivedByID = 0;
 
                 if ($this->BasedOnID && $this->BasedOnID !== $this->ID) {
@@ -940,7 +935,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
         // Save the date when the product was sold.
 
-
         // must be after parent::onBeforeWrite
         if (! $this->DateItemWasBought && $this->Created) {
             $this->DateItemWasBought = $this->Created;
@@ -948,7 +942,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
         // fix the images if it is still worth fixing!
     }
-
 
     protected function anotherOneWithThisCodeExists(): bool
     {

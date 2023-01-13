@@ -4,16 +4,12 @@ namespace Sunnysideup\EcommerceSecondHandProduct\Model;
 
 use SilverStripe\Assets\Image;
 use SilverStripe\Core\Config\Config;
-use SilverStripe\Forms\NumericField;
-use SilverStripe\Forms\LiteralField;
-use SilverStripe\Forms\ReadonlyField;
-use SilverStripe\ORM\DB;
-
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
-
 use SilverStripe\Forms\HeaderField;
+use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\ReadonlyField;
 use SilverStripe\ORM\DataObject;
-
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
@@ -21,47 +17,10 @@ use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-
 use Sunnysideup\Vardump\ArrayToTable;
 
 class SecondHandArchive extends DataObject
 {
-    private static $table_name = 'SecondHandArchive';
-
-    private static $db = [
-        'Title' => 'Varchar(255)',
-        'InternalItemID' => 'Varchar(50)',
-        'SerialNumber' => 'Varchar(50)',
-        'DateItemWasBought' => 'Date',
-        'DateItemWasSold' => 'Date',
-        'ProductQuality' => 'Enum("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
-        'SoldOnBehalf' => 'Boolean',
-        'PurchasePrice' => 'Currency',
-        'Price' => 'Currency',
-        'SoldPrice' => 'Currency',
-        'IncludesBoxOrCase' => 'Enum("No, Box, Case, Both","No")',
-        'OriginalManual' => 'Boolean',
-        'PageID' => 'Int',
-        'Description' => 'Varchar(255)',
-        'SellersName' => 'Varchar(50)',
-        'SellersPhone' => 'Varchar(30)',
-        'SellersEmail' => 'Varchar(255)',
-        'SellersAddress' => 'Varchar(255)',
-        'SellersAddress2' => 'Varchar(255)',
-        'SellersCity' => 'Varchar(100)',
-        'SellersPostalCode' => 'Varchar(50)',
-        'SellersRegionCode' => 'Varchar(100)',
-        'SellersCountry' => 'Varchar(50)',
-        'SellersIDType' => 'Enum(",Drivers Licence, Firearms Licence, Passport","")',
-        'SellersIDNumber' => 'Varchar(50)',
-        'SellersDateOfBirth' => 'Date',
-        'SellersIDExpiryDate' => 'Date',
-        'SellersIDPhotocopy' => 'Boolean',
-        'OriginalItemLastEdited' => 'DBDatetime',
-        'OriginalItemCreated' => 'DBDatetime',
-        'AutoArchived' => 'Boolean',
-    ];
-
     private const MAPPING_FROM_ARCHIVE_TO_SH_PRODUCT = [
         'OriginalItemCreated' => 'Created',
         'OriginalItemLastEdited' => 'LastEdited',
@@ -100,6 +59,41 @@ class SecondHandArchive extends DataObject
         'SellersIDExpiryDate',
         'SellersIDPhotocopy',
         'ImageID',
+    ];
+    private static $table_name = 'SecondHandArchive';
+
+    private static $db = [
+        'Title' => 'Varchar(255)',
+        'InternalItemID' => 'Varchar(50)',
+        'SerialNumber' => 'Varchar(50)',
+        'DateItemWasBought' => 'Date',
+        'DateItemWasSold' => 'Date',
+        'ProductQuality' => 'Enum("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
+        'SoldOnBehalf' => 'Boolean',
+        'PurchasePrice' => 'Currency',
+        'Price' => 'Currency',
+        'SoldPrice' => 'Currency',
+        'IncludesBoxOrCase' => 'Enum("No, Box, Case, Both","No")',
+        'OriginalManual' => 'Boolean',
+        'PageID' => 'Int',
+        'Description' => 'Varchar(255)',
+        'SellersName' => 'Varchar(50)',
+        'SellersPhone' => 'Varchar(30)',
+        'SellersEmail' => 'Varchar(255)',
+        'SellersAddress' => 'Varchar(255)',
+        'SellersAddress2' => 'Varchar(255)',
+        'SellersCity' => 'Varchar(100)',
+        'SellersPostalCode' => 'Varchar(50)',
+        'SellersRegionCode' => 'Varchar(100)',
+        'SellersCountry' => 'Varchar(50)',
+        'SellersIDType' => 'Enum(",Drivers Licence, Firearms Licence, Passport","")',
+        'SellersIDNumber' => 'Varchar(50)',
+        'SellersDateOfBirth' => 'Date',
+        'SellersIDExpiryDate' => 'Date',
+        'SellersIDPhotocopy' => 'Boolean',
+        'OriginalItemLastEdited' => 'DBDatetime',
+        'OriginalItemCreated' => 'DBDatetime',
+        'AutoArchived' => 'Boolean',
     ];
 
     private static $has_one = [
@@ -172,9 +166,9 @@ class SecondHandArchive extends DataObject
     public static function create_from_page($page)
     {
         if ($page->InternalItemID) {
-            $filter = ['InternalItemID' => $page->InternalItemID,];
+            $filter = ['InternalItemID' => $page->InternalItemID];
         } else {
-            $filter = ['PageID' => $page->ID,];
+            $filter = ['PageID' => $page->ID];
         }
         $obj = SecondHandArchive::get()->filter($filter)->first();
         if (! $obj) {
@@ -182,13 +176,13 @@ class SecondHandArchive extends DataObject
         }
 
         // fields that do not match
-        foreach(self::MAPPING_FROM_ARCHIVE_TO_SH_PRODUCT as $myField => $pageField) {
-            $obj->$myField = $page->$pageField;
+        foreach (self::MAPPING_FROM_ARCHIVE_TO_SH_PRODUCT as $myField => $pageField) {
+            $obj->{$myField} = $page->{$pageField};
         }
 
         // fields that match
-        foreach(self::OTHER_MAPPABLE_FIELDS as $myField) {
-            $obj->$myField = $page->$myField;
+        foreach (self::OTHER_MAPPABLE_FIELDS as $myField) {
+            $obj->{$myField} = $page->{$myField};
         }
 
         $obj->write();
@@ -297,7 +291,8 @@ class SecondHandArchive extends DataObject
         $fields->dataFieldByName('AdditionalImages')
             ->getConfig()
             ->getComponentByType(GridFieldDataColumns::class)
-            ->setDisplayFields(['CMSTumbnail'],);
+            ->setDisplayFields(['CMSTumbnail'], )
+        ;
         $fields->addFieldsToTab(
             'Root.SellersDetails',
             [
@@ -318,10 +313,10 @@ class SecondHandArchive extends DataObject
             ]
         );
         $archivedByLink = '';
-        if($this->ArchivedByID) {
+        if ($this->ArchivedByID) {
             $archivedByLink = DBField::create_field(
                 'HTMLText',
-                '<a href="/admin/security/EditForm/field/Members/item/'.$this->ArchivedByID.'/edit">View archiver details</a>'
+                '<a href="/admin/security/EditForm/field/Members/item/' . $this->ArchivedByID . '/edit">View archiver details</a>'
             );
         }
         $fields->addFieldsToTab(
@@ -345,27 +340,28 @@ class SecondHandArchive extends DataObject
                 $fields->dataFieldByName('OriginalItemLastEdited')->setTitle('Product Last Edited')->setDescription(''),
                 LiteralField::create(
                     'ChangeHistory',
-                    '<h2>Selected History</h2><p>Only shows available history.</p>'.
-                    '<blockquote>'.ArrayToTable::convert($this->getHistoryData()).'</blockquote>'
-                )
+                    '<h2>Selected History</h2><p>Only shows available history.</p>' .
+                    '<blockquote>' . ArrayToTable::convert($this->getHistoryData()) . '</blockquote>'
+                ),
             ]
         );
         $currentProduct = SecondHandProduct::get()->filter(['InternalItemID' => $this->InternalItemID])->first();
-        if($currentProduct) {
+        if ($currentProduct) {
             $fields->addFieldsToTab(
                 'Root.Error',
                 [
                     LiteralField::create(
                         'LiveProduct',
-                        '<h2>There is a live product with the same code: <a href="'.$currentProduct->CMSEditLink().'">'.$currentProduct->Title.'</a></h2>'
-                    )
+                        '<h2>There is a live product with the same code: <a href="' . $currentProduct->CMSEditLink() . '">' . $currentProduct->Title . '</a></h2>'
+                    ),
                 ]
             );
         }
+
         return $fields;
     }
 
-    public function getHistoryData(?string $code = '') : array
+    public function getHistoryData(?string $code = ''): array
     {
         $obj = DataObject::get_one(SecondHandProduct::class);
         $array = [];

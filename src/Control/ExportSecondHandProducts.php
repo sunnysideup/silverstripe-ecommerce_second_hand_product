@@ -3,28 +3,21 @@
 namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
 use SilverStripe\Assets\Folder;
-use SilverStripe\Assets\Image;
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
-use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\Director;
-
+use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Control\Middleware\HTTPCacheControlMiddleware;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\SS_List;
-use SilverStripe\ORM\DataList;
-use SilverStripe\Versioned\Versioned;
-use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
-
-use SilverStripe\CMS\Model\SiteTree;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 
-
 class ExportSecondHandProducts extends Controller
 {
-
     public const SIZE_SEPARATOR = '*';
 
     private static $do_not_copy = [
@@ -101,12 +94,13 @@ class ExportSecondHandProducts extends Controller
         $additionalData = [];
         if (! empty($_GET['withimagedata'])) {
             $imageData = self::get_image_array(true);
-            foreach(array_keys($imageData) as $internalItemID) {
+            foreach (array_keys($imageData) as $internalItemID) {
                 $additionalData[$internalItemID] = array_sum($imageData[$internalItemID]);
             }
         }
         $list = SecondHandProduct::get()->filter(['AllowPurchase' => 1]);
         $relations = Config::inst()->get(ExportSecondHandProducts::class, 'relationships_to_include_with_products');
+
         return $this->createList($list, $relations, $additionalData);
     }
 
@@ -114,7 +108,76 @@ class ExportSecondHandProducts extends Controller
     {
         $list = SecondHandProductGroup::get()->exclude(['RootParent' => true]);
         $relations = Config::inst()->get(ExportSecondHandProducts::class, 'relationships_to_include_with_groups');
+
         return $this->createList($list, $relations);
+    }
+
+    public function images()
+    {
+        $array = self::get_image_array(false);
+
+        return $this->returnJSONorFile($array, 'images');
+    }
+
+    /**
+     * @return bool
+     */
+    public function MyPermissionCheck()
+    {
+        $codesWithIPs = $this->Config()->get('secret_codes');
+        $code = $this->request->param('ID');
+
+        return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
+    }
+
+    /**
+     * images file name and size are separated by *.
+     *
+     * @param bool $imageSizesOnly
+     * @param bool $getIds
+     */
+    public static function get_image_array(?bool $imageSizesOnly = false, ?bool $getIds = false): array
+    {
+        $array = [];
+        $secondHandProducts = SecondHandProduct::get()
+            ->filter(['AllowPurchase' => 1])
+        ;
+        $folder = null;
+        foreach ($secondHandProducts as $secondHandProduct) {
+            if (! $folder) {
+                $folderName = $secondHandProduct->getFolderName();
+                $folder = Folder::find_or_make($folderName);
+            }
+            if ($folder) {
+                $arrayInner = $secondHandProduct->getArrayOfImages();
+                foreach ($arrayInner as $imageID => $image) {
+                    // if ($image->ParentID !== $folder->ID) {
+                    //     $secondHandProduct->fixImageFileNames();
+                    // }
+
+                    $filename = $image->getFilename();
+                    $location = Controller::join_links(ASSETS_PATH, $filename);
+                    if (! isset($array[$secondHandProduct->InternalItemID])) {
+                        $array[$secondHandProduct->InternalItemID] = [];
+                    }
+                    $fileSize = 0;
+                    if (file_exists($location)) {
+                        $fileSize = filesize($location);
+                    }
+                    if ($getIds) {
+                        $array[$secondHandProduct->InternalItemID][$imageID] = $image->Name . self::SIZE_SEPARATOR . $fileSize;
+                    } elseif ($fileSize) {
+                        if ($imageSizesOnly) {
+                            $array[$secondHandProduct->InternalItemID][] = $fileSize;
+                        } else {
+                            $array[$secondHandProduct->InternalItemID][] = $image->Name . self::SIZE_SEPARATOR . $fileSize;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $array;
     }
 
     protected function createList(DataList $list, array $relations, ?array $additionalData = [])
@@ -147,76 +210,6 @@ class ExportSecondHandProducts extends Controller
         }
 
         return $this->returnJSONorFile($array, 'groups');
-    }
-
-
-
-    public function images()
-    {
-        $array = self::get_image_array(false);
-
-        return $this->returnJSONorFile($array, 'images');
-    }
-
-    /**
-     * @return bool
-     */
-    public function MyPermissionCheck()
-    {
-        $codesWithIPs = $this->Config()->get('secret_codes');
-        $code = $this->request->param('ID');
-
-        return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
-    }
-
-    /**
-     * images file name and size are separated by *
-     * @param  boolean $imageSizesOnly
-     * @param  boolean $getIds
-     * @return array
-     */
-    public static function get_image_array(?bool $imageSizesOnly = false, ?bool $getIds = false): array
-    {
-        $array = [];
-        $secondHandProducts = SecondHandProduct::get()
-            ->filter(['AllowPurchase' => 1])
-        ;
-        $folder = null;
-        foreach ($secondHandProducts as $secondHandProduct) {
-            if(! $folder) {
-                $folderName = $secondHandProduct->getFolderName();
-                $folder = Folder::find_or_make($folderName);
-            }
-            if ($folder) {
-                $arrayInner = $secondHandProduct->getArrayOfImages();
-                foreach ($arrayInner as $imageID => $image) {
-                    // if ($image->ParentID !== $folder->ID) {
-                    //     $secondHandProduct->fixImageFileNames();
-                    // }
-
-                    $filename = $image->getFilename();
-                    $location = Controller::join_links(ASSETS_PATH, $filename);
-                    if (! isset($array[$secondHandProduct->InternalItemID])) {
-                        $array[$secondHandProduct->InternalItemID] = [];
-                    }
-                    $fileSize = 0;
-                    if (file_exists($location)) {
-                        $fileSize = filesize($location);
-                    }
-                    if ($getIds) {
-                        $array[$secondHandProduct->InternalItemID][$imageID] = $image->Name . self::SIZE_SEPARATOR . $fileSize;
-                    } elseif ($fileSize) {
-                        if ($imageSizesOnly) {
-                            $array[$secondHandProduct->InternalItemID][] = $fileSize;
-                        } else {
-                            $array[$secondHandProduct->InternalItemID][] = $image->Name . self::SIZE_SEPARATOR . $fileSize ;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $array;
     }
 
     protected function init()
@@ -254,7 +247,8 @@ class ExportSecondHandProducts extends Controller
         $response->addHeader('Access-Control-Allow-Origin', '*');
         $response->addHeader('Expires', 0);
         HTTPCacheControlMiddleware::singleton()
-                   ->disableCache();
+            ->disableCache()
+        ;
         $response->output();
         die();
     }
@@ -262,10 +256,8 @@ class ExportSecondHandProducts extends Controller
     /**
      * @param DataObject $currentObject the object we are exporting
      * @param array      $relations     the array of fields to be added
-     *
-     * @return array
      */
-    protected function addRelations($currentObject, array $relations) : array
+    protected function addRelations($currentObject, array $relations): array
     {
         $dataToBeAdded = [];
         foreach ($relations as $myField => $relFields) {

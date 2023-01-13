@@ -14,7 +14,6 @@ class CodeGenerator
 
     /**
      * Generate a random string of non-ambiguous numbers and letters.
-     * @return string
      */
     public static function generate(?int $length = 5): string
     {
@@ -27,9 +26,6 @@ class CodeGenerator
         return $random;
     }
 
-    /**
-     * @return string
-     */
     private static function randomChar(): string
     {
         $index = mt_rand(0, strlen(self::CHARS) - 1);

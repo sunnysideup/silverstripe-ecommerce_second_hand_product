@@ -2,17 +2,12 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Model\Process;
 
-use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Security\Member;
-
-use SilverStripe\Versioned\Versioned;
-use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
 use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
-use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
-
 use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInterface
 {

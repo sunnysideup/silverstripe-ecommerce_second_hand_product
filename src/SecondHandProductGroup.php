@@ -5,7 +5,6 @@ namespace Sunnysideup\EcommerceSecondHandProduct;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\ReadonlyField;
-use SilverStripe\ORM\DataObject;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 
 class SecondHandProductGroup extends ProductGroup
@@ -110,7 +109,7 @@ class SecondHandProductGroup extends ProductGroup
             /** @var SecondHandProductGroup $obj */
             $obj = SecondHandProductGroup::get()->first();
         }
-        /** @return SecondHandProductGroup */
+        // @return SecondHandProductGroup
         return $obj;
     }
 
@@ -151,6 +150,4 @@ class SecondHandProductGroup extends ProductGroup
             ->exists()
         ;
     }
-
-
 }

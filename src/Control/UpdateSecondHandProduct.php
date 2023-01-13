@@ -31,7 +31,7 @@ class UpdateSecondHandProduct extends Controller
         $otherID = $request->param('OtherID');
         if (! empty($otherID)) {
             $internalItemID = Convert::raw2sql($otherID);
-            if($internalItemID) {
+            if ($internalItemID) {
                 // do not use caching here - ...
                 // $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
                 $secondHandProduct = SecondHandProduct::get()->filter(['InternalItemID' => $internalItemID])->first();
