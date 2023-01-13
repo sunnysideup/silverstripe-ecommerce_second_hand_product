@@ -42,7 +42,7 @@ class SecondHandProductController extends ProductController
         $fields = $this->dataRecord->Config()->get('db');
         foreach ($fieldsWeNeed as $key => $description) {
             if (isset($fields[$key])) {
-                $type = preg_replace('#\(.*\)#', '', $fields[$key]);
+                $type = preg_replace('#\(.*\)#', '', (string) $fields[$key]);
                 $dbField = DBField::create_field($type, $this->{$key});
                 $value = $dbField->hasMethod('Nice') ? $dbField->Nice() : $dbField->Raw();
             } else {

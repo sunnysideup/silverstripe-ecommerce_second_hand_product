@@ -139,7 +139,7 @@ class SecondHandForSaleList extends DataObject
                 ->exclude(['ID' => $this->ID])
                 ->sort(['ID' => 'ASC']);
             foreach ($olderOnes as $oldList) {
-                $removeList = explode(',', $oldList->Removed);
+                $removeList = explode(',', (string) $oldList->Removed);
                 if($this->Config()->delete_old_products) {
                     // clearning the for sale - to save space!
                     $objects = SecondHandProduct::get()->filter(['AllowPurchase' => false, 'InternalItemID' => $removeList]);
@@ -323,7 +323,7 @@ class SecondHandForSaleList extends DataObject
             return '<p>' . $noListPhrase . '</p>';
         }
 
-        $listArray = explode(',', $list);
+        $listArray = explode(',', (string) $list);
         $html = '';
         $list = [];
         foreach ($listArray as $code) {
