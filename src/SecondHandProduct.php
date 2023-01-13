@@ -773,7 +773,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         $embargoDays = Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
         if ((int) $embargoDays > 0) {
             $date = $this->DateItemWasBought ? $this->DateItemWasBought : $this->Created;
-            $createdDate = strtotime($date);
+            $createdDate = strtotime((string) $date);
             $daysOld = (time() - $createdDate) / (60 * 60 * 24);
             if ($daysOld <= $embargoDays) {
                 return true;
@@ -787,7 +787,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     {
         $daysMax = (int) Config::inst()->get(SecondHandProduct::class, 'max_number_of_days_for_sale');
         $shouldBeListedAfterTs = strtotime('-' . $daysMax . ' days', DBDatetime::now()->getTimestamp());
-        $listedTs = strtotime($this->Created);
+        $listedTs = strtotime((string) $this->Created);
 
         return $listedTs < $shouldBeListedAfterTs;
     }
@@ -870,7 +870,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     public function getCreatedNice()
     {
         $date = $this->DateItemWasBought ? $this->DateItemWasBought : $this->Created;
-        if(!$this->DateItemWasBought || (strtotime($this->DateItemWasBought) > (strtotime('now') - ( 7 * 86400)))) {
+        if(!$this->DateItemWasBought || (strtotime((string) $this->DateItemWasBought) > (strtotime('now') - ( 7 * 86400)))) {
             $date = $this->Created;
         }
 
