@@ -64,6 +64,7 @@ class SecondHandProductActions
                         ' . $dbName . '."Product' . $ext . '"."InternalItemID" = \'' . $buyable->InternalItemID . '\'
                     ;
                 ';
+                // limit can not be used here...
                 DB::query($sql);
             }
         }

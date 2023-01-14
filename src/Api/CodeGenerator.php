@@ -11,11 +11,12 @@ class CodeGenerator
      * @var string
      */
     private const CHARS = '23456789ACDEFHJKLMNPRSTUVWXY';
+    private const LENGTH = 6;
 
     /**
      * Generate a random string of non-ambiguous numbers and letters.
      */
-    public static function generate(?int $length = 5): string
+    public static function generate(?int $length = self::LENGTH): string
     {
         $random = '';
 
