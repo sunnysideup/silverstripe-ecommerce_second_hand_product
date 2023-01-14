@@ -24,7 +24,7 @@ class SecondHandProductActions
 
     public static function quick_disable_or_enable(bool $enable, $buyable, ?int $archivedByID = 0, ?string $databaseName = '')
     {
-        if ($buyable && $buyable->exist() && $buyable->InternalItemID) {
+        if ($buyable && $buyable->exists() && $buyable->InternalItemID) {
             $dbName = $databaseName ? $databaseName : DB::get_conn()->getSelectedDatabase();
 
             foreach (['', '_Live'] as $ext) {
