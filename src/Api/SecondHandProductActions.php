@@ -37,12 +37,12 @@ class SecondHandProductActions
                         $archivedByLine = 'SecondHandProduct' . $ext . '.ArchivedByID = ' . $archivedByID . ',';
                     }
                     $dateItemSoldLine = '' . $dbName . '."SecondHandProduct' . $ext . '"."DateItemWasSold" = \'' . date('Y-m-d') . '\',';
-                    $zeroOrOne = 1;
+                    $zeroOrOne = 0;
                 } else {
                     $priceLine = 'Product' . $ext . '.Price = ' . $buyable->Price . ',';
                     $archivedByLine = 'SecondHandProduct' . $ext . '.ArchivedByID = 0,';
                     $dateItemSoldLine = '' . $dbName . '."SecondHandProduct' . $ext . '"."DateItemWasSold" = \'\',';
-                    $zeroOrOne = 0;
+                    $zeroOrOne = 1;
                 }
                 $sql = '
                     UPDATE ' . $dbName . '.Product' . $ext . '
@@ -62,7 +62,7 @@ class SecondHandProductActions
 
                     WHERE
                         ' . $dbName . '."Product' . $ext . '"."InternalItemID" = \'' . $buyable->InternalItemID . '\'
-                    LIMIT 1;
+                    ;
                 ';
                 DB::query($sql);
             }
