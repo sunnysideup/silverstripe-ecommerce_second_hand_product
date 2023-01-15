@@ -32,7 +32,7 @@ class SecondHandForSaleList extends DataObject
 
     private static $delete_old_lists = true;
 
-    private static $autoArchiveList = [];
+    private $autoArchiveList = [];
 
     private static $db = [
         'Title' => 'Varchar(100)',
