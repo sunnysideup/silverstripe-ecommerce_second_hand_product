@@ -32,6 +32,9 @@ class SecondHandProductActions
                 $dateItemSoldLine = '';
                 $priceLine = '';
                 $zeroOrOne = 0;
+                if(!$archivedByID) {
+                    $archivedByID = 0;
+                }
                 if (false === $enable) {
                     if ($archivedByID) {
                         $archivedByLine = 'SecondHandProduct' . $ext . '.ArchivedByID = ' . $archivedByID . ',';
