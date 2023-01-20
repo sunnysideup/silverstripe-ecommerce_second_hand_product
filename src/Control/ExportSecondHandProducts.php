@@ -114,7 +114,7 @@ class ExportSecondHandProducts extends Controller
 
     public function images()
     {
-        $array = self::get_image_array(false);
+        $array = self::get_image_array();
 
         return $this->returnJSONorFile($array, 'images');
     }
@@ -166,12 +166,10 @@ class ExportSecondHandProducts extends Controller
                     }
                     if ($getIds) {
                         $array[$secondHandProduct->InternalItemID][$imageID] = $image->Name . self::SIZE_SEPARATOR . $fileSize;
-                    } elseif ($fileSize) {
-                        if ($imageSizesOnly) {
-                            $array[$secondHandProduct->InternalItemID][] = $fileSize;
-                        } else {
-                            $array[$secondHandProduct->InternalItemID][] = $image->Name . self::SIZE_SEPARATOR . $fileSize;
-                        }
+                    } elseif ($imageSizesOnly) {
+                        $array[$secondHandProduct->InternalItemID][] = $fileSize;
+                    } else {
+                        $array[$secondHandProduct->InternalItemID][] = $image->Name . self::SIZE_SEPARATOR . $fileSize;
                     }
                 }
             }
