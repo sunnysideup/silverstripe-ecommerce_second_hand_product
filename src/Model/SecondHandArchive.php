@@ -4,6 +4,7 @@ namespace Sunnysideup\EcommerceSecondHandProduct\Model;
 
 use SilverStripe\Assets\Image;
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\HeaderField;
 use SilverStripe\Forms\LiteralField;
@@ -171,7 +172,7 @@ class SecondHandArchive extends DataObject
             $filter = ['PageID' => $page->ID];
         }
         $obj = SecondHandArchive::get()->filter($filter)->first();
-        if (! $obj) {
+        if (!$obj) {
             $obj = SecondHandArchive::create($filter);
         }
 
@@ -246,23 +247,15 @@ class SecondHandArchive extends DataObject
         return false;
     }
 
-    public function CMSEditLink(): string
+    public function CMSEditLink($action = null): string
     {
-        return $this->ModelAdminLink();
-    }
-
-    public function ModelAdminLink(): string
-    {
-        //admin/secondhandproducts/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/EditForm/field/Sunnysideup-EcommerceSecondHandProduct-Model-SecondHandArchive/item/7760/edit
-        $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandArchive::class);
-
-        return '/admin/secondhandproducts/' . $classURLSegment . '/EditForm/field/' . $classURLSegment . '/item/' . $this->ID . '/edit';
+        return Injector::inst()->get(SecondHandProductAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
 
     public function onBeforeWrite()
     {
         parent::onBeforeWrite();
-        if (! $this->OriginalItemLastEdited) {
+        if (!$this->OriginalItemLastEdited) {
             $this->OriginalItemLastEdited = $this->Created;
         }
     }
@@ -291,8 +284,7 @@ class SecondHandArchive extends DataObject
         $fields->dataFieldByName('AdditionalImages')
             ->getConfig()
             ->getComponentByType(GridFieldDataColumns::class)
-            ->setDisplayFields(['CMSTumbnail'], )
-        ;
+            ->setDisplayFields(['CMSTumbnail'],);
         $fields->addFieldsToTab(
             'Root.SellersDetails',
             [
@@ -341,7 +333,7 @@ class SecondHandArchive extends DataObject
                 LiteralField::create(
                     'ChangeHistory',
                     '<h2>Selected History</h2><p>Only shows available history.</p>' .
-                    '<blockquote>' . ArrayToTable::convert($this->getHistoryData()) . '</blockquote>'
+                        '<blockquote>' . ArrayToTable::convert($this->getHistoryData()) . '</blockquote>'
                 ),
             ]
         );

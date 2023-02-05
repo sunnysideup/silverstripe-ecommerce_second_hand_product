@@ -5,6 +5,7 @@ namespace Sunnysideup\EcommerceSecondHandProduct;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
+use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\DropdownField;
@@ -132,8 +133,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     /**
      * Standard SS variable.
      */
-    private static $summary_fields = [
-    ];
+    private static $summary_fields = [];
 
     private static $seller_summary_detail_fields = [
         'SellersName',
@@ -354,7 +354,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     public function onBeforeDelete()
     {
         SecondHandArchive::create_from_page($this);
-        if (! $this->ArchivedByID) {
+        if (!$this->ArchivedByID) {
             $currentMember = Security::getCurrentUser();
             if ($currentMember) {
                 $this->ArchivedByID = $currentMember->ID;
@@ -675,20 +675,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $this->link('printview');
     }
 
-    public function CMSEditLink()
+    public function CMSEditLink($action = null)
     {
-        $sanitisedClassName = ClassHelpers::sanitise_class_name($this->ClassName);
-
-        return Controller::join_links(
-            singleton(SecondHandProductAdmin::class)->Link(),
-            $sanitisedClassName,
-            'EditForm',
-            'field',
-            $sanitisedClassName,
-            'item',
-            $this->ID,
-            'edit'
-        );
+        return Injector::inst()->get(SecondHandProductAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
 
     public function getSettingsFields()
@@ -739,7 +728,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             return false;
         }
 
-        if (! $this->isListed()) {
+        if (!$this->isListed()) {
             return false;
         }
 
@@ -755,8 +744,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     {
         return (bool) SecondHandProduct::get()
             ->where(self::get_treshold_sql())
-            ->byId($this->ID)
-        ;
+            ->byId($this->ID);
     }
 
     /**
@@ -842,8 +830,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             ->setSort(250)
             ->setDescription(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_help'))
 
-            ->CreateGroupAndMember()
-        ;
+            ->CreateGroupAndMember();
     }
 
     public function exportFields()
@@ -856,7 +843,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     public function populateDefaults()
     {
-        if (! $this->DateItemWasBought) {
+        if (!$this->DateItemWasBought) {
             $this->DateItemWasBought = DBDatetime::now()->Rfc2822();
         }
 
@@ -866,7 +853,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     public function getCreatedNice()
     {
         $date = $this->DateItemWasBought ? $this->DateItemWasBought : $this->Created;
-        if (! $this->DateItemWasBought || (strtotime((string) $this->DateItemWasBought) > (strtotime('now') - (7 * 86400)))) {
+        if (!$this->DateItemWasBought || (strtotime((string) $this->DateItemWasBought) > (strtotime('now') - (7 * 86400)))) {
             $date = $this->Created;
         }
 
@@ -892,7 +879,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     protected function onBeforeWrite()
     {
         // set this first!
-        if (! $this->InternalItemID) {
+        if (!$this->InternalItemID) {
             $this->InternalItemID = 'S-H-' . CodeGenerator::generate();
             $x = 0;
             while ($this->anotherOneWithThisCodeExists() && $x < 50) {
@@ -911,7 +898,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         if ($this->exists()) {
             if ($this->HasBeenSold()) {
                 $this->AllowPurchase = 0;
-                if (! $this->DateItemWasSold) {
+                if (!$this->DateItemWasSold) {
                     $this->DateItemWasSold = DBDatetime::now()->Rfc2822();
                 }
             } else {
@@ -936,7 +923,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         // Save the date when the product was sold.
 
         // must be after parent::onBeforeWrite
-        if (! $this->DateItemWasBought && $this->Created) {
+        if (!$this->DateItemWasBought && $this->Created) {
             $this->DateItemWasBought = $this->Created;
         }
 
@@ -945,7 +932,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     protected function anotherOneWithThisCodeExists(): bool
     {
-        if (! $this->InternalItemID) {
+        if (!$this->InternalItemID) {
             return true;
         }
 
