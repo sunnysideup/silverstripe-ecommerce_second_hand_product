@@ -34,6 +34,7 @@ use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
 use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
+use Page;
 
 class SecondHandProduct extends Product implements PermissionProviderFactoryProvider
 {
@@ -247,7 +248,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
         $array = [];
         foreach ($list as $field) {
-            if (trim($this->{$field})) {
+            if (trim((string) $this->{$field})) {
                 $array[] = $this->{$field};
             }
         }
@@ -318,6 +319,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      */
     public function canEdit($member = null, $context = [])
     {
+        return true;
         $extended = $this->extendedCan(__FUNCTION__, $member);
         if (null !== $extended) {
             return $extended;
@@ -371,22 +373,41 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      */
     public function getCMSFields()
     {
-        $fields = parent::getCMSFields();
+        $fields = Page::getCMSFields();
+
         //remove all unneccessary fields and tabs
-        $fields->removeByName('AlsoShowHere');
-        $fields->removeByName('Tax');
-        $fields->removeByName('Links');
-        $fields->removeByName('Details');
-        $fields->removeByName('Images');
-        $fields->removeFieldFromTab('Root', 'Title');
-        $fields->removeFieldFromTab('Root', 'MenuTitle');
-        $fields->removeFieldFromTab('Root', 'ShortDescription');
-        $fields->removeFieldFromTab('Root', 'Content');
-        $fields->removeFieldFromTab('Root', 'Metadata');
-        $fields->removeFieldFromTab('Root', 'AddToCartLink');
+        $fields->removeByName(
+            [
+                'AlsoShowHere',
+                'Tax',
+                'Links',
+                'Details',
+                'Images',
+                'ApplicableDiscountCoupons',
+            ]
+        );
+        $fields->removeFieldsFromTab(
+            'Root',
+            [
+                'Title',
+                'ShortDescription',
+                'Content',
+                'Metadata',
+                'AddToCartLink',
+                'Price',
+                'AlsoShowHere',
+            ]
+        );
 
         $fields->dataFieldByName('URLSegment')->setReadonly(true);
-
+        $qualityFieldDescription = DBField::create_field(
+            'HTMLText',
+            'A <strong>Condition Rating Page</strong> has yet to be setup'
+        );
+        $obj = EcommerceConfig::inst()->SecondHandExplanationPage();
+        if ($obj->exists()) {
+            $qualityFieldDescription = 'An explanation of the ratings scale can be found by clicking this <a href="' . $obj->Link() . '">link</a>';
+        }
         $fields->addFieldsToTab(
             'Root.Main',
             [
@@ -396,137 +417,102 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                         'HTMLText',
                         '<strong>Allow product to be purchased</strong>'
                     )
-                ),
-                $sellinOnBehalf = CheckboxField::create(
+                )
+                    ->setDescription('This box must be ticked to allow a customer to purchase it'),
+                CheckboxField::create(
                     'SellingOnBehalf',
                     DBField::create_field(
                         'HTMLText',
                         '<strong>Selling on behalf</strong>'
                     )
-                ),
-                $featuredProductField = CheckboxField::create(
+                )
+                    ->setDescription('This box must be ticked if this product is being sold on behalf'),
+                CheckboxField::create(
                     'FeaturedProduct',
                     DBField::create_field(
                         'HTMLText',
                         _t('Product.FEATURED', '<strong>Featured Product</strong>')
                     )
-                ),
-                TextField::create('Title', 'Product Title'),
-            ]
-        );
-        $secondhandProductCategories = SecondHandProductGroup::get();
-        if ($secondhandProductCategories->exists()) {
-            $fields->addFieldToTab(
-                'Root.Main',
-                $categoryField = DropdownField::create(
-                    'ParentID',
-                    'Product Category',
-                    $secondhandProductCategories->map()
                 )
-            );
-        }
-
-        $fields->addFieldsToTab(
-            'Root.Main',
-            [
+                    ->setDescription('If this box is ticked then this product will appear in the "Featured Products" box on the home page'),
+                TextField::create('Title', 'Product Title'),
                 ReadonlyField::create('CanBeSold', 'For Sale', DBField::create_field(DBBoolean::class, $this->canPurchase())->Nice()),
                 ReadonlyField::create('CreatedNice', 'First Entered', $this->getCreatedNice()),
-                TextField::create('InternalItemID', 'Product Code'),
-                $purchasePriceField = NumericField::create('PurchasePrice', 'Purchase Price')->setScale(2),
-                $salePriceField = NumericField::create('Price', 'Sale Price')->setScale(2),
-                $soldPriceField = NumericField::create('SoldPrice', 'Sold Price')->setScale(2),
-                $serialNumberField = TextField::create('SerialNumber', 'Serial Number'),
-                $productQualityField = DropdownField::create(
+                TextField::create('InternalItemID', 'Product Code')->setReadonly(true),
+                $purchasePriceField = NumericField::create('PurchasePrice', 'Purchase Price')
+                    ->setScale(2)
+                    ->setDescription('Price paid for the product'),
+                NumericField::create('Price', 'Sale Price')
+                    ->setScale(2)
+                    ->setDescription('Selling price'),
+                NumericField::create('SoldPrice', 'Sold Price')
+                    ->setScale(2)
+                    ->setDescription('The price that the product actually sold for'),
+                TextField::create('SerialNumber', 'Serial Number')
+                    ->setDescription('Enter the serial number of the product here'),
+                DropdownField::create(
                     'ProductQuality',
                     'Product Condition/Quality',
                     $this->dbObject('ProductQuality')->enumValues()
-                ),
-                $boxOrCaseField = DropdownField::create(
+                )
+                    ->setDescription($qualityFieldDescription),
+                DropdownField::create(
                     'IncludesBoxOrCase',
                     'Includes Box/Case',
                     $this->dbObject('IncludesBoxOrCase')->enumValues()
-                ),
-                $originalManualField = CheckboxField::create('OriginalManual', 'Includes Original Manual'),
-                $contentField = TextField::create('ShortDescription', 'Description'),
-                $boughtDate = DateField::create('DateItemWasBought', 'Date this item was bought'),
-                $soldDate = DateField::create('DateItemWasSold', 'Date this item was sold'),
-                $mainImageField = UploadField::create('Image', 'Main Product Image'),
-                $additionalImagesField = UploadField::create('AdditionalImages', 'More Images'),
-                $metaFieldDesc = TextareaField::create('MetaDescription', 'Meta Description'),
+                )
+                    ->setDescription('Does this product come with a box, case or both?'),
+                CheckboxField::create('OriginalManual', 'Includes Original Manual')
+                    ->setDescription('Tick this box if the product includes the original manual, otherwise leave it empty'),
+                TextField::create('ShortDescription', 'Description')
+                    ->setMaxLength(255)
+                    ->setDescription('Optional text only description, the maximum length of this description is 255 characters.'),
+                DateField::create('DateItemWasBought', 'Date this item was bought')
+                    ->setDescription('Date Format (dd-mm-YYYY). Example: 3rd of May 1992 should be entered as 03-05-1992'),
+                DateField::create('DateItemWasSold', 'Date this item was sold')
+                    ->setDisabled(true),
+                UploadField::create('Image', 'Main Product Image')
+                    ->setDescription(
+                        DBField::create_field(
+                            'HTMLText',
+                            '<strong>Upload the main image for the product here.</strong><br>
+                            Recommended size: 810px wide x 418px high - but you can choose any width up to 810px, height must
+                            ALWAYS BE 418px.
+                            Name should be ' . $this->InternalItemID . '_1.jpg'
+                        )
+                    ),
+                UploadField::create('AdditionalImages', 'More Images')
+                    ->setDescription(
+                        DBField::create_field(
+                            'HTMLText',
+                            '<strong>Upload the main image for the product here.</strong><br>
+                        Recommended size: 810px wide x 418px high - but you can choose any width up to 810px, height must
+                        ALWAYS BE 418px.
+                        Name should be ' . $this->InternalItemID . '_[2,3,4,5, etc...].jpg'
+                        )
+                    ),
+                TextareaField::create('MetaDescription', 'Meta Description'),
             ]
         );
-        $soldDate->setDisabled(true);
 
-        //set right titles and descriptions
-        $featuredProductField->setDescription('If this box is ticked then this product will appear in the "Featured Products" box on the home page');
-        $allowPurchaseField->setDescription('This box must be ticked to allow a customer to purchase it');
-        $sellinOnBehalf->setDescription('This box must be ticked if this product is being sold on behalf');
-        $purchasePriceField->setDescription('Price paid for the product');
-        $salePriceField->setDescription('Selling price');
-        $soldPriceField->setDescription('The price that the product actually sold for');
-        $serialNumberField->setDescription('Enter the serial number of the product here');
-        $originalManualField->setDescription('Tick this box if the product includes the original manual, otherwise leave it empty');
-        $boxOrCaseField->setDescription('Does this product come with a box, case or both?');
-        $contentField->setDescription('Optional text only description, the maximum length of this description is 255 characters.');
-        $contentField->setMaxLength(255);
 
-        $qualityFieldDescription = DBField::create_field(
-            'HTMLText',
-            'A <strong>Condition Rating Page</strong> has yet to be setup'
-        );
-        $obj = EcommerceConfig::inst()->SecondHandExplanationPage();
-        if ($obj->exists()) {
-            $qualityFieldDescription = 'An explanation of the ratings scale can be found by clicking this <a href="' . $obj->Link() . '">link</a>';
-        }
-
-        $productQualityField->setDescription($qualityFieldDescription);
-        $boughtDate->setDescription('Date Format (dd-mm-YYYY). Example: 3rd of May 1992 should be entered as 03-05-1992');
-        $mainImageField->setDescription(
-            DBField::create_field(
-                'HTMLText',
-                '<strong>Upload the main image for the product here.</strong><br>
-                Recommended size: 810px wide x 418px high - but you can choose any width up to 810px, height must
-                ALWAYS BE 418px. Should be provided to FTP data upload as productcode.jpg - e.g. 1003040.jpg.
-                Images should be compressed up to 50%.'
-            )
-        );
-        $additionalImagesField->setDescription(
-            DBField::create_field(
-                'HTMLText',
-                '<strong>Upload additional images here, you can upload as many as you want.</strong><br>
-                Recommended size: 810px wide x 418px high - but you can choose any width up to 810px, height must
-                ALWAYS BE 418px. Should be provided to FTP data upload as productcode.jpg - e.g. 1003040.jpg.
-                Images should be compressed up to 50%.'
-            )
-        );
         //replace InternalItemID field with a read only field
-        $fields->replaceField(
-            'InternalItemID',
-            $fields->dataFieldByName('InternalItemID')->performReadonlyTransformation()
-        );
 
-        $lastEditedItems = SecondHandProduct::get()->sort('Created', 'DESC')->limit(100);
+        // $lastEditedItems = SecondHandArchive::get()->sort('ID', 'DESC')->map('ID', 'InternalItemID');
 
-        $lastItems = [
-            0 => '--- not based on previous sale ---',
-        ];
-
-        foreach ($lastEditedItems as $lastEditedItem) {
-            $details = $lastEditedItem->getSellerSummary();
-            if ($details) {
-                $lastItems[$lastEditedItem->ID] = $details;
-            }
-        }
+        // $lastItems = [
+        //     0 => '--- not based on previous sale ---',
+        // ];
 
         $fields->addFieldsToTab(
             'Root.SellersDetails',
             [
                 HeaderField::create('SellersDetails', 'Enter the details of the person who the product was purchased from'),
-                DropdownField::create(
-                    'BasedOnID',
-                    'Autocomplete from saved items',
-                    $lastItems
-                ),
+                // DropdownField::create(
+                //     'BasedOnID',
+                //     'Autocomplete from saved items',
+                //     $lastItems
+                // ),
                 TextField::create('SellersName', 'Name'),
                 TextField::create('SellersPhone', 'Phone'),
                 TextField::create('SellersEmail', 'Email Address'),
@@ -541,6 +527,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 CheckboxField::create('SellersIDPhotocopy', 'ID Photocopy'),
             ]
         );
+
 
         if (class_exists(GoogleAddressField::class)) {
             $mappingArray = $this->Config()->get('fields_to_google_geocode_conversion');
@@ -564,6 +551,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             }
         }
 
+
         $fields->addFieldsToTab(
             'Root.SellersDetails',
             [
@@ -575,6 +563,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 TextField::create('SellersCountry', 'Country'),
             ]
         );
+
         //add all fields to the main tab
         $fields->addFieldToTab(
             'Root.SellersDetails',
@@ -585,20 +574,20 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 $newWindow = true
             )
         );
-        if ($this->BasedOnID) {
-            $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
-            foreach ($list as $listField) {
-                $fields->replaceField(
-                    $listField,
-                    ReadonlyField::create(
-                        $listField,
-                        $fields->dataFieldByName($listField)->Title()
-                    )
-                );
-            }
+        // if ($this->BasedOnID) {
+        //     $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
+        //     foreach ($list as $listField) {
+        //         $fields->replaceField(
+        //             $listField,
+        //             ReadonlyField::create(
+        //                 $listField,
+        //                 $fields->dataFieldByName($listField)->Title()
+        //             )
+        //         );
+        //     }
 
-            $fields->removeByName('SellersAddressGeocodingField');
-        }
+        //     $fields->removeByName('SellersAddressGeocodingField');
+        // }
 
         $fields->addFieldToTab(
             'Root.Under',
@@ -615,6 +604,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 _t('SecondHandProduct.ARCHIVE_BUTTON', 'Archive Product')
             )
         );
+
         if ($this->HasBeenSold()) {
             $fields = $fields->makeReadonly();
             $fields->replaceField($categoriesTable->Name, $categoriesTable);
@@ -647,7 +637,17 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 // ReadonlyField::create('Sql', 'Sql', $this->get_treshold_sql()),
             ]
         );
-
+        $secondhandProductCategories = SecondHandProductGroup::get();
+        if ($secondhandProductCategories->exists()) {
+            $fields->addFieldToTab(
+                'Root.Main',
+                $categoryField = DropdownField::create(
+                    'ParentID',
+                    'Product Category',
+                    $secondhandProductCategories->map()
+                )
+            );
+        }
         return $fields;
     }
 
