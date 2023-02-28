@@ -916,7 +916,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             }
         }
 
-        if ($this->Title && strlen($this->MetaDescription) < 22) {
+        if ($this->Title && strlen( (string) $this->MetaDescription) < 22) {
             $this->MetaDescription = 'Second Hand Product: ' . $this->Title;
         }
 
