@@ -17,6 +17,7 @@ use SilverStripe\Security\Permission;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
+use Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\Vardump\ArrayToTable;
 
