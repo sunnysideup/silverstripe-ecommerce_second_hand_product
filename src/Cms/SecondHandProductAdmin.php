@@ -97,9 +97,7 @@ class SecondHandProductAdmin extends ModelAdmin
                             ['title' => $archivedProduct->Title]
                         ))
                     );
-                    $cmsEditLink = $archivedProduct->ModelAdminLink();
-
-                    return Controller::curr()->redirect($cmsEditLink);
+                    return Controller::curr()->redirect($archivedProduct->CMSEditLink());
                 }
             }
         }
