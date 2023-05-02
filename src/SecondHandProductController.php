@@ -9,6 +9,13 @@ use SilverStripe\Security\Security;
 use SilverStripe\View\ArrayData;
 use Sunnysideup\Ecommerce\Pages\ProductController;
 
+/**
+ * Class \Sunnysideup\EcommerceSecondHandProduct\SecondHandProductController
+ *
+ * @property \Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct $dataRecord
+ * @method \Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct data()
+ * @mixin \Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct
+ */
 class SecondHandProductController extends ProductController
 {
     private static $fields_to_remove_from_print = [];

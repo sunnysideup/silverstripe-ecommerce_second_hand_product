@@ -13,6 +13,23 @@ use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\Vardump\ArrayToTable;
 
+/**
+ * Class \Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandForSaleList
+ *
+ * @property string $Title
+ * @property int $ProductCount
+ * @property string $ForSale
+ * @property string $Added
+ * @property string $Removed
+ * @property string $AutoArchived
+ * @property string $Archived
+ * @property string $DoubleUps
+ * @property string $LastItemArchived
+ * @property bool $EmailPrepared
+ * @property bool $EmailSent
+ * @property string $Notes
+ * @property bool $CalculationsCompleted
+ */
 class SecondHandForSaleList extends DataObject
 {
     protected static $archive_count = 0;

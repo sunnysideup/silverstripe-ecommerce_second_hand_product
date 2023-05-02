@@ -21,6 +21,46 @@ use Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\Vardump\ArrayToTable;
 
+/**
+ * Class \Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive
+ *
+ * @property string $Title
+ * @property string $InternalItemID
+ * @property string $SerialNumber
+ * @property string $DateItemWasBought
+ * @property string $DateItemWasSold
+ * @property string $ProductQuality
+ * @property bool $SoldOnBehalf
+ * @property float $PurchasePrice
+ * @property float $Price
+ * @property float $SoldPrice
+ * @property string $IncludesBoxOrCase
+ * @property bool $OriginalManual
+ * @property int $PageID
+ * @property string $Description
+ * @property string $SellersName
+ * @property string $SellersPhone
+ * @property string $SellersEmail
+ * @property string $SellersAddress
+ * @property string $SellersAddress2
+ * @property string $SellersCity
+ * @property string $SellersPostalCode
+ * @property string $SellersRegionCode
+ * @property string $SellersCountry
+ * @property string $SellersIDType
+ * @property string $SellersIDNumber
+ * @property string $SellersDateOfBirth
+ * @property string $SellersIDExpiryDate
+ * @property bool $SellersIDPhotocopy
+ * @property string $OriginalItemLastEdited
+ * @property string $OriginalItemCreated
+ * @property bool $AutoArchived
+ * @property int $ArchivedByID
+ * @property int $ImageID
+ * @method \SilverStripe\Security\Member ArchivedBy()
+ * @method \SilverStripe\Assets\Image Image()
+ * @method \SilverStripe\ORM\ManyManyList|\SilverStripe\Assets\Image[] AdditionalImages()
+ */
 class SecondHandArchive extends DataObject
 {
     private const MAPPING_FROM_ARCHIVE_TO_SH_PRODUCT = [

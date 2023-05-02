@@ -7,6 +7,11 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\ReadonlyField;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 
+/**
+ * Class \Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup
+ *
+ * @property bool $RootParent
+ */
 class SecondHandProductGroup extends ProductGroup
 {
     /**

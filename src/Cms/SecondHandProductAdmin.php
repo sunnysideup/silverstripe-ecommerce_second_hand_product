@@ -19,11 +19,8 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
 
 /**
- * @description: for the management of Product and Product Groups only
+ * Class \Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin
  *
- * @authors: Nicolaas [at] Sunny Side Up .co.nz
- * @package: ecommerce
- * @sub-package: cms
  */
 class SecondHandProductAdmin extends ModelAdmin
 {

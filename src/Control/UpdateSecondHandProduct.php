@@ -9,6 +9,10 @@ use SilverStripe\Versioned\Versioned;
 use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
+/**
+ * Class \Sunnysideup\EcommerceSecondHandProduct\Control\UpdateSecondHandProduct
+ *
+ */
 class UpdateSecondHandProduct extends Controller
 {
     private static $allowed_actions = [

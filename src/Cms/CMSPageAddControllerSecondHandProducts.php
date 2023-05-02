@@ -22,6 +22,7 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 
 /**
  * adds a special kind of add form for new second had products.
+ *
  */
 class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
 {

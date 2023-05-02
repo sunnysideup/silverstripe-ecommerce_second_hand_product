@@ -8,6 +8,10 @@ use Sunnysideup\Ecommerce\Model\Process\OrderStep;
 use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
+/**
+ * Class \Sunnysideup\EcommerceSecondHandProduct\Model\Process\OrderStepDisableSecondHandProduct
+ *
+ */
 class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepInterface
 {
     /**

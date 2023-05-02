@@ -36,6 +36,51 @@ use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 use Page;
 
+/**
+ * Class \Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct
+ *
+ * @property string $CUS
+ * @property string $SPC
+ * @property float $MGP
+ * @property float $ZOR
+ * @property bool $FPS
+ * @property bool $SPE
+ * @property bool $IOS
+ * @property bool $PRO
+ * @property bool $FER
+ * @property bool $POA
+ * @property bool $PHT
+ * @property string $NotForSaleMessage
+ * @property bool $KeepRecordEvenThoughItIsNotForSale
+ * @property int $RangeParentID
+ * @property float $SoldPrice
+ * @property float $PurchasePrice
+ * @property string $ProductQuality
+ * @property string $IncludesBoxOrCase
+ * @property bool $SellingOnBehalf
+ * @property bool $OriginalManual
+ * @property string $DateItemWasBought
+ * @property string $DateItemWasSold
+ * @property string $SerialNumber
+ * @property string $SellersName
+ * @property string $SellersPhone
+ * @property string $SellersEmail
+ * @property string $SellersAddress
+ * @property string $SellersAddress2
+ * @property string $SellersCity
+ * @property string $SellersPostalCode
+ * @property string $SellersRegionCode
+ * @property string $SellersCountry
+ * @property string $SellersIDType
+ * @property string $SellersIDNumber
+ * @property string $SellersDateOfBirth
+ * @property string $SellersIDExpiryDate
+ * @property bool $SellersIDPhotocopy
+ * @property int $BasedOnID
+ * @property int $ArchivedByID
+ * @method \Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct BasedOn()
+ * @method \SilverStripe\Security\Member ArchivedBy()
+ */
 class SecondHandProduct extends Product implements PermissionProviderFactoryProvider
 {
     /**
@@ -916,7 +961,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             }
         }
 
-        if ($this->Title && strlen( (string) $this->MetaDescription) < 22) {
+        if ($this->Title && strlen((string) $this->MetaDescription) < 22) {
             $this->MetaDescription = 'Second Hand Product: ' . $this->Title;
         }
 

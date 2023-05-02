@@ -6,6 +6,10 @@ use SilverStripe\Control\Controller;
 use SilverStripe\Security\Permission;
 use Sunnysideup\Ecommerce\Model\Address\EcommerceCountry;
 
+/**
+ * Class \Sunnysideup\EcommerceSecondHandProduct\Control\ControllerPermissionChecker
+ *
+ */
 class ControllerPermissionChecker extends Controller
 {
     /**

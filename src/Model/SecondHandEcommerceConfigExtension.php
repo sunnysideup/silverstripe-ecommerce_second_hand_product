@@ -9,6 +9,10 @@ use SilverStripe\ORM\DataExtension;
 
 /**
  * <a href="$EcomConfig.SecondHandExplanationPage.Link">$EcomConfig.SecondHandExplanationPage.Title</a>.
+ *
+ * @property \Sunnysideup\Ecommerce\Model\Config\EcommerceDBConfig|\Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandEcommerceConfigExtension $owner
+ * @property int $SecondHandExplanationPageID
+ * @method \SilverStripe\CMS\Model\SiteTree SecondHandExplanationPage()
  */
 class SecondHandEcommerceConfigExtension extends DataExtension
 {

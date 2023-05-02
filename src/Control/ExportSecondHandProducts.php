@@ -16,6 +16,10 @@ use SilverStripe\ORM\SS_List;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 
+/**
+ * Class \Sunnysideup\EcommerceSecondHandProduct\Control\ExportSecondHandProducts
+ *
+ */
 class ExportSecondHandProducts extends Controller
 {
     public const SIZE_SEPARATOR = '*';
