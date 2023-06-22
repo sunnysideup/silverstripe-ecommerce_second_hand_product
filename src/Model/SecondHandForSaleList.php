@@ -283,7 +283,7 @@ class SecondHandForSaleList extends DataObject
         if ($lastOneArchivedCode) {
             $lastOneArchivedObject = SecondHandArchive::get()
                 ->filter(['InternalItemID' => $lastOneArchivedCode])
-                ->sort(['Created' => 'DESC'])
+                ->sort(['ID' => 'DESC'])
                 ->first()
             ;
             if ($lastOneArchivedObject) {
@@ -337,8 +337,6 @@ class SecondHandForSaleList extends DataObject
 
         $html = '';
         if ($obj) {
-            $firstCreated = $obj->Created;
-            $lastEdited = $obj->Created;
             $html .=
                 $obj->Title .
                 ' (<a href="' . Director::absoluteURL($obj->CMSEditLink()) . '">' . $obj->InternalItemID . '</a>)' .

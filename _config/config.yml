@@ -16,7 +16,7 @@ Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup:
   sort_options:
     default:
       Title: 'Default Order - (Most Recent)'
-      SQL: '"Created" DESC'
+      SQL: '"ID" DESC'
 
 Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole:
   admin_role_permission_codes:
