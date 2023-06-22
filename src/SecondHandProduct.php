@@ -35,6 +35,7 @@ use Sunnysideup\GoogleAddressField\GoogleAddressField;
 use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 use Page;
+use SilverStripe\ORM\FieldType\DBDate;
 
 /**
  * Class \Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct
@@ -765,7 +766,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     public function canPurchase(Member $member = null, $checkPrice = true)
     {
-        if ($this->HasBeenSold()) {
+        if ($this->DateItemWasSold) {
             return false;
         }
 
@@ -823,11 +824,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     public function HasBeenSold(): bool
     {
-        if (parent::HasBeenSold()) {
-            return true;
-        }
-
-        return (bool) $this->DateItemWasSold;
+        return $this->DateItemWasSold ? true : parent::HasBeenSold();
     }
 
     public function SecondHandProductQualityPercentage()
@@ -944,7 +941,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             if ($this->HasBeenSold()) {
                 $this->AllowPurchase = 0;
                 if (!$this->DateItemWasSold) {
-                    $this->DateItemWasSold = DBDatetime::now()->Rfc2822();
+                    $this->DateItemWasSold = DBDatetime::now()->Format(DBDate::ISO_DATE);
                 }
             } else {
                 $this->ArchivedByID = 0;
