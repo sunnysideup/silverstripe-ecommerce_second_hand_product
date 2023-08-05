@@ -150,6 +150,9 @@ class ExportSecondHandProducts extends Controller
         foreach ($secondHandProducts as $secondHandProduct) {
             if (! $folder) {
                 $folderName = $secondHandProduct->getFolderName();
+                if(!$folderName) {
+                    $folderName = 'second-hand-images';
+                }
                 $folder = Folder::find_or_make($folderName);
             }
             if ($folder) {
