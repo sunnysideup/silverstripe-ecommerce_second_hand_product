@@ -163,8 +163,9 @@ class SecondHandForSaleList extends DataObject
                 $subject = $this->Title;
                 $body = $this->HTMLSummary();
                 $email = new Email($from, $to, $subject, $body);
-                $this->EmailPrepared = 1;
-                $this->EmailSent = $email->send();
+                $this->EmailPrepared = true;
+                $email->send();
+                $this->EmailSent = true;
                 $this->write();
             }
         }

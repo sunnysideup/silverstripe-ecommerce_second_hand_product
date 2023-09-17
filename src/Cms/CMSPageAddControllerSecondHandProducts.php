@@ -4,6 +4,7 @@ namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
 
 use SilverStripe\CMS\Controllers\CMSPageAddController;
 use SilverStripe\CMS\Model\SiteTree;
+use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
@@ -137,7 +138,7 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
         return $form;
     }
 
-    public function doAdd($data, $form)
+    public function doAdd(array $data, Form $form): HTTPResponse
     {
         $className = isset($data['PageType']) ? $data['PageType'] : \Page::class;
         $parentID = isset($data['ParentID']) ? (int) $data['ParentID'] : 0;
@@ -192,7 +193,7 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
         return $this->redirect($record->CMSEditLink());
     }
 
-    public function doCancel($data, $form)
+    public function doCancel(array $data, Form $form): HTTPResponse
     {
         return $this->redirect(singleton(SecondHandProductAdmin::class)->Link());
     }
