@@ -138,65 +138,67 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
         return $form;
     }
 
-    public function doAdd(array $data, Form $form): HTTPResponse
-    {
-        $className = isset($data['PageType']) ? $data['PageType'] : \Page::class;
-        $parentID = isset($data['ParentID']) ? (int) $data['ParentID'] : 0;
+    // TODO: SS4 / SS5 Compat issues
+    // public function doAdd(array $data, Form $form): HTTPResponse
+    // {
+    //     $className = isset($data['PageType']) ? $data['PageType'] : \Page::class;
+    //     $parentID = isset($data['ParentID']) ? (int) $data['ParentID'] : 0;
 
-        $suffix = isset($data['Suffix']) ? '-' . $data['Suffix'] : null;
+    //     $suffix = isset($data['Suffix']) ? '-' . $data['Suffix'] : null;
 
-        if (! $parentID && isset($data['Parent'])) {
-            $page = SiteTree::get_by_link($data['Parent']);
-            if ($page) {
-                $parentID = $page->ID;
-            }
-        }
+    //     if (! $parentID && isset($data['Parent'])) {
+    //         $page = SiteTree::get_by_link($data['Parent']);
+    //         if ($page) {
+    //             $parentID = $page->ID;
+    //         }
+    //     }
 
-        if (is_numeric($parentID) && $parentID > 0) {
-            $parentObj = ProductGroup::get_by_id($parentID);
-        } else {
-            $parentObj = null;
-        }
+    //     if (is_numeric($parentID) && $parentID > 0) {
+    //         $parentObj = ProductGroup::get_by_id($parentID);
+    //     } else {
+    //         $parentObj = null;
+    //     }
 
-        if (! $parentObj || ! $parentObj->ID) {
-            $parentID = 0;
-        }
+    //     if (! $parentObj || ! $parentObj->ID) {
+    //         $parentID = 0;
+    //     }
 
-        if (! singleton($className)->canCreate(
-            Security::getCurrentUser(),
-            ['Parent' => $parentObj]
-        )
-        ) {
-            return Security::permissionFailure($this);
-        }
+    //     if (! singleton($className)->canCreate(
+    //         Security::getCurrentUser(),
+    //         ['Parent' => $parentObj]
+    //     )
+    //     ) {
+    //         return Security::permissionFailure($this);
+    //     }
 
-        $record = $this->getNewItem("new-{$className}-{$parentID}" . $suffix, false);
-        $this->extend('updateDoAdd', $record, $form);
+    //     $record = $this->getNewItem("new-{$className}-{$parentID}" . $suffix, false);
+    //     $this->extend('updateDoAdd', $record, $form);
 
-        try {
-            $record->write();
-        } catch (ValidationException $validationException) {
-            foreach ($validationException->getResult()->getMessages() as $messageArray) {
-                $form->sessionMessage($messageArray['message'], $messageArray['messageType']);
-            }
+    //     try {
+    //         $record->write();
+    //     } catch (ValidationException $validationException) {
+    //         foreach ($validationException->getResult()->getMessages() as $messageArray) {
+    //             $form->sessionMessage($messageArray['message'], $messageArray['messageType']);
+    //         }
 
-            return $this->getResponseNegotiator()->respond($this->getRequest());
-        }
+    //         return $this->getResponseNegotiator()->respond($this->getRequest());
+    //     }
 
-        $this->getRequest()->getSession()->set(
-            'FormInfo.Form_EditForm.formError.message',
-            _t('CMSMain.PageAdded', 'Successfully created page')
-        );
+    //     $this->getRequest()->getSession()->set(
+    //         'FormInfo.Form_EditForm.formError.message',
+    //         _t('CMSMain.PageAdded', 'Successfully created page')
+    //     );
 
-        $this->getRequest()->getSession()->set('FormInfo.Form_EditForm.formError.type', 'good');
+    //     $this->getRequest()->getSession()->set('FormInfo.Form_EditForm.formError.type', 'good');
 
-        return $this->redirect($record->CMSEditLink());
-    }
+    //     return $this->redirect($record->CMSEditLink());
+    // }
 
-    public function doCancel(array $data, Form $form): HTTPResponse
-    {
-        return $this->redirect(singleton(SecondHandProductAdmin::class)->Link());
-    }
+    // TODO: SS4 / SS5 Compat issues
+    // public function doCancel(array $data, Form $form): HTTPResponse
+    // {
+    //     return $this->redirect(singleton(SecondHandProductAdmin::class)->Link());
+    // }
 
     /**
      * @return ArrayList
