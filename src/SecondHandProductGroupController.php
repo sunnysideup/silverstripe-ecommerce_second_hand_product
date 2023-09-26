@@ -17,7 +17,7 @@ class SecondHandProductGroupController extends ProductGroupController
 {
     protected function init()
     {
-        Config::modify()->merge(
+        Config::modify()->set(
             ProductGroup::class,
             'base_buyable_class',
             SecondHandProduct::class
