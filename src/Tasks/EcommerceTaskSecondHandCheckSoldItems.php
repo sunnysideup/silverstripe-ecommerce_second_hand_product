@@ -24,7 +24,7 @@ class EcommerceTaskSecondCheckSoldItems extends BuildTask
             $codes = $_POST['codes'];
             $codesArray = explode('|||', str_replace(["\n", "\t", "\r", ','], '|||', $codes));
             foreach ($codesArray as $key => $code) {
-                $code = trim($code);
+                $code = trim((string) $code);
                 if ($code) {
                     $forSaleProduct = SecondHandProduct::get()->filter(['InternalItemID' => $code, 'AllowPurchase' => 1])->first();
                     if ($forSaleProduct) {
