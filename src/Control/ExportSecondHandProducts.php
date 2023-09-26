@@ -231,8 +231,8 @@ class ExportSecondHandProducts extends Controller
             $json = json_encode($array, JSON_PRETTY_PRINT);
         } else {
             $json = json_encode($array);
-            $json = str_replace(["\t", "\r", "\n"], [' ', ' ', ' '], $json);
-            $json = preg_replace('#\s\s+#', ' ', $json);
+            $json = str_replace(["\t", "\r", "\n"], [' ', ' ', ' '], (string) $json);
+            $json = preg_replace('#\s\s+#', ' ', (string) $json);
         }
 
         $fileName = $this->Config()->get('location_to_save_contents');
