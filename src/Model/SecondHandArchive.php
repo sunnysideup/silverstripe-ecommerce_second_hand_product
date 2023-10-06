@@ -325,7 +325,7 @@ class SecondHandArchive extends DataObject
         $fields->dataFieldByName('AdditionalImages')
             ->getConfig()
             ->getComponentByType(GridFieldDataColumns::class)
-            ->setDisplayFields(['CMSTumbnail'],);
+            ->setDisplayFields(['CMSTumbnail'], );
         $fields->addFieldsToTab(
             'Root.SellersDetails',
             [
@@ -349,7 +349,7 @@ class SecondHandArchive extends DataObject
         if ($this->ArchivedByID) {
             $archivedByLink = DBField::create_field(
                 'HTMLText',
-                '<a href="/admin/security/EditForm/field/Members/item/' . $this->ArchivedByID . '/edit">View archiver details</a>'
+                '<a href="/admin/security/users/EditForm/field/users/item/' . $this->ArchivedByID . '/edit">View archiver details</a>',
             );
         }
         $fields->addFieldsToTab(
