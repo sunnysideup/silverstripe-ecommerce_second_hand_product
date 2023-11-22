@@ -996,4 +996,14 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
         return $stage;
     }
+
+    public function getMinValueInOrder(): float
+    {
+        return 1;
+    }
+
+    public function getMaxValueInOrder(): float
+    {
+        return 1;
+    }
 }
