@@ -16,6 +16,7 @@ use Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield\Configs\GridFieldEdit
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandForSaleList;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
 
 /**
@@ -34,6 +35,7 @@ class SecondHandProductAdmin extends ModelAdmin
 
     private static $managed_models = [
         SecondHandProduct::class,
+        SecondHandProductGroup::class,
         SecondHandArchive::class,
         SecondHandForSaleList::class,
     ];
