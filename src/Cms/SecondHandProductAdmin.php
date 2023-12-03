@@ -61,7 +61,7 @@ class SecondHandProductAdmin extends ModelAdmin
         }
 
         $form = parent::getEditForm();
-        if (singleton($this->modelClass) instanceof SiteTree) {
+        if (singleton($this->modelClass) instanceof SecondHandProduct) {
             $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass));
             if ($gridField) {
                 if ($gridField instanceof GridField) {
