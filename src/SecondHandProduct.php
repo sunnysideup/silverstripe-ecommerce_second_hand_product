@@ -740,7 +740,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     public static function get_treshold_sql(): string
     {
         if ('' === self::$treshold_sql_cache) {
-            $stage = self::get_stage();
+            $tableName = Injector::inst()->get(SecondHandProduct::class)->stageTableDefault();
             $daysMin = (int) Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
             $minThreshold = date(
                 'Y-m-d H:i:s',
@@ -754,9 +754,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             self::$treshold_sql_cache = '
                 (
                     "AllowPurchase" = 1 AND
-                    SecondHandProduct' . $stage . '.DateItemWasBought IS NOT NULL AND
-                    SecondHandProduct' . $stage . ".DateItemWasBought <= '" . $minThreshold . '\' AND
-                    SecondHandProduct' . $stage . ".DateItemWasBought > '" . $maxThreshold . '\'
+                    "' . $tableName . '"."DateItemWasBought" IS NOT NULL AND
+                    "' . $tableName . '"."DateItemWasBought" <= \'' . $minThreshold . '\' AND
+                    "' . $tableName . '"."DateItemWasBought" > \'' . $maxThreshold . '\'
                 )
             ';
         }
@@ -984,18 +984,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $a || $b;
     }
 
-    /**
-     * @return string
-     */
-    protected static function get_stage()
-    {
-        $stage = '';
-        if ('Live' === Versioned::get_stage()) {
-            $stage = '_Live';
-        }
-
-        return $stage;
-    }
 
     public function getMinValueInOrder(): float
     {
