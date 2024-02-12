@@ -75,8 +75,8 @@ class SecondHandForSaleList extends DataObject
         'Removed' => 'Removed',
         'AutoArchived' => 'Auto Archived',
         'Archived' => 'Manually Archived',
-        'EmailPrepared.Nice' => 'Email Ready',
-        'EmailSent.Nice' => 'Email Sent',
+        'EmailPrepared.NiceAndColourfull' => 'Email Ready',
+        'EmailSent.NiceAndColourfull' => 'Email Sent',
     ];
 
     private static $singular_name = 'For Sale List Entry';

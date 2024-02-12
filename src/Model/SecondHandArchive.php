@@ -167,7 +167,7 @@ class SecondHandArchive extends DataObject
         'DateItemWasBought' => 'Date Entered',
         'DateItemWasSold' => 'Date Sold',
         'ProductQuality' => 'Quality',
-        'SoldOnBehalf.Nice' => 'On Behalf',
+        'SoldOnBehalf.NiceAndColourfull' => 'On Behalf',
         'PurchasePrice' => 'Purchase Price',
         'Price' => 'Sale/Ticket Price',
         'SoldPrice' => 'Sold Price',
