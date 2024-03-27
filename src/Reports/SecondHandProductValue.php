@@ -58,7 +58,7 @@ class SecondHandProductValue extends Report
      *
      * @return \SilverStripe\ORM\DataList
      */
-    public function sourceRecords($params = null)
+    public function sourceRecords($params = null, $sort = null, $limit = null)
     {
         return SecondHandProduct::get()->filter(
             [
