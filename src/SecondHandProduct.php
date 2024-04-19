@@ -35,6 +35,7 @@ use Sunnysideup\GoogleAddressField\GoogleAddressField;
 use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 use Page;
+use SilverStripe\Control\Director;
 use SilverStripe\ORM\FieldType\DBDate;
 
 /**
@@ -158,6 +159,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     private static $has_one = [
         'BasedOn' => SecondHandProduct::class,
         'ArchivedBy' => Member::class,
+        'EquivalentNewProduct' => Product::class,
     ];
 
     private static $default_sort = [
@@ -365,7 +367,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      */
     public function canEdit($member = null, $context = [])
     {
-        return true;
+        if(Director::isDev()) {
+            return true;
+        }
         $extended = $this->extendedCan(__FUNCTION__, $member);
         if (null !== $extended) {
             return $extended;
@@ -457,6 +461,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         $fields->addFieldsToTab(
             'Root.Main',
             [
+
                 $allowPurchaseField = CheckboxField::create(
                     'AllowPurchase',
                     DBField::create_field(
@@ -485,6 +490,14 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 ReadonlyField::create('CanBeSold', 'For Sale', DBField::create_field(DBBoolean::class, $this->canPurchase())->Nice()),
                 ReadonlyField::create('CreatedNice', 'First Entered', $this->getCreatedNice()),
                 TextField::create('InternalItemID', 'Product Code')->setReadonly(true),
+                DropdownField::create(
+                    'EquivalentNewProductID',
+                    'New product version',
+                    Product::get()
+                        ->sort('Title', 'ASC')
+                        ->map('ID', 'FullName')
+                )
+                    ->setEmptyString('--- select identical new product (if any) ---'),
                 $purchasePriceField = NumericField::create('PurchasePrice', 'Purchase Price')
                     ->setScale(2)
                     ->setDescription('Price paid for the product'),

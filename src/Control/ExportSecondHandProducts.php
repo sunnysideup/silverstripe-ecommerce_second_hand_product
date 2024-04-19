@@ -41,6 +41,7 @@ class ExportSecondHandProducts extends Controller
         'FullName',
         'ID',
         'RootParent',
+        'EquivalentNewProductID'
     ];
 
     /**

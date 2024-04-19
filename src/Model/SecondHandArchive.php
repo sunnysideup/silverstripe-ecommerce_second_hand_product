@@ -84,6 +84,7 @@ class SecondHandArchive extends DataObject
         'OriginalManual',
         'Description',
         'ArchivedByID',
+        'EquivalentNewProductID',
 
         //sellers details
         'SellersName',
