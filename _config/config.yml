@@ -21,17 +21,16 @@ Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup:
 Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole:
   admin_role_permission_codes:
     - CMS_ACCESS_SecondHandProductAdmin
-
----
-Name: ecommerce_second_hand_product_menu
-After:
-  - '#coreconfig'
-  - '#cmsextensions'
-  - '#ecommerce'
-  - '#app'
----
-SilverStripe\Admin\LeftAndMain:
-  menu_groups:
-    Shop:
-      children:
-        - Sunnysideup-EcommerceSecondHandProduct-Cms-SecondHandProductAdmin
+# ---
+# Name: ecommerce_second_hand_product_menu
+# After:
+#   - '#coreconfig'
+#   - '#cmsextensions'
+#   - '#ecommerce'
+#   - '#app'
+# ---
+# SilverStripe\Admin\LeftAndMain:
+#   menu_groups:
+#     Shop:
+#       children:
+#         - Sunnysideup-EcommerceSecondHandProduct-Cms-SecondHandProductAdmin
