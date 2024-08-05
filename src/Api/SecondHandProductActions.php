@@ -43,8 +43,8 @@ class SecondHandProductActions
                     $zeroOrOne = 0;
                 } else {
                     $price = $buyable->Price ?: 0;
-                    $priceLine = 'Product' . $ext . '.Price = ' . $price . ',';
-                    $archivedByLine = 'SecondHandProduct' . $ext . '.ArchivedByID = 0,';
+                    $priceLine = '' . $dbName . '.Product' . $ext . '.Price = ' . $price . ',';
+                    $archivedByLine = '' . $dbName . '.SecondHandProduct' . $ext . '.ArchivedByID = 0,';
                     $dateItemSoldLine = '' . $dbName . '."SecondHandProduct' . $ext . '"."DateItemWasSold" = \'\',';
                     $zeroOrOne = 1;
                 }
