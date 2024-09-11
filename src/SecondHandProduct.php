@@ -36,7 +36,13 @@ use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 use Page;
 use SilverStripe\Control\Director;
+use SilverStripe\Forms\CheckboxSetField;
+use SilverStripe\Forms\OptionsetField;
+use SilverStripe\Forms\SearchableDropdownField;
 use SilverStripe\ORM\FieldType\DBDate;
+use Sunnysideup\AjaxSelectField\AjaxSelectField;
+use Sunnysideup\Ecommerce\Forms\Fields\ProductSelectField;
+use Sunnysideup\Ecommerce\Pages\ProductGroup;
 
 /**
  * Class \Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct
@@ -367,7 +373,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      */
     public function canEdit($member = null, $context = [])
     {
-        if(Director::isDev()) {
+        if (Director::isDev()) {
             return true;
         }
         $extended = $this->extendedCan(__FUNCTION__, $member);
@@ -490,15 +496,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 ReadonlyField::create('CanBeSold', 'For Sale', DBField::create_field(DBBoolean::class, $this->canPurchase())->Nice()),
                 ReadonlyField::create('CreatedNice', 'First Entered', $this->getCreatedNice()),
                 TextField::create('InternalItemID', 'Product Code')->setReadonly(true),
-                DropdownField::create(
-                    'EquivalentNewProductID',
-                    'New product version',
-                    Product::get()
-                        ->sort('Title', 'ASC')
-                        ->map('ID', 'FullName')
-                )
-                    ->setEmptyString('--- select identical new product (if any) ---'),
-                $purchasePriceField = NumericField::create('PurchasePrice', 'Purchase Price')
+                NumericField::create('PurchasePrice', 'Purchase Price')
                     ->setScale(2)
                     ->setDescription('Price paid for the product'),
                 NumericField::create('Price', 'Sale Price')
@@ -648,9 +646,20 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         //     $fields->removeByName('SellersAddressGeocodingField');
         // }
 
-        $fields->addFieldToTab(
-            'Root.Under',
-            $categoriesTable = $this->getProductGroupsTableField()
+        $fields->addFieldsToTab(
+            'Root.RelatedTo',
+            [
+                SearchableDropdownField::create(
+                    'EquivalentNewProductID',
+                    'New product version',
+                    Product::get()
+                        ->filter(['AllowPurchase' => true])
+                        ->exclude(['ClassName' => SecondHandProduct::class])
+                        ->sort(['FullName' => 'ASC'])
+                ),
+
+                $categoriesTable = $this->getProductGroupsTableField()
+            ]
         );
 
         // If the product has been sold all fields should be disabled
@@ -700,7 +709,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         if ($secondhandProductCategories->exists()) {
             $fields->addFieldToTab(
                 'Root.Main',
-                $categoryField = DropdownField::create(
+                $categoryField = OptionsetField::create(
                     'ParentID',
                     'Product Category',
                     $secondhandProductCategories->map()
@@ -1007,4 +1016,15 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     {
         return 1;
     }
+
+    public function getProductGroupsTableField()
+    {
+        $field = parent::getProductGroupsTableField();
+        $field->setList($this->ProductGroups()->filter(['ShowInSearch' => 1])->exclude(['ClassName' => SecondHandProductGroup::class]));
+        $field->setTitle('Related New Product Categories');
+        $this->extend('updateProductGroupsTableField', $field);
+        return $field;
+    }
+
+
 }
