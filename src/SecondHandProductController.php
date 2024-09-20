@@ -68,4 +68,9 @@ class SecondHandProductController extends ProductController
 
         return $al;
     }
+
+    public function IsSecondHandSection(): bool
+    {
+        return true;
+    }
 }
