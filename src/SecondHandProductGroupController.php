@@ -24,4 +24,9 @@ class SecondHandProductGroupController extends ProductGroupController
         );
         parent::init();
     }
+
+    public function IsSecondHandSection(): bool
+    {
+        return true;
+    }
 }
