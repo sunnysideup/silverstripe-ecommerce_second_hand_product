@@ -20,7 +20,7 @@ class StaleSecondHandProduct extends Report
      * The class of object being managed by this report.
      * Set by overriding in your subclass.
      */
-    protected $dataClass = SiteTree::class;
+    protected $dataClass = SecondHandProduct::class;
 
     private static $default_days_back = 180;
 
