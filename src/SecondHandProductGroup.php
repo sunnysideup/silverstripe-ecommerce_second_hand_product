@@ -60,7 +60,7 @@ class SecondHandProductGroup extends ProductGroup
     public static function main_second_hand_page()
     {
         if (! isset(self::$main_second_hand_page_cache)) {
-            self::$main_second_hand_page_cache = SecondHandProductGroup::get()->first()->TopParentGroup();
+            self::$main_second_hand_page_cache = SecondHandProductGroup::get()->first()?->TopParentGroup();
             if (! self::$main_second_hand_page_cache) {
                 self::$main_second_hand_page_cache = Injector::inst()->get(SecondHandProductGroup::class)->BestRootParentPage();
             }
