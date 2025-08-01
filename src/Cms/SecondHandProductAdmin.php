@@ -8,7 +8,10 @@ use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\GridField\GridField;
+use SilverStripe\Forms\GridField\GridFieldAddNewButton;
+use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\GridField\GridFieldExportButton;
+use SilverStripe\Forms\GridField\GridFieldImportButton;
 use SilverStripe\View\Requirements;
 use Sunnysideup\Ecommerce\Traits\EcommerceModelAdminTrait;
 use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
@@ -18,6 +21,7 @@ use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandForSaleList;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
+use UndefinedOffset\SortableGridField\Forms\GridFieldSortableRows;
 
 /**
  * Class \Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin
@@ -34,10 +38,18 @@ class SecondHandProductAdmin extends ModelAdmin
     private static $menu_title = 'Second Hand';
 
     private static $managed_models = [
+        'SecondHandProduct' => [
+            'dataClass' => SecondHandProduct::class,
+            'title' => 'Second Hand Products',
+        ],
         SecondHandProduct::class,
         SecondHandProductGroup::class,
         SecondHandArchive::class,
         SecondHandForSaleList::class,
+        'RecentlySold' => [
+            'dataClass' => SecondHandProduct::class,
+            'title' => 'Recently Sold',
+        ]
     ];
 
     private static $allowed_actions = [
@@ -70,6 +82,28 @@ class SecondHandProductAdmin extends ModelAdmin
                     $exportButton->setExportColumns(singleton($this->modelClass)->exportFields());
                 }
             }
+        }
+
+        if ($this->modelTab === 'RecentlySold') {
+            $gridFieldName = 'RecentlySold';
+            $gridField = $form->Fields()->fieldByName($gridFieldName);
+
+            $config = $gridField->getConfig();
+            $config->removeComponentsByType([
+                GridFieldAddNewButton::class,
+                GridFieldImportButton::class,
+                GridFieldSortableRows::class
+            ]);
+
+            $dataColumns = $config->getComponentByType(GridFieldDataColumns::class);
+            $dataColumns->setDisplayFields([
+                'Title' => 'Title',
+                'InternalItemID' => 'Code',
+                'Price.Nice' => 'Price',
+                'DateItemWasSold' => 'Date Item Was Sold',
+            ]);
+
+            $config->addComponent(RecentlySoldRestoreAction::create());
         }
 
         return $form;
@@ -129,5 +163,19 @@ class SecondHandProductAdmin extends ModelAdmin
         }
 
         return new HTTPResponse('ERROR!', 400);
+    }
+
+    public function getList()
+    {
+        $list = parent::getList();
+        
+        if ($this->modelTab === 'RecentlySold') {
+            $list = $list->excludeAny([
+                'DateItemWasSold' => null,
+                'DateItemWasSold:LessThanOrEqual' => date('Y-m-d', strtotime('-3 weeks')),
+            ]);
+        }
+
+        return $list;
     }
 }
