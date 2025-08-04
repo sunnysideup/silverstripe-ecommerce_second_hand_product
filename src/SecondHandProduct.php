@@ -3,6 +3,7 @@
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
 use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\Assets\Image;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
@@ -334,7 +335,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         if (null !== $extended) {
             return $extended;
         }
-
         return Permission::check(
             EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
             'any',
@@ -1038,6 +1038,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             }
         }
         if ($this->AdditionalFiles()->exists()) {
+            /**
+             * @var Image $image
+             */
             foreach ($this->AdditionalFiles() as $image) {
                 $newImage = $image->duplicate();
                 $clone->AdditionalFiles()->add($newImage);
