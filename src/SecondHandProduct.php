@@ -680,16 +680,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         }
 
         if ($this->canEdit()) {
-            $fields->replaceField(
-                'AllowPurchase',
-                CheckboxField::create(
-                    'AllowPurchase',
-                    DBField::create_field(
-                        'HTMLText',
-                        '<strong>Allow product to be purchased</strong>'
-                    )
-                )
-            );
             $fields->replaceField('DateItemWasSold', DateField::create('DateItemWasSold', 'Date this item was sold'));
         }
 

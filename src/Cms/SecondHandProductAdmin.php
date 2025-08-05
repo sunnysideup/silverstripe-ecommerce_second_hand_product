@@ -42,7 +42,6 @@ class SecondHandProductAdmin extends ModelAdmin
             'dataClass' => SecondHandProduct::class,
             'title' => 'Second Hand Products',
         ],
-        SecondHandProduct::class,
         SecondHandProductGroup::class,
         SecondHandArchive::class,
         SecondHandForSaleList::class,
