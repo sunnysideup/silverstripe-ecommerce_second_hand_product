@@ -679,10 +679,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             $categoriesTable->setConfig(GridFieldConfig_RecordViewer::create());
         }
 
-        if ($this->canEdit()) {
-            $fields->replaceField('DateItemWasSold', DateField::create('DateItemWasSold', 'Date this item was sold'));
-        }
-
         $fields->addFieldsToTab(
             'Root.Status',
             [
