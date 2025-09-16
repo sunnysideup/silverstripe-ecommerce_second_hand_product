@@ -2,6 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >
     <body>
         <h1>$Title</h1>
+        <meta name="robots" content="noindex, nofollow">
         <ul style="list-style-type: none;">
         <% loop ListOfFieldsForPrinting %>
             <li>
