@@ -36,7 +36,7 @@ class StaleSecondHandProduct extends Report
 
         $name = _t(
             'EcommerceSideReport.STALE_SECOND_HAND_REPORT',
-            'Stale Second Hand Products'
+            'Second Hand Products - Stale'
         );
 
         return $name . ': ' . $object->Nice();
