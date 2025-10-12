@@ -38,12 +38,14 @@ use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 use Page;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\CheckboxSetField;
+use SilverStripe\Forms\CompositeValidator;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\SearchableDropdownField;
 use SilverStripe\ORM\FieldType\DBDate;
 use Sunnysideup\AjaxSelectField\AjaxSelectField;
 use Sunnysideup\Ecommerce\Forms\Fields\ProductSelectField;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
+use Sunnysideup\EcommerceSecondHandProduct\Forms\SecondHandValidator;
 
 /**
  * Class \Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct
@@ -92,6 +94,13 @@ use Sunnysideup\Ecommerce\Pages\ProductGroup;
  */
 class SecondHandProduct extends Product implements PermissionProviderFactoryProvider
 {
+
+    public const SELL_ON_BEHALF_ARRAY = [
+        0 => 'Not on behalf (e.g. Trade-in)',
+        1 => 'On behalf of a customer',
+        2 => 'Unsure - need to check',
+    ];
+
     /**
      * @var string
      */
@@ -142,7 +151,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         'PurchasePrice' => 'Currency',
         'ProductQuality' => 'Enum("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
         'IncludesBoxOrCase' => "Enum('No, Box, Case, Both','No')",
-        'SellingOnBehalf' => 'Boolean',
+        'SellingOnBehalf' => 'Int',
         'OriginalManual' => 'Boolean',
         'DateItemWasBought' => 'Date',
         'DateItemWasSold' => 'Date',
@@ -476,12 +485,13 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                     )
                 )
                     ->setDescription('This box must be ticked to allow a customer to purchase it'),
-                CheckboxField::create(
+                DropdownField::create(
                     'SellingOnBehalf',
                     DBField::create_field(
                         'HTMLText',
                         '<strong>Selling on behalf</strong>'
-                    )
+                    ),
+                    self::SELL_ON_BEHALF_ARRAY
                 )
                     ->setDescription('This box must be ticked if this product is being sold on behalf'),
                 CheckboxField::create(
@@ -705,6 +715,14 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $fields;
     }
 
+    public function getCMSCompositeValidator(): CompositeValidator
+    {
+        $validator = parent::getCMSCompositeValidator();
+        $validator->addValidator(SecondHandValidator::create());
+        return $validator;
+    }
+
+
     public function ArchiveLink(): string
     {
         $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandProduct::class);
@@ -896,6 +914,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         if (!$this->DateItemWasBought) {
             $this->DateItemWasBought = DBDatetime::now()->Rfc2822();
         }
+        $this->SellingOnBehalf = 2; // unsure
 
         return parent::populateDefaults();
     }

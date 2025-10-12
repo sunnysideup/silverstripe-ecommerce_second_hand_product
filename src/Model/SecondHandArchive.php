@@ -112,7 +112,7 @@ class SecondHandArchive extends DataObject
         'DateItemWasBought' => 'Date',
         'DateItemWasSold' => 'Date',
         'ProductQuality' => 'Enum("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
-        'SoldOnBehalf' => 'Boolean',
+        'SoldOnBehalf' => 'Int',
         'PurchasePrice' => 'Currency',
         'Price' => 'Currency',
         'SoldPrice' => 'Currency',
@@ -168,7 +168,7 @@ class SecondHandArchive extends DataObject
         'DateItemWasBought' => 'Date Entered',
         'DateItemWasSold' => 'Date Sold',
         'ProductQuality' => 'Quality',
-        'SoldOnBehalf.NiceAndColourfull' => 'On Behalf',
+        'SoldOnBehalfNice' => 'On Behalf',
         'PurchasePrice' => 'Purchase Price',
         'Price' => 'Sale/Ticket Price',
         'SoldPrice' => 'Sold Price',
@@ -204,7 +204,17 @@ class SecondHandArchive extends DataObject
         'SerialNumber' => 'PartialMatchFilter',
     ];
 
+    private static $casting = [
+        'SoldOnBehalfNice' => 'Varchar',
+    ];
+
+
     private static $show_restore_button = false;
+
+    public function getSoldOnBehalfNice(): string
+    {
+        return SecondHandProduct::SELL_ON_BEHALF_ARRAY[$this->SoldOnBehalf] ?? 'Unknown';
+    }
 
     public static function create_from_page($page)
     {
@@ -326,7 +336,7 @@ class SecondHandArchive extends DataObject
         $fields->dataFieldByName('AdditionalImages')
             ->getConfig()
             ->getComponentByType(GridFieldDataColumns::class)
-            ->setDisplayFields(['CMSTumbnail'], );
+            ->setDisplayFields(['CMSTumbnail'],);
         $fields->addFieldsToTab(
             'Root.SellersDetails',
             [
