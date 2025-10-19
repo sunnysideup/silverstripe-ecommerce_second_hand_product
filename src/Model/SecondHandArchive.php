@@ -213,7 +213,8 @@ class SecondHandArchive extends DataObject
 
     public function getSoldOnBehalfNice(): string
     {
-        return SecondHandProduct::SELL_ON_BEHALF_ARRAY[$this->SoldOnBehalf] ?? 'Unknown';
+        $list = Config::inst()->get(SecondHandProduct::class, 'sell_on_behalf_array');
+        return $list[$this->SoldOnBehalf] ?? 'Unknown';
     }
 
     public static function create_from_page($page)

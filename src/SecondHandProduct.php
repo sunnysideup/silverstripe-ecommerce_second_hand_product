@@ -95,10 +95,10 @@ use Sunnysideup\EcommerceSecondHandProduct\Forms\SecondHandValidator;
 class SecondHandProduct extends Product implements PermissionProviderFactoryProvider
 {
 
-    public const SELL_ON_BEHALF_ARRAY = [
-        0 => 'Not on behalf (e.g. Trade-in)',
-        1 => 'On behalf of a customer',
-        2 => 'Unsure - need to check',
+    private static $sell_on_behalf_array = [
+        0 => 'Trade-in',
+        1 => 'On behalf',
+        2 => '-- please select --',
     ];
 
     /**
@@ -491,7 +491,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                         'HTMLText',
                         '<strong>Selling on behalf</strong>'
                     ),
-                    self::SELL_ON_BEHALF_ARRAY
+                    $this->config()->get('sell_on_behalf_array')
                 )
                     ->setDescription('This box must be ticked if this product is being sold on behalf'),
                 CheckboxField::create(
