@@ -536,8 +536,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                     ->setDescription('Optional text only description, the maximum length of this description is 255 characters.'),
                 DateField::create('DateItemWasBought', 'Date this item was bought')
                     ->setDescription('Date Format (dd-mm-YYYY). Example: 3rd of May 1992 should be entered as 03-05-1992'),
-                DateField::create('DateItemWasSold', 'Date this item was sold')
-                    ->setDisabled(true),
+                DateField::create('DateItemWasSold', 'Date this item was sold'),
                 UploadField::create('Image', 'Main Product Image')
                     ->setDescription(
                         DBField::create_field(
