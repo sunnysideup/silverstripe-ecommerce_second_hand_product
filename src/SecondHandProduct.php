@@ -96,9 +96,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 {
 
     public const SELL_ON_BEHALF_ARRAY = [
-        0 => 'Not on behalf (e.g. Trade-in)',
+        0 => 'Trade-in',
         1 => 'On behalf of a customer',
-        2 => 'Unsure - need to check',
+        2 => '(please choose)',
     ];
 
     /**
@@ -489,7 +489,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                     'SellingOnBehalf',
                     DBField::create_field(
                         'HTMLText',
-                        '<strong>Selling on behalf</strong>'
+                        '<strong>Stock ownership *</strong>'
                     ),
                     self::SELL_ON_BEHALF_ARRAY
                 )
