@@ -95,10 +95,10 @@ use Sunnysideup\EcommerceSecondHandProduct\Forms\SecondHandValidator;
 class SecondHandProduct extends Product implements PermissionProviderFactoryProvider
 {
 
-    public const SELL_ON_BEHALF_ARRAY = [
+    private static $sell_on_behalf_array = [
         0 => 'Trade-in',
-        1 => 'On behalf of a customer',
-        2 => '(please choose)',
+        1 => 'On behalf',
+        2 => '-- please select --',
     ];
 
     /**
@@ -491,7 +491,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                         'HTMLText',
                         '<strong>Stock ownership *</strong>'
                     ),
-                    self::SELL_ON_BEHALF_ARRAY
+                    $this->config()->get('sell_on_behalf_array')
                 )
                     ->setDescription('This box must be ticked if this product is being sold on behalf'),
                 CheckboxField::create(
@@ -536,8 +536,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                     ->setDescription('Optional text only description, the maximum length of this description is 255 characters.'),
                 DateField::create('DateItemWasBought', 'Date this item was bought')
                     ->setDescription('Date Format (dd-mm-YYYY). Example: 3rd of May 1992 should be entered as 03-05-1992'),
-                DateField::create('DateItemWasSold', 'Date this item was sold')
-                    ->setDisabled(true),
+                DateField::create('DateItemWasSold', 'Date this item was sold'),
                 UploadField::create('Image', 'Main Product Image')
                     ->setDescription(
                         DBField::create_field(
