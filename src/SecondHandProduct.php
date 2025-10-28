@@ -98,7 +98,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     private static $sell_on_behalf_array = [
         0 => 'Trade-in',
         1 => 'On behalf',
-        2 => '-- please select --',
+        99 => '-- please select --',
     ];
 
     /**
@@ -913,7 +913,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         if (!$this->DateItemWasBought) {
             $this->DateItemWasBought = DBDatetime::now()->Rfc2822();
         }
-        $this->SellingOnBehalf = 2; // unsure
+        $this->SellingOnBehalf = 99; // unsure
 
         return parent::populateDefaults();
     }

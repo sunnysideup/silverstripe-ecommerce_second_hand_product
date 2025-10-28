@@ -9,7 +9,7 @@ class SecondHandValidator extends RequiredFields
 {
     public function php($data)
     {
-        if (isset($data['SellingOnBehalf']) && $data['SellingOnBehalf'] == 2) {
+        if (isset($data['SellingOnBehalf']) && (int) $data['SellingOnBehalf'] === 99) {
             $this->validationError(
                 'SellingOnBehalf',
                 'Please indicate if you are selling on behalf of a customer or not.',
