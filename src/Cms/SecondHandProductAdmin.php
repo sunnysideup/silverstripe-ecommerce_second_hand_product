@@ -167,12 +167,10 @@ class SecondHandProductAdmin extends ModelAdmin
     public function getList()
     {
         $list = parent::getList();
-        
+
         if ($this->modelTab === 'RecentlySold') {
-            $list = $list->excludeAny([
-                'DateItemWasSold' => null,
-                'DateItemWasSold:LessThanOrEqual' => date('Y-m-d', strtotime('-3 weeks')),
-            ]);
+            $list = $list->sort('DateItemWasSold', 'DESC');
+            $list = $list->filter(['AllowPurchase' => 0]);
         }
 
         return $list;
