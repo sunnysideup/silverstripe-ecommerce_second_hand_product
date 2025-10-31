@@ -1032,7 +1032,14 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     public function duplicate(bool $doWrite = true, array|null $relations = null): static
     {
-        $clone = parent::duplicate($doWrite, $relations);
+        /**
+         * @var SecondHandProduct $clone
+         */
+        $clone = parent::duplicate(false, $relations);
+        $clone->DateItemWasSold = null;
+        $clone->write();
+        $clone->publishRecursive();
+
 
         // Deep copy these because they are cascade_deleted
         if ($this->AdditionalImages()->exists()) {
@@ -1054,10 +1061,8 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             $newImage = $this->Image()->duplicate();
             $clone->ImageID = $newImage->ID;
         }
-
-        if ($doWrite) {
-            $clone->write();
-        }
+        $clone->write();
+        $clone->publishRecursive();
 
         return $clone;
     }
