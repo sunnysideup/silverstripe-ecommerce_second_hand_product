@@ -1037,6 +1037,11 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
          */
         $clone = parent::duplicate(false, $relations);
         $clone->DateItemWasSold = null;
+        $clone->AllowPurchase = 1;
+        // code before any _
+        $code = preg_replace('/_.*/', '', $this->InternalItemID);
+        $count = SecondHandProduct::get()->filter('InternalItemID:StartsWith', $code)->count();
+        $clone->InternalItemID = $code . '-' . ($count + 1);
         $clone->write();
         $clone->publishRecursive();
 
