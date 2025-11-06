@@ -39,6 +39,7 @@ use Page;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\CheckboxSetField;
 use SilverStripe\Forms\CompositeValidator;
+use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\SearchableDropdownField;
 use SilverStripe\ORM\FieldType\DBDate;
@@ -1023,10 +1024,17 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     public function getProductGroupsTableField()
     {
-        $field = parent::getProductGroupsTableField();
-        $field->setList($this->ProductGroups()->filter(['ShowInSearch' => 1])->exclude(['ClassName' => SecondHandProductGroup::class]));
-        $field->setTitle('Related New Product Categories');
-        $this->extend('updateProductGroupsTableField', $field);
+        if ($this->isInDB()) {
+            $field = parent::getProductGroupsTableField();
+            $field->setList($this->ProductGroups()->filter(['ShowInSearch' => 1])->exclude(['ClassName' => SecondHandProductGroup::class]));
+            $field->setTitle('Related New Product Categories');
+            $this->extend('updateProductGroupsTableField', $field);
+        } else {
+            $field = new LiteralField(
+                'ProductGroupsInfo',
+                '<p class="message info">You can assign product categories after you have saved this product for the first time.</p>'
+            );
+        }
         return $field;
     }
 
