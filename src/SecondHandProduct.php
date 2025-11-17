@@ -858,10 +858,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $this->ProductQuality * 10;
     }
 
-    public function InternalItemIDNice()
-    {
-        return $this->InternalItemID;
-    }
 
     public function canView($member = null)
     {
