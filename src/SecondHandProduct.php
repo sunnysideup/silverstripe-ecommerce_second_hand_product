@@ -506,7 +506,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 TextField::create('Title', 'Product Title'),
                 ReadonlyField::create('CanBeSold', 'For Sale', DBField::create_field(DBBoolean::class, $this->canPurchase())->Nice()),
                 ReadonlyField::create('CreatedNice', 'First Entered', $this->getCreatedNice()),
-                TextField::create('InternalItemID', 'Product Code')->setReadonly(true),
+                TextField::create('InternalItemIDCalculated', 'Product Code')->setReadonly(true),
                 NumericField::create('PurchasePrice', 'Purchase Price')
                     ->setScale(2)
                     ->setDescription('Price paid for the product'),
@@ -1052,6 +1052,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
         // Deep copy these because they are cascade_deleted
         if ($this->AdditionalImages()->exists()) {
+            /**
+             * @var Image as $image
+             */
             foreach ($this->AdditionalImages() as $image) {
                 $newImage = $image->duplicate();
                 $clone->AdditionalImages()->add($newImage);
