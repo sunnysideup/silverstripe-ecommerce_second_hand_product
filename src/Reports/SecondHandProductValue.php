@@ -74,7 +74,7 @@ class SecondHandProductValue extends Report
     public function columns()
     {
         return [
-            'InternalItemID' => 'ID',
+            'InternalItemIDCalculated' => 'ID',
             'Title' => [
                 'title' => 'Product Name',
                 'link' => true,
