@@ -10,6 +10,6 @@
             </li>
         <% end_loop %>
         </ul>
-        <!-- <script type="text/javascript">if (window ==window.top) {window.setTimeout(function(){window.print();}, 500);}</script> -->
+        <!-- <script>if (window ==window.top) {window.setTimeout(function(){window.print();}, 500);}</script> -->
     </body>
 </html>
