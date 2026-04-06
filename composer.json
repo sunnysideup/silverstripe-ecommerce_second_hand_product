@@ -1,38 +1,38 @@
 {
-    "name": "sunnysideup/ecommerce_second_hand_product",
-    "type": "silverstripe-vendormodule",
-    "description": "Add a second hand product (or similar) to your Silverstripe e-commerce install.",
-    "keywords": [
-        "Silverstripe-CMS",
-        "CMS",
-        "Silverstripe",
-        "e-commerce",
-        "second hand",
-        "second-hand",
-        "product",
-        "special product"
-    ],
-    "license": "BSD-3-Clause",
-    "authors": [
-        {
-            "name": "Nicolaas Francken",
-            "email": "modules@sunnysideup.co.nz",
-            "role": "lead developer"
-        }
-    ],
-    "require": {
-        "sunnysideup/ecommerce": "*",
-        "sunnysideup/google_address_field": "*",
-        "silverstripe/recipe-cms": "^4.0 || ^5.0"
-    },
-    "extra": {
-        "expose": [
-            "client/images"
-        ]
-    },
-    "autoload": {
-        "psr-4": {
-            "Sunnysideup\\EcommerceSecondHandProduct\\": "src/"
-        }
+  "name": "sunnysideup/ecommerce_second_hand_product",
+  "type": "silverstripe-vendormodule",
+  "description": "Add a second hand product (or similar) to your Silverstripe e-commerce install.",
+  "keywords": [
+    "Silverstripe-CMS",
+    "CMS",
+    "Silverstripe",
+    "e-commerce",
+    "second hand",
+    "second-hand",
+    "product",
+    "special product"
+  ],
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Nicolaas Francken",
+      "email": "modules@sunnysideup.co.nz",
+      "role": "lead developer"
     }
+  ],
+  "require": {
+    "sunnysideup/ecommerce": "5.x-dev",
+    "sunnysideup/google_address_field": "5.x-dev",
+    "silverstripe/recipe-cms": "^4.0 || ^5.0"
+  },
+  "extra": {
+    "expose": [
+      "client/images"
+    ]
+  },
+  "autoload": {
+    "psr-4": {
+      "Sunnysideup\\EcommerceSecondHandProduct\\": "src/"
+    }
+  }
 }
