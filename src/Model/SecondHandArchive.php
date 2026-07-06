@@ -410,7 +410,7 @@ class SecondHandArchive extends DataObject
 
     public function getHistoryData(?string $code = ''): array
     {
-        $obj = DataObject::get_one(SecondHandProduct::class);
+        $obj = SecondHandProduct::get()->setUseCache(true)->first();
         $array = [];
         if ($obj && $this->InternalItemID) {
             $array = $obj->getHistoryData($this->InternalItemID);

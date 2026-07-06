@@ -106,10 +106,7 @@ class SecondHandProductGroup extends ProductGroup
     public function BestRootParentPage()
     {
         /** @var SecondHandProductGroup $obj */
-        $obj = SecondHandProductGroup::get_one(
-            SecondHandProductGroup::class,
-            ['RootParent' => 1]
-        );
+        $obj = SecondHandProductGroup::get()->setUseCache(true)->filter(['RootParent' => 1])->first();
         if (! $obj) {
             /** @var SecondHandProductGroup $obj */
             $obj = SecondHandProductGroup::get()->first();
