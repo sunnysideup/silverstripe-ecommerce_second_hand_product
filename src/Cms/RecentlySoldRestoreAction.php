@@ -94,7 +94,7 @@ class RecentlySoldRestoreAction extends AbstractGridFieldComponent implements
                 ->addHeader('X-Status', $soldProduct->Title . ' Copied.');
 
             return Controller::curr()->redirect(
-                $copy->CMSEditLink()
+                $copy->getCMSEditLink()
             );
         }
     }

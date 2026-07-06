@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
+use SilverStripe\Forms\Validation\CompositeValidator;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Image;
@@ -37,7 +38,6 @@ use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 use Page;
 use SilverStripe\Control\Director;
-use SilverStripe\Forms\CompositeValidator;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\SearchableDropdownField;
@@ -273,7 +273,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      *
      * @var string
      */
-    private static $icon = 'sunnysideup/ecommerce_second_hand_product: client/images/treeicons/SecondHandProduct-file.gif';
+    private static $cms_icon = 'sunnysideup/ecommerce_second_hand_product: client/images/treeicons/SecondHandProduct-file.gif';
 
     /**
      * Standard SS variable.
@@ -290,7 +290,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      *
      * @var string
      */
-    private static $description = 'This page displays a single second-hand product that can only be sold once';
+    private static $class_description = 'This page displays a single second-hand product that can only be sold once';
 
     public function SummaryFields()
     {
@@ -735,7 +735,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     public function ModelAdminLink(): string
     {
-        return $this->CMSEditLink();
+        return $this->getCMSEditLink();
     }
 
     public function getPrintLink()
@@ -743,7 +743,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $this->link('printview');
     }
 
-    public function CMSEditLink($action = null)
+    public function getCMSEditLink($action = null)
     {
         return Injector::inst()->get(SecondHandProductAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }

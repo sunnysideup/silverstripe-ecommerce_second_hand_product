@@ -2,6 +2,9 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\PolyExecution\PolyOutput;
+use Symfony\Component\Console\Command\Command;
 use Exception;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
@@ -14,11 +17,11 @@ class EcommerceTaskSecondHandRemoveOldies extends BuildTask
 {
     private const DAYS_AGO = 360;
 
-    protected $title = 'Remove old second hand products that are not for sale';
+    protected string $title = 'Remove old second hand products that are not for sale';
 
-    protected $description = 'Go through all the second hand products that are not for sale and entered more than year ago and archives them.';
+    protected static string $description = 'Go through all the second hand products that are not for sale and entered more than year ago and archives them.';
 
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         Environment::increaseTimeLimitTo(600);
         $timeFilter = [
@@ -27,7 +30,6 @@ class EcommerceTaskSecondHandRemoveOldies extends BuildTask
         $filter = ['AllowPurchase' => 0] + $timeFilter;
         DB::alteration_message('Filter is: ' . print_r($filter, 1));
         $products = SecondHandProduct::get()->filter($filter)->limit(300);
-
         foreach ($products as $product) {
             DB::alteration_message(
                 '
@@ -42,8 +44,8 @@ class EcommerceTaskSecondHandRemoveOldies extends BuildTask
                 DB::alteration_message('Caught exception, could not delete item ' . $exception->getMessage(), 'deleted');
             }
         }
-
         DB::alteration_message(' ================= Completed =================  ');
+        return Command::SUCCESS;
     }
 
     protected function autoArchiveProduct(SecondHandProduct $obj)

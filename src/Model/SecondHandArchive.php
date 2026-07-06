@@ -399,7 +399,7 @@ class SecondHandArchive extends DataObject
                 [
                     LiteralField::create(
                         'LiveProduct',
-                        '<h2>There is a live product with the same code: <a href="' . $currentProduct->CMSEditLink() . '">' . $currentProduct->Title . '</a></h2>'
+                        '<h2>There is a live product with the same code: <a href="' . $currentProduct->getCMSEditLink() . '">' . $currentProduct->Title . '</a></h2>'
                     ),
                 ]
             );

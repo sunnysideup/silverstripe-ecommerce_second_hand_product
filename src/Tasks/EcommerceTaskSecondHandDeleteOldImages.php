@@ -2,6 +2,9 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\PolyExecution\PolyOutput;
+use Symfony\Component\Console\Command\Command;
 use Exception;
 use SilverStripe\Assets\File;
 use SilverStripe\Control\Controller;
@@ -14,11 +17,11 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 class EcommerceTaskSecondHandDeleteOldImages extends BuildTask
 {
-    protected $title = 'Delete old images';
+    protected string $title = 'Delete old images';
 
-    protected $description = 'Go through all archived second hand images that are older than three months and delete the related images.';
+    protected static string $description = 'Go through all archived second hand images that are older than three months and delete the related images.';
 
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         Environment::increaseTimeLimitTo(600);
         $archivedProducts = SecondHandArchive::get()
@@ -38,8 +41,8 @@ class EcommerceTaskSecondHandDeleteOldImages extends BuildTask
                 $archivedProduct->write();
             }
         }
-
         DB::alteration_message(' ================= Completed =================  ');
+        return Command::SUCCESS;
     }
 
     public static function delete_file($file)

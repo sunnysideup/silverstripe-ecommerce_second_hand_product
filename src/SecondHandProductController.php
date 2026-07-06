@@ -2,11 +2,11 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Model\List\ArrayList;
+use SilverStripe\Model\ArrayData;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
-use SilverStripe\View\ArrayData;
 use Sunnysideup\Ecommerce\Pages\ProductController;
 
 /**

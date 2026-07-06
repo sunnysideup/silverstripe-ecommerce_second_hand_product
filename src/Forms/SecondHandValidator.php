@@ -3,9 +3,9 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Forms;
 
-use SilverStripe\Forms\RequiredFields;
+use SilverStripe\Forms\Validation\RequiredFieldsValidator;
 
-class SecondHandValidator extends RequiredFields
+class SecondHandValidator extends RequiredFieldsValidator
 {
     public function php($data)
     {

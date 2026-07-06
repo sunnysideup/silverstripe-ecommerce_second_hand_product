@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
+use SilverStripe\Model\List\SS_List;
 use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
@@ -12,7 +13,6 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\SS_List;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 

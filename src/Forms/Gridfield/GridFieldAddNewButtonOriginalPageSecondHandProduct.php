@@ -2,11 +2,11 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield;
 
+use SilverStripe\Model\ArrayData;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
-use SilverStripe\View\ArrayData;
 use SilverStripe\View\SSViewer;
 use Sunnysideup\Ecommerce\Forms\Gridfield\GridFieldAddNewButtonOriginalPage;
 use Sunnysideup\EcommerceSecondHandProduct\Cms\CMSPageAddControllerSecondHandProducts;

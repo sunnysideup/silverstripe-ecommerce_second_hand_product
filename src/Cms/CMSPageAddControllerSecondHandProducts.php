@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
 
+use SilverStripe\Model\List\ArrayList;
 use SilverStripe\CMS\Controllers\CMSPageAddController;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\DropdownField;
@@ -10,7 +11,6 @@ use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\FieldType\DBField;
 use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
@@ -112,7 +112,7 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
             $fields,
             $actions
         )->setHTMLID('Form_AddForm');
-        $form->setAttribute('data-hints', $this->SiteTreeHints());
+        $form->setAttribute('data-hints', $this->TreeHints());
         $form->setAttribute('data-childfilter', $this->Link('childfilter'));
 
         return $form;
@@ -123,26 +123,21 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
     // {
     //     $className = isset($data['PageType']) ? $data['PageType'] : \Page::class;
     //     $parentID = isset($data['ParentID']) ? (int) $data['ParentID'] : 0;
-
     //     $suffix = isset($data['Suffix']) ? '-' . $data['Suffix'] : null;
-
     //     if (! $parentID && isset($data['Parent'])) {
     //         $page = SiteTree::get_by_link($data['Parent']);
     //         if ($page) {
     //             $parentID = $page->ID;
     //         }
     //     }
-
     //     if (is_numeric($parentID) && $parentID > 0) {
     //         $parentObj = ProductGroup::get_by_id($parentID);
     //     } else {
     //         $parentObj = null;
     //     }
-
     //     if (! $parentObj || ! $parentObj->ID) {
     //         $parentID = 0;
     //     }
-
     //     if (! singleton($className)->canCreate(
     //         Security::getCurrentUser(),
     //         ['Parent' => $parentObj]
@@ -150,40 +145,32 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
     //     ) {
     //         return Security::permissionFailure($this);
     //     }
-
     //     $record = $this->getNewItem("new-{$className}-{$parentID}" . $suffix, false);
     //     $this->extend('updateDoAdd', $record, $form);
-
     //     try {
     //         $record->write();
     //     } catch (ValidationException $validationException) {
     //         foreach ($validationException->getResult()->getMessages() as $messageArray) {
     //             $form->sessionMessage($messageArray['message'], $messageArray['messageType']);
     //         }
-
     //         return $this->getResponseNegotiator()->respond($this->getRequest());
     //     }
-
     //     $this->getRequest()->getSession()->set(
     //         'FormInfo.Form_EditForm.formError.message',
     //         _t('CMSMain.PageAdded', 'Successfully created page')
     //     );
-
     //     $this->getRequest()->getSession()->set('FormInfo.Form_EditForm.formError.type', 'good');
-
     //     return $this->redirect($record->CMSEditLink());
     // }
-
     // TODO: SS4 / SS5 Compat issues
     // public function doCancel(array $data, Form $form): HTTPResponse
     // {
     //     return $this->redirect(singleton(SecondHandProductAdmin::class)->Link());
     // }
-
     /**
-     * @return ArrayList
+     * @return \SilverStripe\Model\List\ArrayList
      */
-    public function PageTypes()
+    public function RecordTypes()
     {
         $pageTypes = parent::PageTypes();
         $result = ArrayList::create();

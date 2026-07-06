@@ -2,6 +2,9 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
+use Symfony\Component\Console\Input\InputInterface;
+use SilverStripe\PolyExecution\PolyOutput;
+use Symfony\Component\Console\Command\Command;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
@@ -10,11 +13,11 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 class EcommerceTaskSecondCheckSoldItems extends BuildTask
 {
-    protected $title = 'Check second hand sold items';
+    protected string $title = 'Check second hand sold items';
 
-    protected $description = 'Enter product codes for sale to check if they have been marked as sold.';
+    protected static string $description = 'Enter product codes for sale to check if they have been marked as sold.';
 
-    public function run($request)
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         Environment::increaseTimeLimitTo(600);
         DB::alteration_message(' ================= Started =================  ');
@@ -38,7 +41,7 @@ class EcommerceTaskSecondCheckSoldItems extends BuildTask
                         }
 
                         if ($forSaleProduct->AllowPurchase) {
-                            DB::alteration_message('<a href="/' . $forSaleProduct->CMSEditLink() . '">ERROR WITH ' . $code . ' | ' . $forSaleProduct->Title . '</a>', 'deleted');
+                            DB::alteration_message('<a href="/' . $forSaleProduct->getCMSEditLink() . '">ERROR WITH ' . $code . ' | ' . $forSaleProduct->Title . '</a>', 'deleted');
                         }
                     }
                 } else {
@@ -48,22 +51,11 @@ class EcommerceTaskSecondCheckSoldItems extends BuildTask
 
             DB::alteration_message(' ================= Completed =================  ');
             DB::alteration_message('OK: ' . print_r(implode(', ', $codesArray), 1));
-            echo '<p><a href="/dev/tasks/Sunnysideup-EcommerceSecondHandProduct-Tasks-EcommerceTaskSecondCheckSoldItems?">again?</a></p>';
+            $output->writeln('<p><a href="/dev/tasks/Sunnysideup-EcommerceSecondHandProduct-Tasks-EcommerceTaskSecondCheckSoldItems?">again?</a></p>');
         } else {
-            echo '
-            <form method="post">
-                <h2>Paste Codes Below, separated by new line, tab or comma</h2>
-                <textarea name="codes" rows=30 cols=100></textarea>
-                <br />
-                <br />
-                <input type="checkbox" name="markassold" value="1" /> mark as sold
-                <br />
-                <br />
-                <input type="submit" value="check" />
-            </form>
-                ';
+            $output->writeln('            <form method="post">                <h2>Paste Codes Below, separated by new line, tab or comma</h2>                <textarea name="codes" rows=30 cols=100></textarea>                                                <input type="checkbox" name="markassold" value="1" /> mark as sold                                                <input type="submit" value="check" />            </form>                ');
         }
-
-        echo '<p><a href="/dev/tasks/Sunnysideup-EcommerceSecondHandProduct-Tasks-EcommerceTaskSecondHandSoldCodes">Get a list of items sold on this site</a></p>';
+        $output->writeln('<p><a href="/dev/tasks/Sunnysideup-EcommerceSecondHandProduct-Tasks-EcommerceTaskSecondHandSoldCodes">Get a list of items sold on this site</a></p>');
+        return Command::SUCCESS;
     }
 }
