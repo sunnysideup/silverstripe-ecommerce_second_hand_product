@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
-use Symfony\Component\Console\Input\InputInterface;
-use SilverStripe\PolyExecution\PolyOutput;
-use Symfony\Component\Console\Command\Command;
 use Exception;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
+use SilverStripe\PolyExecution\PolyOutput;
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
 
 class EcommerceTaskSecondHandPublishAll extends BuildTask
 {
@@ -20,22 +20,24 @@ class EcommerceTaskSecondHandPublishAll extends BuildTask
 
     protected static string $description = 'Go through all second hand products that are for sale and re-publish them...';
 
+    protected static string $commandName = 'ecommerce:secondhand:publishall';
+
     protected function execute(InputInterface $input, PolyOutput $output): int
     {
         Environment::increaseTimeLimitTo(600);
         $products = SecondHandProduct::get()->filter(['AllowPurchase' => 1]);
         foreach ($products as $product) {
-            DB::alteration_message('Publish: ' . $product->Title . ' - ' . $product->InternalItemID);
+            $output->writeln('Publish: ' . $product->Title . ' - ' . $product->InternalItemID);
 
             try {
                 $product->writeToStage(Versioned::DRAFT);
                 $product->publishRecursive();
             } catch (Exception $exception) {
-                DB::alteration_message('Caught exception, could not publish ' . $exception->getMessage(), 'deleted');
+                $output->writeln('<error>Caught exception, could not publish ' . $exception->getMessage() . '</error>');
             }
         }
 
-        DB::alteration_message(' ================= Completed =================  ');
+        $output->writeln(' ================= Completed =================  ');
         return Command::SUCCESS;
     }
 }
