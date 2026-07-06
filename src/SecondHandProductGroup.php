@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
+use Override;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\ReadonlyField;
@@ -36,7 +37,7 @@ class SecondHandProductGroup extends ProductGroup
         SecondHandProduct::class,
     ];
 
-    private static $icon = 'sunnysideup/ecommerce_second_hand_product: client/images/treeicons/SecondHandProductGroup-file.gif';
+    private static $cms_icon = 'sunnysideup/ecommerce_second_hand_product: client/images/treeicons/SecondHandProductGroup-file.gif';
 
     /**
      * Standard SS variable.
@@ -53,7 +54,7 @@ class SecondHandProductGroup extends ProductGroup
      *
      * @var string
      */
-    private static $description = 'A product category page specifically for second had products';
+    private static $class_description = 'A product category page specifically for second had products';
 
     private static $maximum_number_of_products_to_list = 1000;
 
@@ -76,16 +77,19 @@ class SecondHandProductGroup extends ProductGroup
         return $page ? $page->ID : 0;
     }
 
+    #[Override]
     public function i18n_singular_name()
     {
         return self::$singular_name;
     }
 
-    public function i18n_plural_name()
+    #[Override]
+    public function plural_name()
     {
         return self::$plural_name;
     }
 
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -106,14 +110,12 @@ class SecondHandProductGroup extends ProductGroup
     public function BestRootParentPage()
     {
         /** @var SecondHandProductGroup $obj */
-        $obj = SecondHandProductGroup::get_one(
-            SecondHandProductGroup::class,
-            ['RootParent' => 1]
-        );
+        $obj = SecondHandProductGroup::get()->setUseCache(true)->filter(['RootParent' => 1])->first();
         if (! $obj) {
             /** @var SecondHandProductGroup $obj */
             $obj = SecondHandProductGroup::get()->first();
         }
+
         // @return SecondHandProductGroup
         return $obj;
     }
@@ -121,6 +123,7 @@ class SecondHandProductGroup extends ProductGroup
     /**
      * Returns the class we are working with.
      */
+    #[Override]
     public function getBuyableClassName(): string
     {
         return SecondHandProduct::class;
@@ -129,6 +132,7 @@ class SecondHandProductGroup extends ProductGroup
     /**
      * Event handler called before writing to the database.
      */
+    #[Override]
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();

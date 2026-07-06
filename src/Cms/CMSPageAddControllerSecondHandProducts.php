@@ -2,9 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
 
-use SilverStripe\CMS\Controllers\CMSPageAddController;
-use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Model\List\ArrayList;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
@@ -12,12 +10,8 @@ use SilverStripe\Forms\Form;
 use SilverStripe\Forms\FormAction;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
-use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\FieldType\DBField;
-use SilverStripe\ORM\ValidationException;
-use SilverStripe\Security\Security;
 use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
-use Sunnysideup\Ecommerce\Pages\ProductGroup;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 
@@ -49,7 +43,7 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
     public function AddForm()
     {
         $pageTypes = [];
-        foreach ($this->PageTypes() as $type) {
+        foreach ($this->RecordTypes() as $type) {
             $html = sprintf(
                 '<span class="page-icon class-%s"></span><strong class="title">%s</strong><span class="description">%s</span>',
                 $type->getField('ClassName'),
@@ -61,46 +55,34 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
 
         $numericLabelTmpl = '<span class="step-label"><span class="flyout">%d</span><span class="arrow"></span><span class="title">%s</span></span>';
 
-        $fields = new FieldList(
-            LiteralField::create(
-                'PageModeHeader',
-                DBField::create_field(
-                    'HTMLText',
-                    sprintf(
-                        $numericLabelTmpl,
-                        1,
-                        _t('CMSMain.ChoosePageParentMode', 'Choose where to create this page')
-                    )
-                )
-            ),
-            $parentField = DropdownField::create(
-                'ParentID',
-                'Category',
-                SecondHandProductGroup::get()->map()
-            ),
-            $typeField = new OptionsetField(
-                'PageType',
-                DBField::create_field(
-                    'HTMLText',
-                    sprintf(
-                        $numericLabelTmpl,
-                        2,
-                        _t('CMSMain.ChoosePageType', 'Choose page type')
-                    )
-                ),
-                $pageTypes
-            ),
-            new LiteralField(
-                'RestrictedNote',
+        $fields = FieldList::create(LiteralField::create(
+            'PageModeHeader',
+            DBField::create_field(
+                'HTMLText',
                 sprintf(
-                    '<p class="message notice message-restricted">%s</p>',
-                    _t(
-                        'CMSMain.AddPageRestriction',
-                        'Note: Some page types are not allowed for this selection'
-                    )
+                    $numericLabelTmpl,
+                    1,
+                    _t('CMSMain.ChoosePageParentMode', 'Choose where to create this page')
                 )
             )
-        );
+        ), $parentField = DropdownField::create(
+            'ParentID',
+            'Category',
+            SecondHandProductGroup::get()->map()
+        ), $typeField = OptionsetField::create('PageType', DBField::create_field(
+            'HTMLText',
+            sprintf(
+                $numericLabelTmpl,
+                2,
+                _t('CMSMain.ChoosePageType', 'Choose page type')
+            )
+        ), $pageTypes), LiteralField::create('RestrictedNote', sprintf(
+            '<p class="message notice message-restricted">%s</p>',
+            _t(
+                'CMSMain.AddPageRestriction',
+                'Note: Some page types are not allowed for this selection'
+            )
+        )));
 
         // TODO Re-enable search once it allows for HTML title display,
         // see http://open.silverstripe.org/ticket/7455
@@ -115,14 +97,11 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
             $parentField->setValue((int) $parentID);
         }
 
-        $actions = new FieldList(
-            FormAction::create('doAdd', _t('CMSMain.Create', 'Create'))
-                ->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept')
-                ->setUseButtonTag(true),
-            FormAction::create('doCancel', _t('CMSMain.Cancel', 'Cancel'))
-                ->addExtraClass('ss-ui-action-destructive ss-ui-action-cancel')
-                ->setUseButtonTag(true)
-        );
+        $actions = FieldList::create(FormAction::create('doAdd', _t('CMSMain.Create', 'Create'))
+            ->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept')
+            ->setUseButtonTag(true), FormAction::create('doCancel', _t('CMSMain.Cancel', 'Cancel'))
+            ->addExtraClass('ss-ui-action-destructive ss-ui-action-cancel')
+            ->setUseButtonTag(true));
 
         $this->extend('updatePageOptions', $fields);
 
@@ -132,7 +111,7 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
             $fields,
             $actions
         )->setHTMLID('Form_AddForm');
-        $form->setAttribute('data-hints', $this->SiteTreeHints());
+        $form->setAttribute('data-hints', $this->TreeHints());
         $form->setAttribute('data-childfilter', $this->Link('childfilter'));
 
         return $form;
@@ -143,26 +122,21 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
     // {
     //     $className = isset($data['PageType']) ? $data['PageType'] : \Page::class;
     //     $parentID = isset($data['ParentID']) ? (int) $data['ParentID'] : 0;
-
     //     $suffix = isset($data['Suffix']) ? '-' . $data['Suffix'] : null;
-
     //     if (! $parentID && isset($data['Parent'])) {
     //         $page = SiteTree::get_by_link($data['Parent']);
     //         if ($page) {
     //             $parentID = $page->ID;
     //         }
     //     }
-
     //     if (is_numeric($parentID) && $parentID > 0) {
     //         $parentObj = ProductGroup::get_by_id($parentID);
     //     } else {
     //         $parentObj = null;
     //     }
-
     //     if (! $parentObj || ! $parentObj->ID) {
     //         $parentID = 0;
     //     }
-
     //     if (! singleton($className)->canCreate(
     //         Security::getCurrentUser(),
     //         ['Parent' => $parentObj]
@@ -170,43 +144,35 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
     //     ) {
     //         return Security::permissionFailure($this);
     //     }
-
     //     $record = $this->getNewItem("new-{$className}-{$parentID}" . $suffix, false);
     //     $this->extend('updateDoAdd', $record, $form);
-
     //     try {
     //         $record->write();
     //     } catch (ValidationException $validationException) {
     //         foreach ($validationException->getResult()->getMessages() as $messageArray) {
     //             $form->sessionMessage($messageArray['message'], $messageArray['messageType']);
     //         }
-
     //         return $this->getResponseNegotiator()->respond($this->getRequest());
     //     }
-
     //     $this->getRequest()->getSession()->set(
     //         'FormInfo.Form_EditForm.formError.message',
     //         _t('CMSMain.PageAdded', 'Successfully created page')
     //     );
-
     //     $this->getRequest()->getSession()->set('FormInfo.Form_EditForm.formError.type', 'good');
-
     //     return $this->redirect($record->CMSEditLink());
     // }
-
     // TODO: SS4 / SS5 Compat issues
     // public function doCancel(array $data, Form $form): HTTPResponse
     // {
     //     return $this->redirect(singleton(SecondHandProductAdmin::class)->Link());
     // }
-
     /**
      * @return ArrayList
      */
-    public function PageTypes()
+    public function RecordTypes()
     {
         $pageTypes = parent::PageTypes();
-        $result = new ArrayList();
+        $result = ArrayList::create();
         $productClass = EcommerceConfigClassNames::getName(SecondHandProduct::class);
         $acceptedClasses = ClassInfo::subclassesFor($productClass);
         foreach ($pageTypes as $type) {

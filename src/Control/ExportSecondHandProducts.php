@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
+use Override;
+use SilverStripe\Model\List\SS_List;
 use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
@@ -12,7 +14,6 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
-use SilverStripe\ORM\SS_List;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 
@@ -103,6 +104,7 @@ class ExportSecondHandProducts extends Controller
                 $additionalData[$internalItemID] = array_sum($imageData[$internalItemID]);
             }
         }
+
         $list = SecondHandProduct::get()->filter(['AllowPurchase' => 1]);
         $relations = Config::inst()->get(ExportSecondHandProducts::class, 'relationships_to_include_with_products');
 
@@ -154,8 +156,10 @@ class ExportSecondHandProducts extends Controller
                 if(!$folderName) {
                     $folderName = 'second-hand-images';
                 }
+
                 $folder = Folder::find_or_make($folderName);
             }
+
             if ($folder) {
                 $arrayInner = $secondHandProduct->getArrayOfImages();
                 foreach ($arrayInner as $imageID => $image) {
@@ -168,10 +172,12 @@ class ExportSecondHandProducts extends Controller
                     if (! isset($array[$secondHandProduct->InternalItemID])) {
                         $array[$secondHandProduct->InternalItemID] = [];
                     }
+
                     $fileSize = 0;
                     if (file_exists($location)) {
                         $fileSize = filesize($location);
                     }
+
                     if ($getIds) {
                         $array[$secondHandProduct->InternalItemID][$imageID] = $image->Name . self::SIZE_SEPARATOR . $fileSize;
                     } elseif ($imageSizesOnly) {
@@ -218,6 +224,7 @@ class ExportSecondHandProducts extends Controller
         return $this->returnJSONorFile($array, 'groups');
     }
 
+    #[Override]
     protected function init()
     {
         parent::init();
@@ -246,7 +253,8 @@ class ExportSecondHandProducts extends Controller
             file_put_contents($fileNameFull, $json);
             die('COMPLETED');
         }
-        $response = (new HTTPResponse($json));
+
+        $response = (HTTPResponse::create($json));
         $response->addHeader('Content-Type', 'application/json; charset="utf-8"');
         $response->addHeader('Pragma', 'no-cache');
         $response->addHeader('cache-control', 'no-cache, no-store, must-revalidate');

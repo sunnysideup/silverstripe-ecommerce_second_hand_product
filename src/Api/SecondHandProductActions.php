@@ -25,32 +25,33 @@ class SecondHandProductActions
 
     public static function quick_disable_or_enable(bool $enable, $buyable, ?int $archivedByID = 0, ?string $databaseName = '')
     {
-        if (Director::isLive()) {
-            if ($buyable && $buyable->exists() && $buyable->InternalItemID) {
-                $dbName = $databaseName ? $databaseName : DB::get_conn()->getSelectedDatabase();
+        if (Director::isLive() && ($buyable && $buyable->exists() && $buyable->InternalItemID)) {
+            $dbName = $databaseName ?: DB::get_conn()->getSelectedDatabase();
+            foreach (['', '_Live'] as $ext) {
+                $archivedByLine = '';
+                $dateItemSoldLine = '';
+                $priceLine = '';
+                $zeroOrOne = 0;
+                if (!$archivedByID) {
+                    $archivedByID = 0;
+                }
 
-                foreach (['', '_Live'] as $ext) {
-                    $archivedByLine = '';
-                    $dateItemSoldLine = '';
-                    $priceLine = '';
+                if (false === $enable) {
+                    if ($archivedByID !== 0) {
+                        $archivedByLine = 'SecondHandProduct' . $ext . '.ArchivedByID = ' . $archivedByID . ',';
+                    }
+
+                    $dateItemSoldLine = '' . $dbName . '."SecondHandProduct' . $ext . '"."DateItemWasSold" = \'' . date('Y-m-d') . "',";
                     $zeroOrOne = 0;
-                    if (!$archivedByID) {
-                        $archivedByID = 0;
-                    }
-                    if (false === $enable) {
-                        if ($archivedByID) {
-                            $archivedByLine = 'SecondHandProduct' . $ext . '.ArchivedByID = ' . $archivedByID . ',';
-                        }
-                        $dateItemSoldLine = '' . $dbName . '."SecondHandProduct' . $ext . '"."DateItemWasSold" = \'' . date('Y-m-d') . '\',';
-                        $zeroOrOne = 0;
-                    } else {
-                        $price = $buyable->Price ?: 0;
-                        $priceLine = '' . $dbName . '.Product' . $ext . '.Price = ' . $price . ',';
-                        $archivedByLine = '' . $dbName . '.SecondHandProduct' . $ext . '.ArchivedByID = 0,';
-                        $dateItemSoldLine = '' . $dbName . '."SecondHandProduct' . $ext . '"."DateItemWasSold" = \'\',';
-                        $zeroOrOne = 1;
-                    }
-                    $sql = '
+                } else {
+                    $price = $buyable->Price ?: 0;
+                    $priceLine = '' . $dbName . '.Product' . $ext . '.Price = ' . $price . ',';
+                    $archivedByLine = '' . $dbName . '.SecondHandProduct' . $ext . '.ArchivedByID = 0,';
+                    $dateItemSoldLine = '' . $dbName . '."SecondHandProduct' . $ext . '"."DateItemWasSold" = \'\',';
+                    $zeroOrOne = 1;
+                }
+
+                $sql = '
                         UPDATE ' . $dbName . '.Product' . $ext . '
                             INNER JOIN ' . $dbName . '.SiteTree' . $ext . '
                                 ON ' . $dbName . '.SiteTree' . $ext . '.ID = ' . $dbName . '.Product' . $ext . '.ID
@@ -70,9 +71,8 @@ class SecondHandProductActions
                             ' . $dbName . '."Product' . $ext . '"."InternalItemID" = \'' . $buyable->InternalItemID . '\'
                         ;
                     ';
-                    // limit can not be used here...
-                    DB::query($sql);
-                }
+                // limit can not be used here...
+                DB::query($sql);
             }
         }
     }
@@ -85,7 +85,7 @@ class SecondHandProductActions
 
             try {
                 $secondHandProduct->doArchive();
-            } catch (Exception $e) {
+            } catch (Exception) {
                 user_error('Could not archive ' . $secondHandProduct->Title . ' - ' . $secondHandProduct->InternalItemID . ' please check dates', E_USER_ERROR);
             }
 
@@ -102,7 +102,7 @@ class SecondHandProductActions
         if ($parentID) {
             self::ensureParentHasVersion($parentID);
             if (! $restoredPage) {
-                return new HTTPResponse("SiteTree #{$id} not found", 400);
+                return HTTPResponse::create(sprintf('SiteTree #%d not found', $id), 400);
             }
 
             return $restoredPage->doRestoreToStage();

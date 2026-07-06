@@ -32,6 +32,7 @@ class RecentlySoldRestoreAction extends AbstractGridFieldComponent implements
         if ($columnName === 'Actions') {
             return ['title' => ''];
         }
+
         return [];
     }
 
@@ -67,7 +68,7 @@ class RecentlySoldRestoreAction extends AbstractGridFieldComponent implements
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)
     {
         if ($actionName !== 'restoreproductcopy') {
-            return;
+            return null;
         }
 
         $id = $arguments['RecordID'] ?? null;
@@ -75,7 +76,7 @@ class RecentlySoldRestoreAction extends AbstractGridFieldComponent implements
             Controller::curr()->getResponse()
                 ->setStatusCode(500)
                 ->addHeader('X-Status', 'Product ID Not Found.');
-            return;
+            return null;
         }
         else {
             $soldProduct = SecondHandProduct::get_by_id($id);
@@ -93,7 +94,7 @@ class RecentlySoldRestoreAction extends AbstractGridFieldComponent implements
                 ->addHeader('X-Status', $soldProduct->Title . ' Copied.');
 
             return Controller::curr()->redirect(
-                $copy->CMSEditLink()
+                $copy->getCMSEditLink()
             );
         }
     }

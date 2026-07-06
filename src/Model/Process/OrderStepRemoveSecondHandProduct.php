@@ -2,7 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Model\Process;
 
-use SilverStripe\Security\Member;
+use Override;
 use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
@@ -15,6 +15,8 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
  */
 class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInterface
 {
+    private static $table_name = 'OrderStepRemoveSecondHandProduct';
+
     /**
      * The OrderStatusLog that is relevant to the particular step.
      *
@@ -31,6 +33,7 @@ class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInt
         'ShowAsInProcessOrder' => 1,
     ];
 
+    #[Override]
     public function HideFromEveryone(): bool
     {
         return true;
@@ -45,6 +48,7 @@ class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInt
      *
      * @return bool - true if the current step is ready to be run...
      */
+    #[Override]
     public function initStep(Order $order): bool
     {
         return true;
@@ -55,6 +59,7 @@ class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInt
      *
      * @return bool - true if run correctly
      */
+    #[Override]
     public function doStep(Order $order): bool
     {
         foreach ($order->Buyables() as $buyable) {
@@ -72,11 +77,13 @@ class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInt
      *
      * @return string
      */
+    #[Override]
     protected function myDescription()
     {
         return _t('OrderStep.REMOVESECONDHANDPRODUCT_DESCRIPTION', 'Remove second hand products once the sale has been confirmed.');
     }
 
+    #[Override]
     protected function canBeDeferred(): bool
     {
         return true;

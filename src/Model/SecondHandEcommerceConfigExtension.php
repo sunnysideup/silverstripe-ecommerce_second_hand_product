@@ -2,19 +2,20 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Model;
 
+use SilverStripe\Core\Extension;
+use Sunnysideup\Ecommerce\Model\Config\EcommerceDBConfig;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TreeDropdownField;
-use SilverStripe\ORM\DataExtension;
 
 /**
  * <a href="$EcomConfig.SecondHandExplanationPage.Link">$EcomConfig.SecondHandExplanationPage.Title</a>.
  *
- * @property \Sunnysideup\Ecommerce\Model\Config\EcommerceDBConfig|\Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandEcommerceConfigExtension $owner
+ * @property EcommerceDBConfig|SecondHandEcommerceConfigExtension $owner
  * @property int $SecondHandExplanationPageID
- * @method \SilverStripe\CMS\Model\SiteTree SecondHandExplanationPage()
+ * @method SiteTree SecondHandExplanationPage()
  */
-class SecondHandEcommerceConfigExtension extends DataExtension
+class SecondHandEcommerceConfigExtension extends Extension
 {
     private static $has_one = [
         'SecondHandExplanationPage' => SiteTree::class,

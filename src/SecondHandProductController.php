@@ -2,19 +2,19 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
-use SilverStripe\ORM\ArrayList;
+use SilverStripe\Model\List\ArrayList;
+use SilverStripe\Model\ArrayData;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
-use SilverStripe\View\ArrayData;
 use Sunnysideup\Ecommerce\Pages\ProductController;
 
 /**
  * Class \Sunnysideup\EcommerceSecondHandProduct\SecondHandProductController
  *
- * @property \Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct $dataRecord
- * @method \Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct data()
- * @mixin \Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct
+ * @property SecondHandProduct $dataRecord
+ * @method SecondHandProduct data()
+ * @mixin SecondHandProduct
  */
 class SecondHandProductController extends ProductController
 {
@@ -36,7 +36,7 @@ class SecondHandProductController extends ProductController
     public function ListOfFieldsForPrinting()
     {
         $al = ArrayList::create();
-        $fieldsWeNeed = $this->dataRecord->stat('db');
+        $fieldsWeNeed = static::config()->get('db');
         $labels = $this->FieldLabels();
         foreach (array_keys($fieldsWeNeed) as $fieldKey) {
             if (in_array($fieldKey, self::$fields_to_remove_from_print, true)) {

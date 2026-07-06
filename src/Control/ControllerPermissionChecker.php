@@ -23,14 +23,12 @@ class ControllerPermissionChecker extends Controller
     public static function permissionCheck($codesWithIPs, $code)
     {
         //with a code you do not have to be logged in ...
-        if (count($codesWithIPs)) {
+        if (count($codesWithIPs) > 0) {
             $ip = EcommerceCountry::get_ip();
             if ($code) {
-                $testIP = isset($codesWithIPs[$code]) ? $codesWithIPs[$code] : false;
-                if ($testIP) {
-                    if ($testIP === $ip || '*' === $testIP) {
-                        return true;
-                    }
+                $testIP = $codesWithIPs[$code] ?? false;
+                if ($testIP && ($testIP === $ip || '*' === $testIP)) {
+                    return true;
                 }
             }
         }

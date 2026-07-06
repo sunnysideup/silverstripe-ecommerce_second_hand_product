@@ -3,10 +3,12 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Forms;
 
-use SilverStripe\Forms\RequiredFields;
+use Override;
+use SilverStripe\Forms\Validation\RequiredFieldsValidator;
 
-class SecondHandValidator extends RequiredFields
+class SecondHandValidator extends RequiredFieldsValidator
 {
+    #[Override]
     public function php($data)
     {
         if (isset($data['SellingOnBehalf']) && (int) $data['SellingOnBehalf'] === 99) {

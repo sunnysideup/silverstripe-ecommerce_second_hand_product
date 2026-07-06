@@ -2,32 +2,38 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
+use Exception;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
+use SilverStripe\PolyExecution\PolyOutput;
 use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
 
 class EcommerceTaskSecondHandRemoveOldies extends BuildTask
 {
-    private const DAYS_AGO = 360;
-    protected $title = 'Remove old second hand products that are not for sale';
+    private const int DAYS_AGO = 360;
 
-    protected $description = 'Go through all the second hand products that are not for sale and entered more than year ago and archives them.';
+    protected string $title = 'Remove old second hand products that are not for sale';
 
-    public function run($request)
+    protected static string $description = 'Go through all the second hand products that are not for sale and entered more than year ago and archives them.';
+
+    protected static string $commandName = 'ecommerce:secondhand:removeoldies';
+
+    protected function execute(InputInterface $input, PolyOutput $output): int
     {
         Environment::increaseTimeLimitTo(600);
         $timeFilter = [
             'Created:LessThan' => date('Y-m-d', strtotime('-' . self::DAYS_AGO . ' days')) . ' 00:00:00',
         ];
         $filter = ['AllowPurchase' => 0] + $timeFilter;
-        DB::alteration_message('Filter is: ' . print_r($filter, 1));
+        $output->writeln('Filter is: ' . print_r($filter, 1));
         $products = SecondHandProduct::get()->filter($filter)->limit(300);
-
         foreach ($products as $product) {
-            DB::alteration_message(
+            $output->writeln(
                 '
                 Archiving: ' . $product->Title .
                 ' - ' . $product->InternalItemID .
@@ -36,12 +42,13 @@ class EcommerceTaskSecondHandRemoveOldies extends BuildTask
 
             try {
                 $this->autoArchiveProduct($product);
-            } catch (\Exception $exception) {
-                DB::alteration_message('Caught exception, could not delete item ' . $exception->getMessage(), 'deleted');
+            } catch (Exception $exception) {
+                $output->writeln('<error>Caught exception, could not delete item ' . $exception->getMessage() . '</error>');
             }
         }
 
-        DB::alteration_message(' ================= Completed =================  ');
+        $output->writeln(' ================= Completed =================  ');
+        return Command::SUCCESS;
     }
 
     protected function autoArchiveProduct(SecondHandProduct $obj)
@@ -51,6 +58,7 @@ class EcommerceTaskSecondHandRemoveOldies extends BuildTask
             $archivedRecord->AutoArchive = true;
             $archivedRecord->write();
         } else {
+            // @TODO (SS6 upgrade)
             user_error('Could not archive ' . $obj->InternalItemID);
         }
     }
