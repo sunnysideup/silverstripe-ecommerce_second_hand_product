@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sunnysideup\EcommerceSecondHandProduct\Api;
 
 class CodeGenerator
@@ -11,6 +13,7 @@ class CodeGenerator
      * @var string
      */
     private const CHARS = '23456789ACDEFHJKLMNPRSTUVWXY';
+
     private const LENGTH = 6;
 
     /**

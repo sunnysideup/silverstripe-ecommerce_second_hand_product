@@ -29,10 +29,11 @@ class EcommerceTaskSecondHandDeleteOldImages extends BuildTask
             if(SecondHandProduct::get()->filter(['InternalItemID' => $archivedProduct->InternalItemID])->exists()) {
                 DB::alteration_message('ERROR - product exists for: ' . $archivedProduct->Title . ' - ' . $archivedProduct->InternalItemID);
             } else {
-                $this->delete_file($archivedProduct->Image());
+                static::delete_file($archivedProduct->Image());
                 foreach($archivedProduct->AdditionalImages() as $image) {
-                    $this->delete_file($image);
+                    static::delete_file($image);
                 }
+
                 $archivedProduct->ImageID = 0;
                 $archivedProduct->write();
             }
@@ -40,11 +41,13 @@ class EcommerceTaskSecondHandDeleteOldImages extends BuildTask
 
         DB::alteration_message(' ================= Completed =================  ');
     }
+
     public static function delete_file($file)
     {
         if ($file || ! ($file instanceof File)) {
             $file = File::get()->byID($file);
         }
+
         if ($file) {
             $fileName = $file->getFilename();
             $id = $file->ID;
@@ -54,6 +57,7 @@ class EcommerceTaskSecondHandDeleteOldImages extends BuildTask
             } catch (Exception $exception) {
                 DB::alteration_message('Caught exception: ' . $exception->getMessage(), 'deleted');
             }
+
             $file->deleteFromStage(Versioned::DRAFT);
             $file->deleteFromStage(Versioned::LIVE);
             $fullName = Controller::join_links(ASSETS_PATH, $fileName);

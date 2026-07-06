@@ -25,7 +25,7 @@ class EcommerceTaskSecondCheckSoldItems extends BuildTask
             $codesArray = explode('|||', str_replace(["\n", "\t", "\r", ','], '|||', $codes));
             foreach ($codesArray as $key => $code) {
                 $code = trim((string) $code);
-                if ($code) {
+                if ($code !== '' && $code !== '0') {
                     $forSaleProduct = SecondHandProduct::get()->filter(['InternalItemID' => $code, 'AllowPurchase' => 1])->first();
                     if ($forSaleProduct) {
                         if (! empty($_POST['markassold'])) {

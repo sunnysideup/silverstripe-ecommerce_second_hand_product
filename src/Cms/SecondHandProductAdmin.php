@@ -4,7 +4,6 @@ namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
 
 use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\CMS\Controllers\CMSMain;
-use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Control\Controller;
 use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Forms\GridField\GridField;
@@ -74,12 +73,10 @@ class SecondHandProductAdmin extends ModelAdmin
         $form = parent::getEditForm();
         if (singleton($this->modelClass) instanceof SecondHandProduct) {
             $gridField = $form->Fields()->dataFieldByName($this->sanitiseClassName($this->modelClass));
-            if ($gridField) {
-                if ($gridField instanceof GridField) {
-                    $gridField->setConfig(GridFieldEditOriginalPageConfigSecondHandPage::create());
-                    $gridField->getConfig()->addComponent($exportButton = new GridFieldExportButton('buttons-before-left'));
-                    $exportButton->setExportColumns(singleton($this->modelClass)->exportFields());
-                }
+            if ($gridField && $gridField instanceof GridField) {
+                $gridField->setConfig(GridFieldEditOriginalPageConfigSecondHandPage::create());
+                $gridField->getConfig()->addComponent($exportButton = GridFieldExportButton::create('buttons-before-left'));
+                $exportButton->setExportColumns(singleton($this->modelClass)->exportFields());
             }
         }
 
@@ -117,10 +114,10 @@ class SecondHandProductAdmin extends ModelAdmin
     {
         if (isset($_GET['productid'])) {
             $id = (int) $_GET['productid'];
-            if ($id) {
+            if ($id !== 0) {
                 $archivedProduct = SecondHandProductActions::archive($id);
                 //after deleting the product redirect to the archived page
-                if ($archivedProduct) {
+                if ($archivedProduct instanceof SecondHandArchive) {
                     $this->getResponse()->addHeader(
                         'X-Status',
                         rawurlencode(_t(
@@ -134,14 +131,14 @@ class SecondHandProductAdmin extends ModelAdmin
             }
         }
 
-        return new HTTPResponse('ERROR!', 400);
+        return HTTPResponse::create('ERROR!', 400);
     }
 
     public function restore($request)
     {
         if (isset($_GET['productid'])) {
             $id = (int) $_GET['productid'];
-            if ($id) {
+            if ($id !== 0) {
                 $restoredPage = SecondHandProductActions::restore($id);
                 if ($restoredPage) {
                     $this->getResponse()->addHeader(
@@ -157,11 +154,11 @@ class SecondHandProductAdmin extends ModelAdmin
                     return Controller::curr()->redirect($cmsEditLink);
                 }
 
-                return new HTTPResponse("Parent Page #{$id} is missing", 400);
+                return HTTPResponse::create(sprintf('Parent Page #%s is missing', $id), 400);
             }
         }
 
-        return new HTTPResponse('ERROR!', 400);
+        return HTTPResponse::create('ERROR!', 400);
     }
 
     public function getList()
@@ -169,7 +166,7 @@ class SecondHandProductAdmin extends ModelAdmin
         $list = parent::getList();
 
         if ($this->modelTab === 'RecentlySold') {
-            $list = $list->sort('DateItemWasSold', 'DESC');
+            $list = $list->sort(['DateItemWasSold' => 'DESC']);
             $list = $list->filter(['AllowPurchase' => 0]);
         }
 

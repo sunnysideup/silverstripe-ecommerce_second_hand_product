@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Reports;
 
+use SilverStripe\ORM\DataList;
 use SilverStripe\Forms\GridField\GridFieldExportButton;
 use SilverStripe\ORM\FieldType\DBCurrency;
 use SilverStripe\Reports\Report;
@@ -56,7 +57,7 @@ class SecondHandProductValue extends Report
      *
      * @param null|mixed $params
      *
-     * @return \SilverStripe\ORM\DataList
+     * @return DataList
      */
     public function sourceRecords($params = null, $sort = null, $limit = null)
     {

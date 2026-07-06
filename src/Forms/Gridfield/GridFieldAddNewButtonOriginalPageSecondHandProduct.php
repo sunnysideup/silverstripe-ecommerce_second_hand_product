@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield;
 
+use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\GridField\GridFieldAddNewButton;
@@ -43,7 +44,7 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
             $getSegment = '?ParentID=' . $page->ID;
         }
 
-        $data = new ArrayData([
+        $data = ArrayData::create([
             'NewLink' => '/admin/' . Config::inst()->get(CMSPageAddControllerSecondHandProducts::class, 'url_segment') . '/' . $getSegment,
             'ButtonName' => $this->buttonName,
         ]);
@@ -58,7 +59,7 @@ class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNew
     /**
      * finds the most likely root parent for the shop.
      *
-     * @return null|\SilverStripe\CMS\Model\SiteTree
+     * @return null|SiteTree
      */
     public function BestRootParentPage()
     {

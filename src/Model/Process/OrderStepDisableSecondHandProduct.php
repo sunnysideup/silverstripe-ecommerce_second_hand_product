@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sunnysideup\EcommerceSecondHandProduct\Model\Process;
 
 use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
@@ -14,6 +16,8 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
  */
 class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepInterface
 {
+    private static $table_name = 'OrderStepDisableSecondHandProduct';
+
     /**
      * The OrderStatusLog that is relevant to the particular step.
      *

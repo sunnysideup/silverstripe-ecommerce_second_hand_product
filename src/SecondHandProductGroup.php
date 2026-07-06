@@ -81,7 +81,7 @@ class SecondHandProductGroup extends ProductGroup
         return self::$singular_name;
     }
 
-    public function i18n_plural_name()
+    public function plural_name()
     {
         return self::$plural_name;
     }
@@ -114,6 +114,7 @@ class SecondHandProductGroup extends ProductGroup
             /** @var SecondHandProductGroup $obj */
             $obj = SecondHandProductGroup::get()->first();
         }
+
         // @return SecondHandProductGroup
         return $obj;
     }

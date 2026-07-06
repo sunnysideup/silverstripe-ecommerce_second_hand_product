@@ -2,7 +2,6 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Model\Process;
 
-use SilverStripe\Security\Member;
 use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
@@ -15,6 +14,8 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
  */
 class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInterface
 {
+    private static $table_name = 'OrderStepRemoveSecondHandProduct';
+
     /**
      * The OrderStatusLog that is relevant to the particular step.
      *

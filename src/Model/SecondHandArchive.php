@@ -2,6 +2,8 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Model;
 
+use SilverStripe\ORM\ManyManyList;
+use SilverStripe\Forms\FieldList;
 use SilverStripe\Assets\Image;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
@@ -57,9 +59,9 @@ use Sunnysideup\Vardump\ArrayToTable;
  * @property bool $AutoArchived
  * @property int $ArchivedByID
  * @property int $ImageID
- * @method \SilverStripe\Security\Member ArchivedBy()
- * @method \SilverStripe\Assets\Image Image()
- * @method \SilverStripe\ORM\ManyManyList|\SilverStripe\Assets\Image[] AdditionalImages()
+ * @method Member ArchivedBy()
+ * @method Image Image()
+ * @method ManyManyList|Image[] AdditionalImages()
  */
 class SecondHandArchive extends DataObject
 {
@@ -103,6 +105,7 @@ class SecondHandArchive extends DataObject
         'SellersIDPhotocopy',
         'ImageID',
     ];
+
     private static $table_name = 'SecondHandArchive';
 
     private static $db = [
@@ -219,11 +222,8 @@ class SecondHandArchive extends DataObject
 
     public static function create_from_page($page)
     {
-        if ($page->InternalItemID) {
-            $filter = ['InternalItemID' => $page->InternalItemID];
-        } else {
-            $filter = ['PageID' => $page->ID];
-        }
+        $filter = $page->InternalItemID ? ['InternalItemID' => $page->InternalItemID] : ['PageID' => $page->ID];
+
         $obj = SecondHandArchive::get()->filter($filter)->first();
         if (!$obj) {
             $obj = SecondHandArchive::create($filter);
@@ -305,7 +305,7 @@ class SecondHandArchive extends DataObject
         return Injector::inst()->get(SecondHandProductAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
 
-    public function onBeforeWrite()
+    protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
         if (!$this->OriginalItemLastEdited) {
@@ -316,7 +316,7 @@ class SecondHandArchive extends DataObject
     /**
      * stadard SS method.
      *
-     * @return \SilverStripe\Forms\FieldList
+     * @return FieldList
      */
     public function getCMSFields()
     {
@@ -334,6 +334,7 @@ class SecondHandArchive extends DataObject
                 ]
             );
         }
+
         $fields->dataFieldByName('AdditionalImages')
             ->getConfig()
             ->getComponentByType(GridFieldDataColumns::class)
@@ -364,6 +365,7 @@ class SecondHandArchive extends DataObject
                 '<a href="/admin/security/users/EditForm/field/users/item/' . $this->ArchivedByID . '/edit">View archiver details</a>',
             );
         }
+
         $fields->addFieldsToTab(
             'Root.History',
             [

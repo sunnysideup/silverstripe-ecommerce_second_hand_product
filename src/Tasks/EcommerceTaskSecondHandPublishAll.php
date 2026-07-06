@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
+use Exception;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
@@ -24,7 +25,7 @@ class EcommerceTaskSecondHandPublishAll extends BuildTask
             try {
                 $product->writeToStage(Versioned::DRAFT);
                 $product->publishRecursive();
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 DB::alteration_message('Caught exception, could not publish ' . $exception->getMessage(), 'deleted');
             }
         }

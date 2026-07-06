@@ -3,8 +3,6 @@
 namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
 
 use SilverStripe\CMS\Controllers\CMSPageAddController;
-use SilverStripe\CMS\Model\SiteTree;
-use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
@@ -14,10 +12,7 @@ use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\FieldType\DBField;
-use SilverStripe\ORM\ValidationException;
-use SilverStripe\Security\Security;
 use Sunnysideup\Ecommerce\Config\EcommerceConfigClassNames;
-use Sunnysideup\Ecommerce\Pages\ProductGroup;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
 
@@ -61,46 +56,34 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
 
         $numericLabelTmpl = '<span class="step-label"><span class="flyout">%d</span><span class="arrow"></span><span class="title">%s</span></span>';
 
-        $fields = new FieldList(
-            LiteralField::create(
-                'PageModeHeader',
-                DBField::create_field(
-                    'HTMLText',
-                    sprintf(
-                        $numericLabelTmpl,
-                        1,
-                        _t('CMSMain.ChoosePageParentMode', 'Choose where to create this page')
-                    )
-                )
-            ),
-            $parentField = DropdownField::create(
-                'ParentID',
-                'Category',
-                SecondHandProductGroup::get()->map()
-            ),
-            $typeField = new OptionsetField(
-                'PageType',
-                DBField::create_field(
-                    'HTMLText',
-                    sprintf(
-                        $numericLabelTmpl,
-                        2,
-                        _t('CMSMain.ChoosePageType', 'Choose page type')
-                    )
-                ),
-                $pageTypes
-            ),
-            new LiteralField(
-                'RestrictedNote',
+        $fields = FieldList::create(LiteralField::create(
+            'PageModeHeader',
+            DBField::create_field(
+                'HTMLText',
                 sprintf(
-                    '<p class="message notice message-restricted">%s</p>',
-                    _t(
-                        'CMSMain.AddPageRestriction',
-                        'Note: Some page types are not allowed for this selection'
-                    )
+                    $numericLabelTmpl,
+                    1,
+                    _t('CMSMain.ChoosePageParentMode', 'Choose where to create this page')
                 )
             )
-        );
+        ), $parentField = DropdownField::create(
+            'ParentID',
+            'Category',
+            SecondHandProductGroup::get()->map()
+        ), $typeField = OptionsetField::create('PageType', DBField::create_field(
+            'HTMLText',
+            sprintf(
+                $numericLabelTmpl,
+                2,
+                _t('CMSMain.ChoosePageType', 'Choose page type')
+            )
+        ), $pageTypes), LiteralField::create('RestrictedNote', sprintf(
+            '<p class="message notice message-restricted">%s</p>',
+            _t(
+                'CMSMain.AddPageRestriction',
+                'Note: Some page types are not allowed for this selection'
+            )
+        )));
 
         // TODO Re-enable search once it allows for HTML title display,
         // see http://open.silverstripe.org/ticket/7455
@@ -115,14 +98,11 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
             $parentField->setValue((int) $parentID);
         }
 
-        $actions = new FieldList(
-            FormAction::create('doAdd', _t('CMSMain.Create', 'Create'))
-                ->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept')
-                ->setUseButtonTag(true),
-            FormAction::create('doCancel', _t('CMSMain.Cancel', 'Cancel'))
-                ->addExtraClass('ss-ui-action-destructive ss-ui-action-cancel')
-                ->setUseButtonTag(true)
-        );
+        $actions = FieldList::create(FormAction::create('doAdd', _t('CMSMain.Create', 'Create'))
+            ->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept')
+            ->setUseButtonTag(true), FormAction::create('doCancel', _t('CMSMain.Cancel', 'Cancel'))
+            ->addExtraClass('ss-ui-action-destructive ss-ui-action-cancel')
+            ->setUseButtonTag(true));
 
         $this->extend('updatePageOptions', $fields);
 
@@ -206,7 +186,7 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
     public function PageTypes()
     {
         $pageTypes = parent::PageTypes();
-        $result = new ArrayList();
+        $result = ArrayList::create();
         $productClass = EcommerceConfigClassNames::getName(SecondHandProduct::class);
         $acceptedClasses = ClassInfo::subclassesFor($productClass);
         foreach ($pageTypes as $type) {

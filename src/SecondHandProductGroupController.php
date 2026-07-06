@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
 use SilverStripe\Core\Config\Config;
@@ -9,9 +11,9 @@ use Sunnysideup\Ecommerce\Pages\ProductGroupController;
 /**
  * Class \Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroupController
  *
- * @property \Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup $dataRecord
- * @method \Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup data()
- * @mixin \Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup
+ * @property SecondHandProductGroup $dataRecord
+ * @method SecondHandProductGroup data()
+ * @mixin SecondHandProductGroup
  */
 class SecondHandProductGroupController extends ProductGroupController
 {
@@ -29,6 +31,7 @@ class SecondHandProductGroupController extends ProductGroupController
     {
         return true;
     }
+
     public function ShowFilterLinks(): bool
     {
         return false;

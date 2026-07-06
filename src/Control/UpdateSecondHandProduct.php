@@ -4,7 +4,6 @@ namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Convert;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
 use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;

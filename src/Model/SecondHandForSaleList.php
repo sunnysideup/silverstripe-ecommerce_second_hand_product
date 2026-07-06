@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Model;
 
+use Exception;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
 use SilverStripe\Forms\LiteralField;
@@ -33,6 +34,7 @@ use Sunnysideup\Vardump\ArrayToTable;
 class SecondHandForSaleList extends DataObject
 {
     protected static $archive_count = 0;
+
     private static $keep_list_for_days = 21;
 
     private static $last_edited_remove_in_days = 30;
@@ -133,6 +135,7 @@ class SecondHandForSaleList extends DataObject
             $this->autoArchiveNonActiveProducts();
             $this->autoArchiveReallyOldProducts();
         }
+
         $this->AutoArchived = implode(',', $this->autoArchiveList);
         $this->write();
     }
@@ -162,7 +165,7 @@ class SecondHandForSaleList extends DataObject
             if ($from) {
                 $subject = $this->Title;
                 $body = $this->HTMLSummary();
-                $email = new Email($from, $to, $subject, $body);
+                $email = Email::create($from, $to, $subject, $body);
                 $this->EmailPrepared = true;
                 $email->send();
                 $this->EmailSent = true;
@@ -192,6 +195,7 @@ class SecondHandForSaleList extends DataObject
                     $objects = SecondHandProduct::get()->filter(['AllowPurchase' => false, 'InternalItemID' => $removeList]);
                     $this->autoArchiveProducts($objects);
                 }
+
                 $oldList->delete();
             }
         }
@@ -230,12 +234,12 @@ class SecondHandForSaleList extends DataObject
             $this->CalculationsCompleted = true;
             $currentArray = SecondHandProduct::get()
                 ->filter(['AllowPurchase' => 1])
-                ->sort('Title ASC')
+                ->sort(['Title' => 'ASC'])
                 ->column('InternalItemID')
             ;
             $notCurrentArray = SecondHandProduct::get()
                 ->filter(['AllowPurchase' => 0])
-                ->sort('Title ASC')
+                ->sort(['Title' => 'ASC'])
                 ->column('InternalItemID')
             ;
             $this->ProductCount = count($currentArray);
@@ -265,6 +269,7 @@ class SecondHandForSaleList extends DataObject
                 $this->LastItemArchived = $last->InternalItemID;
             }
         }
+
         if (! $this->Title && $this->Created) {
             $this->Title = 'Second Hand Products For Sale on ' . $this->Created;
         }
@@ -313,7 +318,7 @@ class SecondHandForSaleList extends DataObject
 
     protected function codeToDetails(string $list, $noListPhrase = 'No Change', ?bool $showHistory = false): string
     {
-        if (! $list) {
+        if ($list === '' || $list === '0') {
             return '<p>' . $noListPhrase . '</p>';
         }
 
@@ -323,10 +328,11 @@ class SecondHandForSaleList extends DataObject
         foreach ($listArray as $code) {
             $list[] = $this->codeToDetailsInner($code);
         }
+
         // important, sort alpabetically.
         sort($list);
 
-        return '<ol>' . implode($list) . '</ol>';
+        return '<ol>' . implode('', $list) . '</ol>';
     }
 
     protected function codeToDetailsInner(string $code, ?bool $showHistory = false): string
@@ -346,6 +352,7 @@ class SecondHandForSaleList extends DataObject
         } else {
             $html .= $code;
         }
+
         $historyTable = '';
         if ($obj && $showHistory) {
             $historyTable = ArrayToTable::convert($obj->getHistoryData($code));
@@ -366,9 +373,10 @@ class SecondHandForSaleList extends DataObject
 
                 try {
                     $archivedRecord = SecondHandProductActions::archive($obj->ID);
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     DB::alteration_message('Caught exception, could not delete item ' . $exception->getMessage(), 'deleted');
                 }
+
                 if ($archivedRecord && $archivedRecord instanceof SecondHandArchive) {
                     $archivedRecord->AutoArchived = true;
                     $archivedRecord->write();

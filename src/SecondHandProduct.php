@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
+use SilverStripe\Forms\FieldList;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Image;
 use SilverStripe\Control\Controller;
@@ -23,7 +24,6 @@ use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
-use SilverStripe\Versioned\Versioned;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
@@ -37,15 +37,11 @@ use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
 use Page;
 use SilverStripe\Control\Director;
-use SilverStripe\Forms\CheckboxSetField;
 use SilverStripe\Forms\CompositeValidator;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\SearchableDropdownField;
 use SilverStripe\ORM\FieldType\DBDate;
-use Sunnysideup\AjaxSelectField\AjaxSelectField;
-use Sunnysideup\Ecommerce\Forms\Fields\ProductSelectField;
-use Sunnysideup\Ecommerce\Pages\ProductGroup;
 use Sunnysideup\EcommerceSecondHandProduct\Forms\SecondHandValidator;
 
 /**
@@ -90,8 +86,8 @@ use Sunnysideup\EcommerceSecondHandProduct\Forms\SecondHandValidator;
  * @property bool $SellersIDPhotocopy
  * @property int $BasedOnID
  * @property int $ArchivedByID
- * @method \Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct BasedOn()
- * @method \SilverStripe\Security\Member ArchivedBy()
+ * @method SecondHandProduct BasedOn()
+ * @method Member ArchivedBy()
  */
 class SecondHandProduct extends Product implements PermissionProviderFactoryProvider
 {
@@ -313,7 +309,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         $list = Config::inst()->get(SecondHandProduct::class, 'seller_summary_detail_fields');
         $array = [];
         foreach ($list as $field) {
-            if (trim((string) $this->{$field})) {
+            if (trim((string) $this->{$field}) !== '' && trim((string) $this->{$field}) !== '0') {
                 $array[] = $this->{$field};
             }
         }
@@ -326,7 +322,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return self::$singular_name;
     }
 
-    public function i18n_plural_name()
+    public function plural_name()
     {
         return self::$plural_name;
     }
@@ -345,6 +341,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         if (null !== $extended) {
             return $extended;
         }
+
         return Permission::check(
             EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'),
             'any',
@@ -386,6 +383,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         if (Director::isDev()) {
             return true;
         }
+
         $extended = $this->extendedCan(__FUNCTION__, $member);
         if (null !== $extended) {
             return $extended;
@@ -435,7 +433,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     /**
      * stadard SS method.
      *
-     * @return \SilverStripe\Forms\FieldList
+     * @return FieldList
      */
     public function getCMSFields()
     {
@@ -474,6 +472,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         if ($obj->exists()) {
             $qualityFieldDescription = 'An explanation of the ratings scale can be found by clicking this <a href="' . $obj->Link() . '">link</a>';
         }
+
         $fields->addFieldsToTab(
             'Root.Main',
             [
@@ -601,11 +600,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             if (is_array($mappingArray) && count($mappingArray)) {
                 $fields->addFieldToTab(
                     'Root.SellersDetails',
-                    $geocodingField = new GoogleAddressField(
-                        'SellersAddressGeocodingField',
-                        _t('OrderAddress.FIND_ADDRESS', 'Find address'),
-                        Controller::curr()->getRequest()->getSession()->get('SellersAddressGeocodingFieldValue')
-                    )
+                    $geocodingField = GoogleAddressField::create('SellersAddressGeocodingField', _t('OrderAddress.FIND_ADDRESS', 'Find address'), Controller::curr()->getRequest()->getSession()->get('SellersAddressGeocodingFieldValue'))
                 );
                 $geocodingField->setFieldMap($mappingArray);
 
@@ -712,6 +707,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 )
             );
         }
+
         return $fields;
     }
 
@@ -828,7 +824,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     {
         $embargoDays = Config::inst()->get(SecondHandProduct::class, 'embargo_number_of_days');
         if ((int) $embargoDays > 0) {
-            $date = $this->DateItemWasBought ? $this->DateItemWasBought : $this->Created;
+            $date = $this->DateItemWasBought ?: $this->Created;
             $createdDate = strtotime((string) $date);
             $daysOld = (time() - $createdDate) / (60 * 60 * 24);
             if ($daysOld <= $embargoDays) {
@@ -910,6 +906,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         if (!$this->DateItemWasBought) {
             $this->DateItemWasBought = DBDatetime::now()->Rfc2822();
         }
+
         $this->SellingOnBehalf = 99; // unsure
 
         return parent::populateDefaults();
@@ -917,7 +914,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
 
     public function getCreatedNice()
     {
-        $date = $this->DateItemWasBought ? $this->DateItemWasBought : $this->Created;
+        $date = $this->DateItemWasBought ?: $this->Created;
         if (!$this->DateItemWasBought || (strtotime((string) $this->DateItemWasBought) > (strtotime('now') - (7 * 86400)))) {
             $date = $this->Created;
         }
@@ -931,7 +928,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      *
      * @param null|mixed $_params
      *
-     * @return \SilverStripe\Forms\FieldList
+     * @return FieldList
      */
     public function scaffoldSearchFields($_params = null)
     {
@@ -1018,7 +1015,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return 1;
     }
 
-    public function getProductGroupsTableField()
+    protected function getProductGroupsTableField()
     {
         if ($this->isInDB()) {
             $field = parent::getProductGroupsTableField();
@@ -1026,11 +1023,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             $field->setTitle('Related New Product Categories');
             $this->extend('updateProductGroupsTableField', $field);
         } else {
-            $field = new LiteralField(
-                'ProductGroupsInfo',
-                '<p class="message info">You can assign product categories after you have saved this product for the first time.</p>'
-            );
+            $field = LiteralField::create('ProductGroupsInfo', '<p class="message info">You can assign product categories after you have saved this product for the first time.</p>');
         }
+
         return $field;
     }
 
@@ -1044,7 +1039,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         $clone->AllowPurchase = 1;
         // code before any _
         $code = preg_replace('/_.*/', '', $this->InternalItemID);
-        $count = SecondHandProduct::get()->filter('InternalItemID:StartsWith', $code)->count();
+        $count = SecondHandProduct::get()->filter(['InternalItemID:StartsWith' => $code])->count();
         $clone->InternalItemID = $code . '-' . ($count + 1);
         $clone->write();
         $clone->publishRecursive();
@@ -1060,6 +1055,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 $clone->AdditionalImages()->add($newImage);
             }
         }
+
         if ($this->AdditionalFiles()->exists()) {
             /**
              * @var Image $image
@@ -1069,10 +1065,12 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 $clone->AdditionalFiles()->add($newImage);
             }
         }
+
         if ($this->Image()->exists()) {
             $newImage = $this->Image()->duplicate();
             $clone->ImageID = $newImage->ID;
         }
+
         $clone->write();
         $clone->publishRecursive();
 

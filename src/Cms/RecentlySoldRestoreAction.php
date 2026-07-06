@@ -32,6 +32,7 @@ class RecentlySoldRestoreAction extends AbstractGridFieldComponent implements
         if ($columnName === 'Actions') {
             return ['title' => ''];
         }
+
         return [];
     }
 

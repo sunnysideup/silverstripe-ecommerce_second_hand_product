@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
+use Exception;
 use SilverStripe\Core\Environment;
 use SilverStripe\Dev\BuildTask;
 use SilverStripe\ORM\DB;
@@ -12,6 +13,7 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 class EcommerceTaskSecondHandRemoveOldies extends BuildTask
 {
     private const DAYS_AGO = 360;
+
     protected $title = 'Remove old second hand products that are not for sale';
 
     protected $description = 'Go through all the second hand products that are not for sale and entered more than year ago and archives them.';
@@ -36,7 +38,7 @@ class EcommerceTaskSecondHandRemoveOldies extends BuildTask
 
             try {
                 $this->autoArchiveProduct($product);
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 DB::alteration_message('Caught exception, could not delete item ' . $exception->getMessage(), 'deleted');
             }
         }
