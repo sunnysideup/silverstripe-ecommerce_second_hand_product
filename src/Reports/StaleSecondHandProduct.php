@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Reports;
 
+use Override;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\FieldList;
@@ -26,6 +27,7 @@ class StaleSecondHandProduct extends Report
     /**
      * @return string
      */
+    #[Override]
     public function title()
     {
         $values = $this->sourceRecords()->column('PurchasePrice');
@@ -95,6 +97,7 @@ class StaleSecondHandProduct extends Report
     /**
      * @return array
      */
+    #[Override]
     public function columns()
     {
         return [
@@ -138,6 +141,7 @@ class StaleSecondHandProduct extends Report
         return $params;
     }
 
+    #[Override]
     public function getReportField()
     {
         $field = parent::getReportField();

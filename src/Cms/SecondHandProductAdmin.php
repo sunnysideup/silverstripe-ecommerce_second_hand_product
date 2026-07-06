@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
 
+use Override;
 use SilverStripe\Admin\ModelAdmin;
 use SilverStripe\CMS\Controllers\CMSMain;
 use SilverStripe\Control\Controller;
@@ -64,6 +65,7 @@ class SecondHandProductAdmin extends ModelAdmin
      */
     private static $menu_icon = 'vendor/sunnysideup/ecommerce/client/images/icons/product-file.gif';
 
+    #[Override]
     public function getEditForm($id = null, $fields = null)
     {
         foreach (GoogleAddressField::js_requirements() as $jsFile) {
@@ -161,6 +163,7 @@ class SecondHandProductAdmin extends ModelAdmin
         return HTTPResponse::create('ERROR!', 400);
     }
 
+    #[Override]
     public function getList()
     {
         $list = parent::getList();

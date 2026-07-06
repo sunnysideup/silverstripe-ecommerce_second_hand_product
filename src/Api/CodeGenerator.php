@@ -9,12 +9,10 @@ class CodeGenerator
     /**
      * avoided numbers: 0, 1
      * avoided letters B,G,I,O,Q,S,Z.
-     *
-     * @var string
      */
-    private const CHARS = '23456789ACDEFHJKLMNPRSTUVWXY';
+    private const string CHARS = '23456789ACDEFHJKLMNPRSTUVWXY';
 
-    private const LENGTH = 6;
+    private const int LENGTH = 6;
 
     /**
      * Generate a random string of non-ambiguous numbers and letters.

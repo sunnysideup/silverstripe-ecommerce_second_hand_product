@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Model\Process;
 
+use Override;
 use Sunnysideup\Ecommerce\Interfaces\OrderStepInterface;
 use Sunnysideup\Ecommerce\Model\Order;
 use Sunnysideup\Ecommerce\Model\Process\OrderStep;
@@ -34,6 +35,7 @@ class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepIn
         'ShowAsInProcessOrder' => 1,
     ];
 
+    #[Override]
     public function HideFromEveryone(): bool
     {
         return true;
@@ -48,6 +50,7 @@ class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepIn
      *
      * @return bool - true if the current step is ready to be run...
      */
+    #[Override]
     public function initStep(Order $order): bool
     {
         return true;
@@ -58,6 +61,7 @@ class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepIn
      *
      * @return bool - true if run correctly
      */
+    #[Override]
     public function doStep(Order $order): bool
     {
         foreach ($order->Buyables() as $buyable) {
@@ -74,6 +78,7 @@ class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepIn
      *
      * @return string
      */
+    #[Override]
     protected function myDescription()
     {
         return _t('OrderStep.DISABLESECONDHANDPRODUCT_DESCRIPTION', 'Disallow second hand products from being sold more than once.');

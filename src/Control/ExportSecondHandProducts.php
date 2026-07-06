@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
+use Override;
 use SilverStripe\Model\List\SS_List;
 use SilverStripe\Assets\Folder;
 use SilverStripe\CMS\Model\SiteTree;
@@ -223,6 +224,7 @@ class ExportSecondHandProducts extends Controller
         return $this->returnJSONorFile($array, 'groups');
     }
 
+    #[Override]
     protected function init()
     {
         parent::init();

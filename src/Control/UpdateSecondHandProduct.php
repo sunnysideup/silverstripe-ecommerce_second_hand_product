@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
+use Override;
 use SilverStripe\Control\Controller;
 use SilverStripe\Core\Convert;
 use SilverStripe\Versioned\Versioned;
@@ -79,6 +80,7 @@ class UpdateSecondHandProduct extends Controller
         return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
     }
 
+    #[Override]
     protected function init()
     {
         parent::init();

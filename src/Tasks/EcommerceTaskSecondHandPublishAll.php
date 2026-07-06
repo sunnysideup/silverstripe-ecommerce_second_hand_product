@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Sunnysideup\EcommerceSecondHandProduct\Tasks;
 
 use Symfony\Component\Console\Input\InputInterface;

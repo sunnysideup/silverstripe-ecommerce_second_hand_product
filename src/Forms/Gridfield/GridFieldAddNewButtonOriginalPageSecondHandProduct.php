@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Forms\Gridfield;
 
+use Override;
 use SilverStripe\Model\ArrayData;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Config\Config;
@@ -24,6 +25,7 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
  */
 class GridFieldAddNewButtonOriginalPageSecondHandProduct extends GridFieldAddNewButtonOriginalPage
 {
+    #[Override]
     public function getHTMLFragments($gridField)
     {
         $singleton = singleton($gridField->getModelClass());

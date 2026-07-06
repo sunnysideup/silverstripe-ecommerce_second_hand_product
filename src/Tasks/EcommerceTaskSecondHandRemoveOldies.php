@@ -15,7 +15,7 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
 
 class EcommerceTaskSecondHandRemoveOldies extends BuildTask
 {
-    private const DAYS_AGO = 360;
+    private const int DAYS_AGO = 360;
 
     protected string $title = 'Remove old second hand products that are not for sale';
 

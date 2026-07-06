@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Model;
 
+use Override;
 use Exception;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\Email\Email;
@@ -89,6 +90,7 @@ class SecondHandForSaleList extends DataObject
         'ID' => 'DESC',
     ];
 
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -140,11 +142,13 @@ class SecondHandForSaleList extends DataObject
         $this->write();
     }
 
+    #[Override]
     public function canDelete($member = null)
     {
         return false;
     }
 
+    #[Override]
     public function canEdit($member = null)
     {
         if ($this->Created) {
@@ -227,6 +231,7 @@ class SecondHandForSaleList extends DataObject
         }
     }
 
+    #[Override]
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();

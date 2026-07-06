@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
+use Override;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\ReadonlyField;
@@ -76,16 +77,19 @@ class SecondHandProductGroup extends ProductGroup
         return $page ? $page->ID : 0;
     }
 
+    #[Override]
     public function i18n_singular_name()
     {
         return self::$singular_name;
     }
 
+    #[Override]
     public function plural_name()
     {
         return self::$plural_name;
     }
 
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();
@@ -119,6 +123,7 @@ class SecondHandProductGroup extends ProductGroup
     /**
      * Returns the class we are working with.
      */
+    #[Override]
     public function getBuyableClassName(): string
     {
         return SecondHandProduct::class;
@@ -127,6 +132,7 @@ class SecondHandProductGroup extends ProductGroup
     /**
      * Event handler called before writing to the database.
      */
+    #[Override]
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();

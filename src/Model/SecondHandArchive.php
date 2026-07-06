@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct\Model;
 
+use Override;
 use SilverStripe\ORM\ManyManyList;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Assets\Image;
@@ -65,14 +66,14 @@ use Sunnysideup\Vardump\ArrayToTable;
  */
 class SecondHandArchive extends DataObject
 {
-    private const MAPPING_FROM_ARCHIVE_TO_SH_PRODUCT = [
+    private const array MAPPING_FROM_ARCHIVE_TO_SH_PRODUCT = [
         'OriginalItemCreated' => 'Created',
         'OriginalItemLastEdited' => 'LastEdited',
         'PageID' => 'ID',
         'SoldOnBehalf' => 'SellingOnBehalf',
     ];
 
-    private const OTHER_MAPPABLE_FIELDS = [
+    private const array OTHER_MAPPABLE_FIELDS = [
         'Title',
         'Price',
         'InternalItemID',
@@ -255,6 +256,7 @@ class SecondHandArchive extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         return false;
@@ -268,6 +270,7 @@ class SecondHandArchive extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canEdit($member = null, $context = [])
     {
         return false;
@@ -281,6 +284,7 @@ class SecondHandArchive extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canView($member = null, $context = [])
     {
         return Permission::check(
@@ -295,16 +299,19 @@ class SecondHandArchive extends DataObject
      *
      * @return bool
      */
+    #[Override]
     public function canDelete($member = null)
     {
         return false;
     }
 
+    #[Override]
     public function CMSEditLink($action = null): string
     {
         return Injector::inst()->get(SecondHandProductAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
 
+    #[Override]
     protected function onBeforeWrite()
     {
         parent::onBeforeWrite();
@@ -318,6 +325,7 @@ class SecondHandArchive extends DataObject
      *
      * @return FieldList
      */
+    #[Override]
     public function getCMSFields()
     {
         $fields = parent::getCMSFields();

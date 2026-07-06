@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
+use Override;
 use SilverStripe\Forms\Validation\CompositeValidator;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\AssetAdmin\Forms\UploadField;
@@ -292,6 +293,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      */
     private static $class_description = 'This page displays a single second-hand product that can only be sold once';
 
+    #[Override]
     public function SummaryFields()
     {
         return [
@@ -317,11 +319,13 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return implode('; ', $array);
     }
 
+    #[Override]
     public function i18n_singular_name()
     {
         return self::$singular_name;
     }
 
+    #[Override]
     public function plural_name()
     {
         return self::$plural_name;
@@ -335,6 +339,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      *
      * @return bool
      */
+    #[Override]
     public function canCreate($member = null, $context = [])
     {
         $extended = $this->extendedCan(__FUNCTION__, $member);
@@ -356,6 +361,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      *
      * @return bool
      */
+    #[Override]
     public function canPublish($member = null)
     {
         $extended = $this->extendedCan(__FUNCTION__, $member);
@@ -378,6 +384,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      *
      * @return bool
      */
+    #[Override]
     public function canEdit($member = null, $context = [])
     {
         if (Director::isDev()) {
@@ -403,6 +410,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      *
      * @return bool
      */
+    #[Override]
     public function canDelete($member = null)
     {
         $extended = $this->extendedCan(__FUNCTION__, $member);
@@ -417,7 +425,8 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         );
     }
 
-    public function onBeforeDelete()
+    #[Override]
+    protected function onBeforeDelete()
     {
         SecondHandArchive::create_from_page($this);
         if (!$this->ArchivedByID) {
@@ -435,6 +444,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      *
      * @return FieldList
      */
+    #[Override]
     public function getCMSFields()
     {
         $fields = Page::getCMSFields();
@@ -711,6 +721,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $fields;
     }
 
+    #[Override]
     public function getCMSCompositeValidator(): CompositeValidator
     {
         $validator = parent::getCMSCompositeValidator();
@@ -743,11 +754,13 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $this->link('printview');
     }
 
+    #[Override]
     public function getCMSEditLink($action = null)
     {
         return Injector::inst()->get(SecondHandProductAdmin::class)->getCMSEditLinkForManagedDataObject($this);
     }
 
+    #[Override]
     public function getSettingsFields()
     {
         $fields = parent::getSettingsFields();
@@ -786,6 +799,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return self::$treshold_sql_cache;
     }
 
+    #[Override]
     public function canPurchase(Member $member = null, $checkPrice = true)
     {
         if ($this->DateItemWasSold) {
@@ -844,6 +858,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $listedTs < $shouldBeListedAfterTs;
     }
 
+    #[Override]
     public function HasBeenSold(): bool
     {
         return $this->DateItemWasSold ? true : parent::HasBeenSold();
@@ -855,6 +870,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     }
 
 
+    #[Override]
     public function canView($member = null)
     {
         if (Permission::check('CMS_ACCESS_SecondHandProductAdmin')) {
@@ -901,6 +917,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $fields;
     }
 
+    #[Override]
     public function populateDefaults()
     {
         if (!$this->DateItemWasBought) {
@@ -930,6 +947,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
      *
      * @return FieldList
      */
+    #[Override]
     public function scaffoldSearchFields($_params = null)
     {
         $fields = parent::scaffoldSearchFields($_params);
@@ -938,6 +956,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $fields;
     }
 
+    #[Override]
     protected function onBeforeWrite()
     {
         // set this first!
@@ -1005,16 +1024,19 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     }
 
 
+    #[Override]
     public function getMinValueInOrder(): float
     {
         return 1;
     }
 
+    #[Override]
     public function getMaxValueInOrder(): float
     {
         return 1;
     }
 
+    #[Override]
     protected function getProductGroupsTableField()
     {
         if ($this->isInDB()) {
@@ -1029,6 +1051,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return $field;
     }
 
+    #[Override]
     public function duplicate(bool $doWrite = true, array|null $relations = null): static
     {
         /**

@@ -68,7 +68,7 @@ class RecentlySoldRestoreAction extends AbstractGridFieldComponent implements
     public function handleAction(GridField $gridField, $actionName, $arguments, $data)
     {
         if ($actionName !== 'restoreproductcopy') {
-            return;
+            return null;
         }
 
         $id = $arguments['RecordID'] ?? null;
@@ -76,7 +76,7 @@ class RecentlySoldRestoreAction extends AbstractGridFieldComponent implements
             Controller::curr()->getResponse()
                 ->setStatusCode(500)
                 ->addHeader('X-Status', 'Product ID Not Found.');
-            return;
+            return null;
         }
         else {
             $soldProduct = SecondHandProduct::get_by_id($id);

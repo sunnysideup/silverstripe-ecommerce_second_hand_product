@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
+use Override;
 use SilverStripe\Core\Config\Config;
 use Sunnysideup\Ecommerce\Pages\ProductGroup;
 use Sunnysideup\Ecommerce\Pages\ProductGroupController;
@@ -17,6 +18,7 @@ use Sunnysideup\Ecommerce\Pages\ProductGroupController;
  */
 class SecondHandProductGroupController extends ProductGroupController
 {
+    #[Override]
     protected function init()
     {
         Config::modify()->set(
@@ -32,6 +34,7 @@ class SecondHandProductGroupController extends ProductGroupController
         return true;
     }
 
+    #[Override]
     public function ShowFilterLinks(): bool
     {
         return false;
