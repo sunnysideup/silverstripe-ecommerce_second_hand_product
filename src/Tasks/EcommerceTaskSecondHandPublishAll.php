@@ -32,6 +32,7 @@ class EcommerceTaskSecondHandPublishAll extends BuildTask
                 DB::alteration_message('Caught exception, could not publish ' . $exception->getMessage(), 'deleted');
             }
         }
+
         DB::alteration_message(' ================= Completed =================  ');
         return Command::SUCCESS;
     }

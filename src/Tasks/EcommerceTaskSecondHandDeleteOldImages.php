@@ -41,6 +41,7 @@ class EcommerceTaskSecondHandDeleteOldImages extends BuildTask
                 $archivedProduct->write();
             }
         }
+
         DB::alteration_message(' ================= Completed =================  ');
         return Command::SUCCESS;
     }

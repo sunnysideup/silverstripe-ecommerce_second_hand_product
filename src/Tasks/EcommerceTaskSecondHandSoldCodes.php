@@ -37,6 +37,7 @@ class EcommerceTaskSecondHandSoldCodes extends BuildTask
                 DB::alteration_message($product->InternalItemID);
             }
         }
+
         DB::alteration_message(' ================= For Sale =================  ');
         return Command::SUCCESS;
     }

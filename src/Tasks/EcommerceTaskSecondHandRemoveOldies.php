@@ -44,6 +44,7 @@ class EcommerceTaskSecondHandRemoveOldies extends BuildTask
                 DB::alteration_message('Caught exception, could not delete item ' . $exception->getMessage(), 'deleted');
             }
         }
+
         DB::alteration_message(' ================= Completed =================  ');
         return Command::SUCCESS;
     }

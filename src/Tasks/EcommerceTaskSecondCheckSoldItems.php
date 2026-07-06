@@ -55,6 +55,7 @@ class EcommerceTaskSecondCheckSoldItems extends BuildTask
         } else {
             $output->writeln('            <form method="post">                <h2>Paste Codes Below, separated by new line, tab or comma</h2>                <textarea name="codes" rows=30 cols=100></textarea>                                                <input type="checkbox" name="markassold" value="1" /> mark as sold                                                <input type="submit" value="check" />            </form>                ');
         }
+
         $output->writeln('<p><a href="/dev/tasks/Sunnysideup-EcommerceSecondHandProduct-Tasks-EcommerceTaskSecondHandSoldCodes">Get a list of items sold on this site</a></p>');
         return Command::SUCCESS;
     }

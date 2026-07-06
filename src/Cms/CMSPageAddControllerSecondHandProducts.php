@@ -44,7 +44,7 @@ class CMSPageAddControllerSecondHandProducts extends CMSPageAddController
     public function AddForm()
     {
         $pageTypes = [];
-        foreach ($this->PageTypes() as $type) {
+        foreach ($this->RecordTypes() as $type) {
             $html = sprintf(
                 '<span class="page-icon class-%s"></span><strong class="title">%s</strong><span class="description">%s</span>',
                 $type->getField('ClassName'),
