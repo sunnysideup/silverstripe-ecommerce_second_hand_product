@@ -29,4 +29,8 @@ class SecondHandProductGroupController extends ProductGroupController
     {
         return true;
     }
+    public function ShowFilterLinks(): bool
+    {
+        return false;
+    }
 }
