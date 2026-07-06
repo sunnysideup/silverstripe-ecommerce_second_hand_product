@@ -3,7 +3,16 @@
 namespace Sunnysideup\EcommerceSecondHandProduct\Cms;
 
 use SilverStripe\Model\List\ArrayList;
-use SilverStripe\CMS\Controllers\CMSPageAddController;
+
+/**
+  * ### @@@@ START REPLACEMENT @@@@ ###
+  * WHY: automated upgrade
+  * OLD: SilverStripe\CMS\Controllers\CMSPageAddController
+  * NEW: SilverStripe\CMS\Controllers\CMSMainAddForm ...  (COMPLEX)
+  * EXP: Removed deprecated class SilverStripe\CMS\Controllers\CMSPageAddController - replaced with CMSMainAddForm. See: https://docs.silverstripe.org/en/6/changelogs/6.0.0/
+  * ### @@@@ STOP REPLACEMENT @@@@ ###
+  */
+use SilverStripe\CMS\Controllers\CMSMainAddForm;
 use SilverStripe\Core\ClassInfo;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
