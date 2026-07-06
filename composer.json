@@ -21,9 +21,9 @@
         }
     ],
     "require": {
-        "sunnysideup/ecommerce": "^5.0-dev",
-        "sunnysideup/google_address_field": "^5.0-dev",
-        "silverstripe/recipe-cms": "^4.0 || ^5.0"
+        "sunnysideup/ecommerce": "^33.0",
+        "sunnysideup/google_address_field": "^5.0",
+        "silverstripe/recipe-cms": "^6.0"
     },
     "extra": {
         "expose": [
