@@ -151,6 +151,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         'SoldPrice' => 'Currency',
         'PurchasePrice' => 'Currency',
         'ProductQuality' => 'Enum("1, 2, 3, 4, 5, 6, 7, 8, 9, 10","10")',
+        'Notes' => 'Text',
         'IncludesBoxOrCase' => "Enum('No, Box, Case, Both','No')",
         'SellingOnBehalf' => 'Int',
         'OriginalManual' => 'Boolean',
@@ -524,6 +525,8 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                     $this->dbObject('ProductQuality')->enumValues()
                 )
                     ->setDescription($qualityFieldDescription),
+                TextareaField::create('Notes', 'Notes')
+                    ->setDescription('Optional notes about the product, these notes will not be displayed to the public.'),
                 DropdownField::create(
                     'IncludesBoxOrCase',
                     'Includes Box/Case',
