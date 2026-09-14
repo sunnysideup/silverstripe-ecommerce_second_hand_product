@@ -22,6 +22,8 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProductGroup;
  */
 class ExportSecondHandProducts extends Controller
 {
+    use SecondHandControllerTrait;
+
     public const SIZE_SEPARATOR = '*';
 
     private static $do_not_copy = [
@@ -125,17 +127,6 @@ class ExportSecondHandProducts extends Controller
     }
 
     /**
-     * @return bool
-     */
-    public function MyPermissionCheck()
-    {
-        $codesWithIPs = $this->Config()->get('secret_codes');
-        $code = $this->request->param('ID');
-
-        return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
-    }
-
-    /**
      * images file name and size are separated by *.
      *
      * @param bool $imageSizesOnly
@@ -216,14 +207,6 @@ class ExportSecondHandProducts extends Controller
         }
 
         return $this->returnJSONorFile($array, 'groups');
-    }
-
-    protected function init()
-    {
-        parent::init();
-        if (! $this->MyPermissionCheck()) {
-            die('you do not have access');
-        }
     }
 
     protected function returnJSONorFile($array, $filenameAppendix = '')

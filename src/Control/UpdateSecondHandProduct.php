@@ -15,6 +15,8 @@ use Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct;
  */
 class UpdateSecondHandProduct extends Controller
 {
+    use SecondHandControllerTrait;
+
     private static $allowed_actions = [
         'removefromsale' => '->MyPermissionCheck',
         'archive' => '->MyPermissionCheck',
@@ -67,24 +69,5 @@ class UpdateSecondHandProduct extends Controller
         }
 
         return json_encode($archived);
-    }
-
-    /**
-     * @return bool
-     */
-    public function MyPermissionCheck()
-    {
-        $codesWithIPs = $this->Config()->get('secret_codes');
-        $code = $this->request->param('ID');
-
-        return ControllerPermissionChecker::permissionCheck($codesWithIPs, $code);
-    }
-
-    protected function init()
-    {
-        parent::init();
-        if (! $this->MyPermissionCheck()) {
-            die('you do not have access');
-        }
     }
 }

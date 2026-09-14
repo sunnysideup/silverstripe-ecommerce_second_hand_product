@@ -9,5 +9,5 @@ After:
 ---
 SilverStripe\Control\Director:
   rules:
-    secondhandproductlist//$Action/$ID/$OtherID: Sunnysideup\EcommerceSecondHandProduct\Control\ExportSecondHandProducts
-    updatesecondhandproduct//$Action/$ID/$OtherID: Sunnysideup\EcommerceSecondHandProduct\Control\UpdateSecondHandProduct
+    secondhandproductlist//$Action/$OtherID: Sunnysideup\EcommerceSecondHandProduct\Control\ExportSecondHandProducts
+    updatesecondhandproduct//$Action/$OtherID: Sunnysideup\EcommerceSecondHandProduct\Control\UpdateSecondHandProduct
