@@ -2,21 +2,29 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
+use Page;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Image;
 use SilverStripe\Control\Controller;
+use SilverStripe\Control\Director;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\CheckboxField;
+use SilverStripe\Forms\CheckboxSetField;
+use SilverStripe\Forms\CompositeValidator;
 use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
 use SilverStripe\Forms\HeaderField;
+use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\OptionsetField;
 use SilverStripe\Forms\ReadonlyField;
+use SilverStripe\Forms\SearchableDropdownField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBDate;
 use SilverStripe\ORM\FieldType\DBDatetime;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Group;
@@ -24,29 +32,21 @@ use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
 use SilverStripe\Versioned\Versioned;
+use Sunnysideup\AjaxSelectField\AjaxSelectField;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
 use Sunnysideup\Ecommerce\Config\EcommerceConfig;
 use Sunnysideup\Ecommerce\Forms\Fields\EcommerceCMSButtonField;
+use Sunnysideup\Ecommerce\Forms\Fields\ProductSelectField;
 use Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole;
 use Sunnysideup\Ecommerce\Pages\Product;
+use Sunnysideup\Ecommerce\Pages\ProductGroup;
 use Sunnysideup\EcommerceSecondHandProduct\Api\CodeGenerator;
 use Sunnysideup\EcommerceSecondHandProduct\Cms\SecondHandProductAdmin;
+use Sunnysideup\EcommerceSecondHandProduct\Forms\SecondHandValidator;
 use Sunnysideup\EcommerceSecondHandProduct\Model\SecondHandArchive;
 use Sunnysideup\GoogleAddressField\GoogleAddressField;
 use Sunnysideup\PermissionProvider\Api\PermissionProviderFactory;
 use Sunnysideup\PermissionProvider\Interfaces\PermissionProviderFactoryProvider;
-use Page;
-use SilverStripe\Control\Director;
-use SilverStripe\Forms\CheckboxSetField;
-use SilverStripe\Forms\CompositeValidator;
-use SilverStripe\Forms\LiteralField;
-use SilverStripe\Forms\OptionsetField;
-use SilverStripe\Forms\SearchableDropdownField;
-use SilverStripe\ORM\FieldType\DBDate;
-use Sunnysideup\AjaxSelectField\AjaxSelectField;
-use Sunnysideup\Ecommerce\Forms\Fields\ProductSelectField;
-use Sunnysideup\Ecommerce\Pages\ProductGroup;
-use Sunnysideup\EcommerceSecondHandProduct\Forms\SecondHandValidator;
 
 /**
  * Class \Sunnysideup\EcommerceSecondHandProduct\SecondHandProduct
@@ -95,7 +95,6 @@ use Sunnysideup\EcommerceSecondHandProduct\Forms\SecondHandValidator;
  */
 class SecondHandProduct extends Product implements PermissionProviderFactoryProvider
 {
-
     private static $sell_on_behalf_array = [
         0 => 'Trade-in',
         1 => 'On behalf',
@@ -270,8 +269,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     private static $second_hand_admin_user_firstname = '';
 
     private static $second_hand_admin_user_surname = '';
-
-    private static $second_hand_admin_user_password = '';
 
     /**
      * standard SS declaration.
@@ -879,7 +876,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             ->setEmail(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email'))
             ->setFirstName(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_firstname'))
             ->setSurname(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_surname'))
-            ->setPassword(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_password'))
             ->setGroupName(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_name'))
             ->setCode(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_code'))
             ->setPermissionCode(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'))
