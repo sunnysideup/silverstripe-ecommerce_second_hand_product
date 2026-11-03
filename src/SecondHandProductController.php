@@ -2,6 +2,7 @@
 
 namespace Sunnysideup\EcommerceSecondHandProduct;
 
+use SilverStripe\Control\Middleware\HTTPCacheControlMiddleware;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\Security\Permission;
@@ -29,14 +30,14 @@ class SecondHandProductController extends ProductController
         if (! Permission::check('CMS_ACCESS_SECOND_HAND_PRODUCTS')) {
             return Security::permissionFailure($this, 'You do not have access to this feature, please login first.');
         }
-
+        HTTPCacheControlMiddleware::singleton()->disableCache(true);
         return $this->RenderWith('SecondHandProduct_printview');
     }
 
     public function ListOfFieldsForPrinting()
     {
         $al = ArrayList::create();
-        $fieldsWeNeed = $this->dataRecord->stat('db');
+        $fieldsWeNeed = $this->dataRecord->config()->get('db');
         $labels = $this->FieldLabels();
         foreach (array_keys($fieldsWeNeed) as $fieldKey) {
             if (in_array($fieldKey, self::$fields_to_remove_from_print, true)) {
@@ -46,7 +47,7 @@ class SecondHandProductController extends ProductController
             }
         }
 
-        $fields = $this->dataRecord->Config()->get('db');
+        $fields = $this->dataRecord->config()->get('db');
         foreach ($fieldsWeNeed as $key => $description) {
             if (isset($fields[$key])) {
                 $type = preg_replace('#\(.*\)#', '', (string) $fields[$key]);
