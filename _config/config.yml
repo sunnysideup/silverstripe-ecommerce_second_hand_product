@@ -34,3 +34,9 @@ Sunnysideup\Ecommerce\Model\Extensions\EcommerceRole:
 #     Shop:
 #       children:
 #         - Sunnysideup-EcommerceSecondHandProduct-Cms-SecondHandProductAdmin
+
+SilverStripe\Core\Injector\Injector:
+  Psr\SimpleCache\CacheInterface.secondHandThrottle:
+    factory: SilverStripe\Core\Cache\CacheFactory
+    constructor:
+      namespace: 'secondHandThrottle'

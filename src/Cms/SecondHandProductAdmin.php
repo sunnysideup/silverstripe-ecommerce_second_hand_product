@@ -12,6 +12,8 @@ use SilverStripe\Forms\GridField\GridFieldAddNewButton;
 use SilverStripe\Forms\GridField\GridFieldDataColumns;
 use SilverStripe\Forms\GridField\GridFieldExportButton;
 use SilverStripe\Forms\GridField\GridFieldImportButton;
+use SilverStripe\Security\SecurityToken;
+use SilverStripe\Versioned\Versioned;
 use SilverStripe\View\Requirements;
 use Sunnysideup\Ecommerce\Traits\EcommerceModelAdminTrait;
 use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
@@ -115,9 +117,16 @@ class SecondHandProductAdmin extends ModelAdmin
 
     public function archive($request)
     {
+        if (! SecurityToken::inst()->checkRequest($request)) {
+            return new HTTPResponse('Invalid or missing security token', 403);
+        }
         if (isset($_GET['productid'])) {
             $id = (int) $_GET['productid'];
             if ($id) {
+                $product = SecondHandProduct::get_by_id($id);
+                if (! $product || ! $product->canEdit() || ! $product->canDelete()) {
+                    return new HTTPResponse('You do not have permission to archive this product', 403);
+                }
                 $archivedProduct = SecondHandProductActions::archive($id);
                 //after deleting the product redirect to the archived page
                 if ($archivedProduct) {
@@ -139,11 +148,24 @@ class SecondHandProductAdmin extends ModelAdmin
 
     public function restore($request)
     {
+        if (! SecurityToken::inst()->checkRequest($request)) {
+            return new HTTPResponse('Invalid or missing security token', 403);
+        }
         if (isset($_GET['productid'])) {
             $id = (int) $_GET['productid'];
             if ($id) {
+                $latestVersion = Versioned::get_latest_version(SiteTree::class, $id);
+                if (! $latestVersion) {
+                    return new HTTPResponse("SiteTree #{$id} not found", 404);
+                }
+                if (! is_a($latestVersion->ClassName, SecondHandProduct::class, true)) {
+                    return new HTTPResponse("SiteTree #{$id} is not a second hand product", 400);
+                }
+                if (! $latestVersion->canEdit() || ! $latestVersion->canDelete()) {
+                    return new HTTPResponse('You do not have permission to restore this product', 403);
+                }
                 $restoredPage = SecondHandProductActions::restore($id);
-                if ($restoredPage) {
+                if ($restoredPage instanceof SiteTree) {
                     $this->getResponse()->addHeader(
                         'X-Status',
                         rawurlencode(_t(

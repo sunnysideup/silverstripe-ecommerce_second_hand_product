@@ -3,7 +3,7 @@
 namespace Sunnysideup\EcommerceSecondHandProduct\Control;
 
 use SilverStripe\Control\Controller;
-use SilverStripe\Core\Convert;
+use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\EcommerceSecondHandProduct\Api\SecondHandProductActions;
@@ -33,10 +33,11 @@ class UpdateSecondHandProduct extends Controller
 
     public function removefromsale($request)
     {
+        $this->requireWriteAuthentication($request);
         $unpublished = false;
         $otherID = $request->param('OtherID');
         if (! empty($otherID)) {
-            $internalItemID = Convert::raw2sql($otherID);
+            $internalItemID = (string) $otherID;
             if ($internalItemID) {
                 // do not use caching here - ...
                 // $secondHandProduct = DataObject::get_one(SecondHandProduct::class, ['InternalItemID' => $internalItemID]);
@@ -48,7 +49,7 @@ class UpdateSecondHandProduct extends Controller
                     $secondHandProduct->writeToStage(Versioned::DRAFT);
 
                     //no need to publish recursive here to reduce time!
-                    $secondHandProduct->publishSingle();
+                    $unpublished = (bool) $secondHandProduct->publishSingle();
                 }
             }
         }
@@ -58,10 +59,11 @@ class UpdateSecondHandProduct extends Controller
 
     public function archive($request)
     {
+        $this->requireWriteAuthentication($request);
         $archived = false;
         $otherID = $request->param('OtherID');
         if (! empty($otherID)) {
-            $internalItemID = Convert::raw2sql($otherID);
+            $internalItemID = (string) $otherID;
             $secondHandProduct = SecondHandProduct::get()->filter(['InternalItemID' => $internalItemID])->first();
             if ($secondHandProduct) {
                 $archived = SecondHandProductActions::archive($secondHandProduct->ID);
@@ -69,5 +71,16 @@ class UpdateSecondHandProduct extends Controller
         }
 
         return json_encode($archived);
+    }
+
+    /**
+     * Requests authenticated by secret code (Bearer header) are fine.
+     * Requests authenticated by a logged-in session need a valid security token (CSRF).
+     */
+    protected function requireWriteAuthentication($request): void
+    {
+        if (! $this->hasValidWriteAuthentication($request)) {
+            throw new HTTPResponse_Exception('Invalid or missing security token', 403);
+        }
     }
 }

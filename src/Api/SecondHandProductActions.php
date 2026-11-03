@@ -28,6 +28,11 @@ class SecondHandProductActions
         if (Director::isLive()) {
             if ($buyable && $buyable->exists() && $buyable->InternalItemID) {
                 $dbName = $databaseName ? $databaseName : DB::get_conn()->getSelectedDatabase();
+                // the database name is used as an identifier - only allow safe characters.
+                if (! is_string($dbName) || ! preg_match('/^[A-Za-z0-9_$]+$/', $dbName)) {
+                    return;
+                }
+                $archivedByID = (int) $archivedByID;
 
                 foreach (['', '_Live'] as $ext) {
                     $archivedByLine = '';
@@ -44,7 +49,7 @@ class SecondHandProductActions
                         $dateItemSoldLine = '' . $dbName . '."SecondHandProduct' . $ext . '"."DateItemWasSold" = \'' . date('Y-m-d') . '\',';
                         $zeroOrOne = 0;
                     } else {
-                        $price = $buyable->Price ?: 0;
+                        $price = (float) ($buyable->Price ?: 0);
                         $priceLine = '' . $dbName . '.Product' . $ext . '.Price = ' . $price . ',';
                         $archivedByLine = '' . $dbName . '.SecondHandProduct' . $ext . '.ArchivedByID = 0,';
                         $dateItemSoldLine = '' . $dbName . '."SecondHandProduct' . $ext . '"."DateItemWasSold" = \'\',';
@@ -67,11 +72,11 @@ class SecondHandProductActions
                             ' . $dbName . '."SiteTree' . $ext . '"."ShowInSearch" = ' . $zeroOrOne . '
 
                         WHERE
-                            ' . $dbName . '."Product' . $ext . '"."InternalItemID" = \'' . $buyable->InternalItemID . '\'
+                            ' . $dbName . '."Product' . $ext . '"."InternalItemID" = ?
                         ;
                     ';
                     // limit can not be used here...
-                    DB::query($sql);
+                    DB::prepared_query($sql, [(string) $buyable->InternalItemID]);
                 }
             }
         }
@@ -98,15 +103,21 @@ class SecondHandProductActions
     public static function restore(int $id)
     {
         $restoredPage = Versioned::get_latest_version(SiteTree::class, $id);
+        if (! $restoredPage) {
+            return new HTTPResponse("SiteTree #{$id} not found", 400);
+        }
+        // only second hand products can be restored here
+        if (! is_a($restoredPage->ClassName, SecondHandProduct::class, true)) {
+            return new HTTPResponse("SiteTree #{$id} is not a second hand product", 400);
+        }
         $parentID = $restoredPage->ParentID;
         if ($parentID) {
             self::ensureParentHasVersion($parentID);
-            if (! $restoredPage) {
-                return new HTTPResponse("SiteTree #{$id} not found", 400);
-            }
 
             return $restoredPage->doRestoreToStage();
         }
+
+        return null;
     }
 
     /**

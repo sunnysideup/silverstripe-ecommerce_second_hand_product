@@ -31,6 +31,7 @@ use SilverStripe\Security\Group;
 use SilverStripe\Security\Member;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\Security;
+use SilverStripe\Security\SecurityToken;
 use SilverStripe\Versioned\Versioned;
 use Sunnysideup\AjaxSelectField\AjaxSelectField;
 use Sunnysideup\Ecommerce\Api\ClassHelpers;
@@ -727,14 +728,14 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
     {
         $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandProduct::class);
 
-        return '/admin/secondhandproducts/' . $classURLSegment . '/archive/?productid=' . $this->ID;
+        return SecurityToken::inst()->addToUrl('/admin/secondhandproducts/' . $classURLSegment . '/archive/?productid=' . $this->ID);
     }
 
     public static function restore_link(int $id): string
     {
         $classURLSegment = ClassHelpers::sanitise_class_name(SecondHandProduct::class);
 
-        return '/admin/secondhandproducts/' . $classURLSegment . '/restore/?productid=' . $id;
+        return SecurityToken::inst()->addToUrl('/admin/secondhandproducts/' . $classURLSegment . '/restore/?productid=' . $id);
     }
 
     public function ModelAdminLink(): string
