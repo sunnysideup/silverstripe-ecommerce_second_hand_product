@@ -874,9 +874,6 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
         return PermissionProviderFactory::inst()
             ->setParentGroup(EcommerceRole::get_category())
 
-            ->setEmail(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_email'))
-            ->setFirstName(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_firstname'))
-            ->setSurname(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_user_surname'))
             ->setGroupName(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_name'))
             ->setCode(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_group_code'))
             ->setPermissionCode(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_code'))
@@ -894,7 +891,7 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
             ->setSort(250)
             ->setDescription(EcommerceConfig::get(SecondHandProduct::class, 'second_hand_admin_permission_help'))
 
-            ->CreateGroupAndMember();
+            ->CreateGroup();
     }
 
     public function exportFields()
