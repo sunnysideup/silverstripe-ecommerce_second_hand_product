@@ -12,6 +12,7 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Forms\CheckboxField;
 use SilverStripe\Forms\CheckboxSetField;
 use SilverStripe\Forms\CompositeValidator;
+use SilverStripe\Forms\CurrencyField;
 use SilverStripe\Forms\DateField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\GridField\GridFieldConfig_RecordViewer;
@@ -502,18 +503,14 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                     )
                 )
                     ->setDescription('If this box is ticked then this product will appear in the "Featured Products" box on the home page'),
-                TextField::create('Title', 'Product Title'),
                 ReadonlyField::create('CanBeSold', 'For Sale', DBField::create_field(DBBoolean::class, $this->canPurchase())->Nice()),
                 ReadonlyField::create('CreatedNice', 'First Entered', $this->getCreatedNice()),
                 TextField::create('InternalItemIDCalculated', 'Product Code')->setReadonly(true),
-                NumericField::create('PurchasePrice', 'Purchase Price')
-                    ->setScale(2)
+                CurrencyField::create('PurchasePrice', 'Purchase Price')
                     ->setDescription('Price paid for the product'),
-                NumericField::create('Price', 'Sale Price')
-                    ->setScale(2)
+                CurrencyField::create('Price', 'Selling for Price')
                     ->setDescription('Selling price'),
-                NumericField::create('SoldPrice', 'Sold Price')
-                    ->setScale(2)
+                CurrencyField::create('SoldPrice', 'Sold Price')
                     ->setDescription('The price that the product actually sold for'),
                 TextField::create('SerialNumber', 'Serial Number')
                     ->setDescription('Enter the serial number of the product here'),
@@ -562,6 +559,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 TextareaField::create('MetaDescription', 'Meta Description'),
             ]
         );
+
+        // product title goes first on the main tab
+        $fields->findOrMakeTab('Root.Main')->unshift(TextField::create('Title', 'Product Title'));
 
 
         //replace InternalItemID field with a read only field
@@ -683,6 +683,9 @@ class SecondHandProduct extends Product implements PermissionProviderFactoryProv
                 _t('SecondHandProduct.ARCHIVE_BUTTON', 'Archive Product')
             )
         );
+
+        // allows the app to adjust the fields once they have all been added.
+        $this->extend('updateSecondHandCMSFieldsAfterBuild', $fields);
 
         if ($this->HasBeenSold()) {
             $fields = $fields->makeReadonly();
