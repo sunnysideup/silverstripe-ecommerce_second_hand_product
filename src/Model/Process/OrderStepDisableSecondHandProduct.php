@@ -16,10 +16,11 @@ class OrderStepDisableSecondHandProduct extends OrderStep implements OrderStepIn
 {
     /**
      * The OrderStatusLog that is relevant to the particular step.
+     * This step does not create any log entries, so there is none.
      *
      * @var string
      */
-    protected $relevantLogEntryClassName = OrderStepDisableSecondHandProduct::class;
+    protected $relevantLogEntryClassName = '';
 
     private static $defaults = [
         'CustomerCanEdit' => 0,

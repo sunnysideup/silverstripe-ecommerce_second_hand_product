@@ -17,10 +17,11 @@ class OrderStepRemoveSecondHandProduct extends OrderStep implements OrderStepInt
 {
     /**
      * The OrderStatusLog that is relevant to the particular step.
+     * This step does not create any log entries, so there is none.
      *
      * @var string
      */
-    protected $relevantLogEntryClassName = OrderStepRemoveSecondHandProduct::class;
+    protected $relevantLogEntryClassName = '';
 
     private static $defaults = [
         'CustomerCanEdit' => 0,
